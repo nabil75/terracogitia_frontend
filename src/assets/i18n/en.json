@@ -1,0 +1,266 @@
+﻿{
+    "menu-general":{
+        "concevoir": "Design",
+        "collect":"Collect",
+        "clean":"Clean",
+        "explore":"Explore",
+        "visualize":"Visualize",
+        "usefull-links":"Usefull Links",
+        "language":"Languages",
+        "theme":"Themes",
+        "en":"English",
+        "fr":"French",
+        "dark": "Dark",
+        "light": "Light",
+        "modifier_questionnaire": "Edit questionnaire",
+        "afficher_questionnaire": "View questionnaire",
+        "nouveau_questionnaire": "New questionnaire",
+        "telecharger_fichier": "Download a file"
+    },
+    "home":{
+        "base_line":"From Questions to Knowledge.",
+        "learn_more":"Learn More",
+        "accueil": "Home",
+        "creation_titre": "Powerful and Customizable Questionnaire Builder",
+        "creation_description":"QuaeroQuesto makes it easy to create powerful, customized questionnaires. With an intuitive interface, flexible templates, and a wide range of question types, you can design complex surveys in just a few clicks while keeping full control over the flow and logic between questions. Multilingual and user-friendly, the tool adapts to your needs—from simple polls to advanced forms.",
+        "diffusion_titre": "Optimized and Intelligent Questionnaire Distribution",
+        "diffusion_description":"With QuaeroQuesto, distributing your questionnaires is simple, smart, and fully optimized. Import your contacts (via CSV, API, or CRM integration), manage your mailing lists effortlessly, and send your surveys instantly or at the perfect time. Powered by AI, the platform optimizes send times, automatically segments your audience, and personalizes each message to boost response rates and engagement. Monitor participation in real time and manage your campaigns with complete confidence.",
+        "exploitation_titre": "Smart and In-Depth Data Analysis",
+        "exploitation_description": "With QuaeroQuesto, turn your results into actionable insights. Visualize your data in real time through interactive tables, charts, and heat maps, and refine your analysis with dynamic filters and variable cross-analysis. Easily export your results to Excel, CSV, Power BI, or any external analytics tool. Powered by AI, QuaeroQuesto goes further — it automatically analyzes responses, detects trends and correlations, categorizes open answers by theme or sentiment, and suggests strategic actions to help you make the most of your data.",
+        "generation_rapport_titre":"Smart and Personalized Report Generation",
+        "generation_rapport_description":"With QuaeroQuesto, create professional, impactful reports perfectly aligned with your visual identity. Choose from customizable templates featuring tables, charts, and infographics, then export your reports in PDF, DOCX, or HTML, or share them via an interactive dashboard.Powered by AI, QuaeroQuesto automatically drafts executive summaries, generates multilingual syntheses, and selects the most relevant visualizations for each dataset. Deliver ready-to-share, insight-rich reports enhanced with strategic recommendations.",
+        "partage_rapport_titre":"Smart and Secure Report Sharing",
+        "partage_rapport_description":"With QuaeroQuesto, share your insights easily and securely. Publish your reports on a dedicated space, manage access rights with precision, and automatically notify stakeholders of updates. Create dynamic dashboards to provide clear, interactive data views. Powered by AI, QuaeroQuesto tailors key insights to each audience — executives, marketing, HR, and more — and automatically generates concise summaries in multiple formats: text, slides, or visual story. Smarter, safer, and more impactful sharing."
+    },
+    "my_questionnaire":{
+        "title_page":"My Questionnaires",
+        "choose_questionnaire": "Choose a questionnaire",
+        "id":"ID",
+        "title":"Title",
+        "creation_date":"Creation Date",
+        "actions":"Actions",
+        "nombre_questions": "Nb. Questions",
+        "modifier_questionnaire": "Edit Questionnaire",
+        "repondre_questionnaire": "Answer Questionnaire",
+        "supprimer_questionnaire": "Delete Questionnaire",
+        "analyser_resultats": "Analyze Results",
+        "creer_rapport": "Create Report",
+        "nombre_reponses": "Nb. Answers",
+        "chargement":"Loading questionnaires..."
+    },
+    "new_questionnaire": {
+        "intitule_questionnaire": "Questionnaire Title",
+        "title_page_new": "New Questionnaire",
+        "title_page_edit": "Edit Questionnaire",
+        "type_question": "Choose Question Type",
+        "tout_effacer": "Clear All",
+        "reduire_tout": "Collapse All",
+        "agrandir_tout": "Expand All",
+        "questionnaire_automatique": "Automatic Questionnaire"
+    },
+    "commons":{
+        "reponse":"Answer",
+        "aucune": "None",
+        "aucun": "None",
+        "aucune_reponse": "None of these answers", 
+        "option":"Option",
+        "option_deja_presente": "Option already present",
+        "options_generiques": "Generic Options",
+        "reponse_obligatoire": "Mandatory",
+        "reponse_facultative": "Optional",
+        "reponse_par_defaut": "Default Response",
+        "ordre_des_reponses": "Displaying the response options",
+        "ordre_fixe": "Fixed Order",
+        "ordre_aleatoire": "Random Order",
+        "option_autre": "Other",
+        "option_nsp": "Don't know",
+        "reponse_oui": "Yes",
+        "reponse_non": "No",
+        "effectifs": "Frequencies",
+        "pourcentages": "Percentages",
+        "enregistrer": "Save",
+        "enregistrer_commentaire": "Save Comment",
+        "confirmation": "Confirmation before deletion",
+        "confirmation_suppression_questionnaire": "Are you sure you want to delete the selected questionnaire?",
+        "annuler": "Cancel",
+        "supprimer": "Delete",
+        "fermer": "Close",
+        "generation_en_cours": "Generation in progress...",
+        "traitement_en_cours": "Processing in progress...",
+        "rechercher": "Search",
+        "keyword": "Enter a keyword to filter",
+        "keywords": "Enter one or more keywords to filter",
+        "libelle_question": "Question Label",
+        "parametres": "Parameters",
+        "enregistrement_audio":" Recording..."
+
+    },
+    "question_fermee":{
+        "modalites":"Answer Choices",
+        "choix_unique":"Closed-Ended Question Single-Choice",
+        "choix_multiple":"Closed-Ended Question Multiple-Choice",
+        "ajouter_modalite":"Add Answer Choice",
+        "nb_reponses_maximum":"Maximum Number of Answers",
+        "nb_reponses_minimum": "Minimum Number of Answers",
+        "reponses_ordonnees":"Ordered Responses"
+    },
+
+    "question_notation":{
+        "notation":"Star Rating Question",
+        "nb_graduations":"Number Steps"
+    }, 
+    "question_echelle":{
+        "echelle": "Scale Question",
+        "seuil": "Threshold", 
+        "semantique_differentiel_gauche": "Differential Semantics Left (negative trend)",
+        "semantique_differentiel_droit": "Differential Semantics Right (positive trend)",
+        "semantique_differentiel_seuil": "Value between 0 and 100, below which a comment is required",
+        "ajouter_semantique_differentiel":"Add Differential Semantics",
+        "supprimer_semantique_differentiel": "Delete Differential Semantics"
+    },
+
+    "question_grille":{
+        "grille":"Grid Question",
+        "lignes":"Rows",
+        "colonnes":"Columns",
+        "ajouter_ligne":"Add Row",
+        "ajouter_colonne":"Add Column"
+    },
+
+    "question_satisfaction":{
+        "satisfaction":"Satisfaction Question",
+        "echelle_5_positions":"Scale 5 Positions",
+        "echelle_7_positions":"Scale 7 Positions",
+        "type_echelle":"Scale Type"
+    },
+
+    "question_ouverte":{
+        "ouverte":"Open Question",
+        "type_saisie":"Input Type",
+        "saisie_vocale":"Voice Input",
+        "saisie_manuelle":"Manual Input"
+    },
+
+    "parametres":{
+        "afficher":"Show Question",
+        "branchement":"Conditional Branching",
+        "generer":"Generate Question",
+        "reduire_agrandir":"Reduce/Collapse",
+        "supprimer":"Delete"
+    },
+
+    "SATISFACTION": {
+        "VERY_DISSATISFIED": "Very Dissatisfied",
+        "SOMEWHAT_DISSATISFIED": "Somewhat Dissatisfied",
+        "MODERATELY_SATISFIED": "Moderately Satisfied",
+        "SOMEWHAT_SATISFIED": "Somewhat Satisfied",
+        "VERY_SATISFIED": "Very Satisfied",
+        "EXTREMELY_DISSATISFIED": "Extremely Dissatisfied",
+        "EXTREMELY_SATISFIED": "Extremely Satisfied"
+    },
+    
+    "result_simple":{
+        "analyse_univariee": "Univariate analysis",
+        "choix_questionnaire": "Choose a questionnaire (enter a keyword to filter)",
+        "choix_question": "Choose a question",
+        "visualisations_standard": "Standard Visualizations",
+        "visualisations_avancees": "Advanced Visualizations",
+        "message":"No table or graph to display",
+        "choix_type_graphique":"Choose graphic representation",
+        "questionnaire":"Questionnaire title",
+        "explore_data":"Explore collected data (Univariate analysis)",
+        "commentaire_placeholder":"Enter your comment here",
+        "generer_commentaire":"Generate comment",
+        "instruction_commentaire":"Please select a model",
+        "no_data": "No data toi display for this question"
+    },
+
+    "result_avance":{
+        "analyse_bivariee": "Bivariate analysis",
+        "choix_questionnaire": "Choose a questionnaire (enter a keyword to filter)",
+        "choix_question1": "Choose question one",
+        "choix_question2": "Choose question two",
+        "visualisations_standard": "Standard Visualizations",
+        "visualisations_avancees": "Advanced Visualizations",
+        "message":"No table or graph to display",
+        "choix_type_graphique":"Choose graphic representation",
+        "questionnaire":"Questionnaire title",
+        "explore_data":"Explore collected data (Bivariate analysis)",
+        "commentaire_placeholder":"Enter your comment here",
+        "generer_commentaire":"Generate comment",
+        "instruction_commentaire":"Please select a model",
+        "no_data": "No data toi display for these questions",
+        "total_ligne": "Total row",
+        "total_colonne": "Total column",
+        "afficher_effectifs": "Show the frequencies",
+        "afficher_pourcentages_ligne": "Show row pourcentages",
+        "infobulle_premiere_question":"This question is supposed to correspond to the explanatory variable",
+        "infobulle_deuxieme_question":"This question is supposed to correspond to the variable to be explained",
+        "msg_selectionner_question_2":"Please select the second question",
+        "msg_selectionner_question_1":"Please select the first question",
+        "bar_chart": "Bar chart",
+        "bubble_chart": "Bubble chart",
+        "stacked_bar_chart": "Stacked bar chart"
+    },
+    "result_multivarie":{
+        "analyse_multivariee": "Multivariate analysis",
+        "choix_questionnaire": "Choose a questionnaire (enter a keyword to filter)",
+        "choix_question1": "Choose question one",
+        "choix_question2": "Choose question two",
+        "visualisations_standard": "Standard Visualizations",
+        "visualisations_avancees": "Advanced Visualizations",
+        "choix_type_graphique":"Choose graphic representation",
+        "questionnaire":"Questionnaire title",
+        "explore_data":"Explore collected data (Multivariate analysis)",
+        "commentaire_placeholder":"Enter your comment here",
+        "generer_commentaire":"Generate comment",
+        "instruction_commentaire":"Please select a model",
+        "no_data": "No data toi display for these questions",
+        "total_ligne": "Total row",
+        "total_colonne": "Total column",
+        "afficher_effectifs": "Show the frequencies",
+        "afficher_pourcentages_ligne": "Show row pourcentages",
+        "infobulle_premiere_question":"This question is supposed to correspond to the explanatory variable",
+        "infobulle_deuxieme_question":"This question is supposed to correspond to the variable to be explained",
+        "msg_selectionner_question_2":"Please select the second question",
+        "msg_selectionner_question_1":"Please select the first question",
+        "bar_chart": "Bar chart",
+        "bubble_chart": "Bubble chart",
+        "stacked_bar_chart": "Stacked bar chart",
+        "message_liste_vide": "You must select at least 2 questions"
+    },
+    
+
+
+    "PAGINATOR":{
+        "ITEMS_PER_PAGE": "Questionnaires per page",
+        "NEXT_PAGE": "Next page",
+        "PREVIOUS_PAGE": "Previous page",
+        "FIRST_PAGE": "First page",
+        "LAST_PAGE": "Last page",
+        "OF": "of"
+    },
+    "generator":{
+        "consigne_questionnary_1":"Here is a list of themes and sub-themes likely to respond to your problem, please select those you wish to keep.",
+        "accordion_close":"Close",
+        "accordion_open":"Open",
+        "placeholder_objet_question":"Enter your answer here"
+    },
+    "edit_questionnaire": {
+        "title_page": "Complete a questionnaire"
+    },
+    "type_question":{
+        "change": "Change Question Type",
+        "unique": "Single-Choice",
+        "multiple": "Multiple-Choice",
+        "notation": "Notation-Stars",
+        "echelle": "Scale Question",
+        "grille": "Grid Question",
+        "satisfaction": "Satisfaction",
+        "ouverte": "Open Question"
+    },
+        "rapport":{
+            "ajouter_slide": "Add Slide"
+    }
+
+}

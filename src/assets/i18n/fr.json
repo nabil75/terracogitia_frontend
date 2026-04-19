@@ -1,0 +1,259 @@
+﻿{
+    "menu-general": {
+        "concevoir": "Concevoir",
+        "collect": "Collecter",
+        "clean": "Préparer",
+        "explore": "Explorer",
+        "visualize": "Visualiser",
+        "usefull-links": "Liens Utiles",
+        "language": "Langues",
+        "theme": "Thèmes",
+        "en": "Anglais",
+        "fr": "Français",
+        "dark": "Sombre",
+        "light": "Clair",
+        "modifier_questionnaire": "Modifier un questionnaire",
+        "afficher_questionnaire": "Afficher un questionnaire",
+        "nouveau_questionnaire": "Nouveau questionnaire",
+        "telecharger_fichier": "Télécharger un fichier"
+    },
+    "home": {
+        "base_line": "De la question à la connaissance.",
+        "learn_more": "En savoir plus",
+        "accueil": "Accueil",
+        "creation_titre": "Création de questionnaires puissants et personnalisés",
+        "creation_description": "QuaeroQuesto vous permet de créer des questionnaires puissants et personnalisés en toute simplicité. Grâce à une interface intuitive, des modèles adaptables et une large gamme de types de questions, concevez rapidement des enquêtes complexes tout en gardant une gestion fluide des liens et des logiques entre vos questions. Multilingue et facile à prendre en main, l’outil s’adapte à vos besoins, du simple sondage au questionnaire avancé.",
+        "diffusion_titre": "Diffusion optimisée et intelligente des questionnaires",
+        "diffusion_description": "Avec QuaeroQuesto, la diffusion de vos questionnaires devient simple, intelligente et parfaitement maîtrisée. Importez vos contacts (CSV, API ou CRM), gérez vos listes de diffusion à votre rythme, puis envoyez vos questionnaires immédiatement ou au moment le plus opportun. Grâce à l’IA, la plateforme optimise les moments d’envoi, segmente automatiquement vos audiences et personnalise chaque message pour maximiser les taux de réponse et l’engagement. Suivez en temps réel la participation et pilotez vos campagnes en toute sérénité.",
+        "exploitation_titre": "Analyse intelligente et approfondie des données recueillies",
+        "exploitation_description": "Avec QuaeroQuesto, transformez vos résultats en véritables insights. Visualisez vos données en temps réel grâce à des tableaux, graphiques et cartes de chaleur interactifs, et affinez vos analyses à l’aide de filtres dynamiques et de croisements de variables. Exportez facilement vos résultats vers Excel, CSV, Power BI ou tout autre outil analytique externe. Grâce à l’intelligence artificielle, QuaeroQuesto va plus loin : il analyse automatiquement les réponses, détecte les tendances et corrélations, classe les verbatims par thématiques ou tonalité, et vous suggère des pistes d’action stratégiques pour tirer le meilleur parti de vos données.",
+        "generation_rapport_titre":"Génération intelligente et personnalisée de rapports",
+        "generation_rapport_description":"Avec QuaeroQuesto, créez des rapports professionnels clairs, percutants et parfaitement alignés sur votre charte graphique. Choisissez parmi des modèles personnalisables intégrant tableaux, graphiques et infographies, puis exportez vos rapports en PDF, DOCX, HTML ou partagez-les via un tableau de bord interactif. Grâce à l’intelligence artificielle, QuaeroQuesto rédige automatiquement vos rapports d’étude, en propose des synthèses multilingues et sélectionne les visualisations les plus pertinentes pour chaque jeu de données. Obtenez des présentations prêtes à partager, enrichies d’analyses et de recommandations stratégiques.",
+        "partage_rapport_titre":"Partage intelligent et sécurisé des rapports d'étude",
+        "partage_rapport_description":"Avec QuaeroQuesto, diffusez vos analyses en toute simplicité et sécurité. Publiez vos rapports sur un espace dédié, gérez finement les droits d’accès et informez automatiquement les parties prenantes des mises à jour. Créez des tableaux de bord dynamiques pour offrir une lecture claire et interactive de vos résultats. Grâce à l’intelligence artificielle, QuaeroQuesto adapte la diffusion de vos insights à chaque profil de lecteur — direction, marketing, RH, etc. — et génère automatiquement des résumés pertinents sous différents formats : texte, slides ou visual story. Un partage plus ciblé, plus intelligent, et toujours impactant."
+    },
+    "my_questionnaire": {
+        "title_page": "Mes Questionnaires",
+        "choose_questionnaire": "Choisissez un questionnaire",
+        "id": "ID",
+        "title": "Intitulé",
+        "creation_date": "Date Création",
+        "actions": "Actions",
+        "nombre_questions": "Nb. questions",
+        "modifier_questionnaire": "Modifier le questionnaire",
+        "repondre_questionnaire": "Répondre au questionnaire",
+        "supprimer_questionnaire": "Supprimer le questionnaire",
+        "analyser_resultats": "Analyser les résultats",
+        "creer_rapport": "Créer un rapport",
+        "nombre_reponses": "Nb. réponses",
+        "chargement":"Chargement des questionnaires..."
+    },
+    "new_questionnaire": {
+        "intitule_questionnaire": "Intitulé du questionnaire",
+        "title_page_new": "Nouveau Questionnaire",
+        "title_page_edit": "Modifier Questionnaire",
+        "type_question": "Choisissez le type de question",
+        "tout_effacer": "Tout effacer",
+        "reduire_tout": "Réduire tout",
+        "agrandir_tout": "Agrandir tout",
+        "questionnaire_automatique": "Questionnaire automatique"
+    },
+    "commons": {
+        "reponse": "Réponse",
+        "aucune": "Aucune",
+        "aucun": "Aucun",
+        "aucune_reponse": "Aucune de ces réponses", 
+        "option": "Option",
+        "option_deja_presente": "Option déjà présente",
+        "options_generiques": "Options Génériques",
+        "reponse_obligatoire": "Obligatoire",
+        "reponse_facultative": "Facultative",
+        "reponse_par_defaut": "Réponse par défaut",
+        "ordre_des_reponses": "Affichage des options de réponse",
+        "ordre_fixe": "Ordre Fixe",
+        "ordre_aleatoire": "Ordre Aléatoire",
+        "option_autre": "Autre",
+        "option_nsp": "Je ne sais pas",
+        "reponse_oui": "Oui",
+        "reponse_non": "Non",
+        "effectifs": "Effectifs",
+        "pourcentages": "Pourcentages",
+        "enregistrer": "Enregistrer",
+        "enregistrer_commentaire": "Enregistrer Commentaire",
+        "confirmation": "Confirmation avant suppression",
+        "confirmation_suppression_questionnaire": "Êtes-vous sûr de vouloir supprimer le questionnaire sélectionné ?",
+        "annuler": "Annuler",
+        "supprimer": "Supprimer",
+        "fermer": "Fermer",
+        "generation_en_cours": "Génération en cours...",
+        "traitement_en_cours": "Traitement en cours...",
+        "rechercher": "Rechercher",
+        "keyword": "Entrez un mot clé pour filtrer.",
+        "keywords": "Entrez un ou plusieurs mots clés pour filtrer.",
+        "libelle_question": "Libellé de la question",
+        "parametres": "Paramètres",
+        "enregistrement_audio":" Enregistrement..."
+    },
+    "question_fermee": {
+        "modalites": "Modalités",
+        "choix_unique": "Question Fermée à Choix Unique",
+        "choix_multiple": "Question Fermée à Choix Multiple",
+        "ajouter_modalite": "Ajouter Modalité",
+        "nb_reponses_maximum": "Nombre Réponses Maximum",
+        "nb_reponses_minimum": "Nombre Réponses Minimum",
+        "reponses_ordonnees": "Réponses Ordonnées"
+    },
+    "question_notation": {
+        "notation": "Question Notation-Etoiles",
+        "nb_graduations": "Nombre Graduations"
+    },
+    "question_echelle": {
+        "echelle": "Question Echelle",
+        "seuil": "Seuil",        
+        "semantique_differentiel_gauche": "Sémantique Différentiel Gauche (tendance négative)",
+        "semantique_differentiel_droit": "Sémantique Différentiel Droit (tendance positive)",
+        "semantique_differentiel_seuil": "Valeur entre 0 et 100, en dessous de laquelle un commentaire est requis",
+        "ajouter_semantique_differentiel": "Ajouter Sémantique Différentiel",
+        "supprimer_semantique_differentiel": "Supprimer Sémantique"
+    },
+    "question_grille": {
+        "grille": "Question Grille",
+        "lignes": "Lignes",
+        "colonnes": "Colonnes",
+        "ajouter_ligne": "Ajouter Ligne",
+        "ajouter_colonne": "Ajouter Colonne"
+    },
+    "question_satisfaction": {
+        "satisfaction": "Question Satisfaction",
+        "echelle_5_positions": "Echelle 5 Positions",
+        "echelle_7_positions": "Echelle 7 Positions",
+        "type_echelle": "Type d'Echelle"
+    },
+
+    "question_ouverte":{
+        "ouverte":"Question Ouverte",
+        "type_saisie":"Type Saisie",
+        "saisie_vocale":"Saisie Vocale",
+        "saisie_manuelle":"Saisie Manuelle"
+    },
+    "parametres": {
+        "afficher": "Afficher Question",
+        "branchement": "Branchement Conditionnel",
+        "generer": "Générer Question",
+        "reduire_agrandir": "Réduire/Agrandir",
+        "supprimer": "Supprimer"
+    },
+    "SATISFACTION": {
+        "VERY_DISSATISFIED": "Très Insatisfait",
+        "SOMEWHAT_DISSATISFIED": "Plutôt Insatisfait",
+        "MODERATELY_SATISFIED": "Moyennement Satisfait",
+        "SOMEWHAT_SATISFIED": "Plutôt Satisfait",
+        "VERY_SATISFIED": "Très Satisfait",
+        "EXTREMELY_DISSATISFIED": "Extrêmement Insatisfait",
+        "EXTREMELY_SATISFIED": "Extrêmement Satisfait"
+    },
+
+    "result_simple":{
+        "analyse_univariee": "Analyse Univariée",
+        "choix_questionnaire": "Choisissez un questionnaire (saisissez un mot clé pour filtrer)",
+        "choix_question": "Choisissez une question",
+        "visualisations_standard": "Visualisations Standard",
+        "visualisations_avancees": "Visualisations Avancées",
+        "message":"Aucun tableau ou graphique à afficher",
+        "choix_type_graphique":"Choisissez un type de représentation graphique",
+        "questionnaire":"Intitulé du questionnaire",
+        "commentaire_placeholder":"Saisissez ici votre commentaire",
+        "generer_commentaire":"Générer Commentaire",
+        "instruction_commentaire":"Veuillez sélectionner un modèle",
+        "no_data": "Aucune donnée à afficher pour cette question"
+    },
+    "result_avance":{
+        "analyse_bivariee": "Analyse Bivariée",
+        "choix_questionnaire": "Choisissez un questionnaire (saisissez un mot clé pour filtrer)",
+        "choix_question1": "Choisissez votre première question",
+        "choix_question2": "Choisissez votre deuxième question",
+        "visualisations_standard": "Visualisations Standard",
+        "visualisations_avancees": "Visualisations Avancées",
+        "message":"Aucun tableau ou graphique à afficher",
+        "choix_type_graphique":"Choisissez un type de représentation graphique",
+        "questionnaire":"Intitulé du questionnaire",
+        "commentaire_placeholder":"Saisissez ici votre commentaire",
+        "generer_commentaire":"Générer Commentaire",
+        "instruction_commentaire":"Veuillez sélectionner un modèle",
+        "no_data": "Aucune donnée à afficher pour ces questions",
+        "total_ligne": "Total ligne",
+        "total_colonne": "Total colonne",
+        "afficher_effectifs": "Afficher les effectifs",
+        "afficher_pourcentages_ligne": "Afficher les pourcentages ligne",
+        "infobulle_premiere_question":"Cette question est censée correspondre à la variable explicative",
+        "infobulle_deuxieme_question":"Cette question est censée correspondre à la variable à expliquer",
+        "msg_selectionner_question_2":"Veuillez sélectionner la deuxième question",
+        "msg_selectionner_question_1":"Veuillez sélectionner la première question",
+        "bar_chart": "Graphique en barres",
+        "bubble_chart": "Graphique à bulles",
+        "stacked_bar_chart": "Graphique Barres empilées"
+    },
+
+    "result_multivarie":{
+        "analyse_multivariee": "Analyse Multivariée",
+        "choix_questionnaire": "Choisissez un questionnaire (saisissez un mot clé pour filtrer)",
+        "choix_question1": "Choisissez votre première question",
+        "choix_question2": "Choisissez votre deuxième question",
+        "visualisations_standard": "Visualisations Standard",
+        "visualisations_avancees": "Visualisations Avancées",
+        "choix_type_graphique":"Choisissez un type de représentation graphique",
+        "questionnaire":"Intitulé du questionnaire",
+        "commentaire_placeholder":"Saisissez ici votre commentaire",
+        "generer_commentaire":"Générer Commentaire",
+        "instruction_commentaire":"Veuillez sélectionner un modèle",
+        "no_data": "Aucune donnée à afficher pour ces questions",
+        "total_ligne": "Total ligne",
+        "total_colonne": "Total colonne",
+        "afficher_effectifs": "Afficher les effectifs",
+        "afficher_pourcentages_ligne": "Afficher les pourcentages ligne",
+        "infobulle_premiere_question":"Cette question est censée correspondre à la variable explicative",
+        "infobulle_deuxieme_question":"Cette question est censée correspondre à la variable à expliquer",
+        "msg_selectionner_question_2":"Veuillez sélectionner la deuxième question",
+        "msg_selectionner_question_1":"Veuillez sélectionner la première question",
+        "bar_chart": "Graphique en barres",
+        "bubble_chart": "Graphique à bulles",
+        "stacked_bar_chart": "Graphique Barres empilées",
+        "message_liste_vide": "Vous devez sélectionner au moins 2 questions"        
+    },
+
+    "PAGINATOR":{
+        "ITEMS_PER_PAGE": "Questionnaires par page",
+        "NEXT_PAGE": "Page suivante",
+        "PREVIOUS_PAGE": "Page précédente",
+        "FIRST_PAGE": "Première page",
+        "LAST_PAGE": "Dernière page",
+        "OF": "sur"
+          
+    },
+    "generator":{
+        "consigne_questionnary_1":"Voici une liste des thèmes et sous-thèmes susceptibles de répondre à votre problématique, veuillez sélectionner ceux que vous souhaitez conserver",
+        "accordion_close":"Fermer",
+        "accordion_open":"Ouvrir",
+        "placeholder_objet_question":"Saisissez ici votre réponse"
+    },
+
+    "edit_questionnaire": {
+        "title_page": "Saisir un questionnaire"
+    },
+    "type_question":{
+        "change": "Changer le type de question",
+        "unique": "Fermée unique",
+        "multiple": "Fermée multiple",
+        "notation": "Notation-Etoiles",
+        "echelle": "Echelle",
+        "grille": "Grille-Tableau",
+        "satisfaction": "Satisfaction",
+        "ouverte": "Ouverte"
+    },
+    "rapport":{
+        "ajouter_slide": "Ajouter Diapositive"
+    }
+    
+    
+
+}

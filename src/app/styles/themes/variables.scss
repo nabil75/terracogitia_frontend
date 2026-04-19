@@ -1,0 +1,63 @@
+﻿:root {
+    // Common Variables
+    --font-body-text: 16px;
+    --font-body-text-small: 12px;
+    --font-size-label: 0.75vw;
+    --font-size-title: 1vw;
+    --font-size-title-page: 3vw;
+    --padding-base: 1rem;
+    --font-icon-menu-questionnaire:64px!important;
+
+
+    // Dark Theme
+    --body-background: rgb(13, 12, 12);
+    --title-section-color: #43b4c0;
+    --primary-text: #E5DDCF;
+    --secondary-text: rgba(74, 95, 100, 0.5);
+    --gray-text: darkgray;
+    --lightgray-text: rgba(181, 178, 178, 0.728);
+    --hr-border: solid 2px rgb(244, 238, 238);
+    --div-background: #212529;
+    --div-border: 5px solid rgb(185, 178, 178);
+    --div-border-hover: 5px solid rgb(122, 119, 119);
+    --hover-background: #292929;
+    --success-alert: #388E3C;
+    --warning-alert: #F57C00;
+    --error-alert: #D32F2F;
+    --light-color:rgb(177, 174, 174);
+    --paginator-background: darkgray;
+    --btn-action-background: #43b4c0;
+    --btn-action-color: black;
+    --hightlight-row: #44484d; /* Light gray for highlighted rows */
+    --caret-color: white;
+    --icon-delete: rgb(170, 164, 164);
+    --icon-delete-hover: white;
+    --icon-menu-questionnaire: white;
+  }
+  
+  .light-theme {
+    // Light Theme Variables
+    --body-background: #F5F5F5; /* Light gray background */
+    --title-section-color: #01A3D7; /* Darker, muted cyan for titles */
+    --primary-text: #1C1C1C; /* Dark gray for primary text */
+    --secondary-text:rgba(167, 164, 164, 0.5);
+    --gray-text: darkgray;
+    --lightgray-text: rgba(181, 178, 178, 0.728);
+    --hr-border: solid 2px rgb(244, 238, 238);
+    --div-background: #FFFFFF; /* White background for divs */
+    --div-border: 5px solid rgb(200, 200, 200); /* Light gray for div borders */
+    --div-border-hover: 5px solid rgb(160, 160, 160); /* Slightly darker gray for hover border */
+    --hover-background: #E0E0E0; /* Light gray for hover background */
+    --success-alert: #4CAF50; /* Bright green for success alerts */
+    --warning-alert: #FF9800; /* Bright orange for warnings */
+    --error-alert: #F44336; /* Bright red for errors */
+    --light-color:white;
+    --paginator-background:lightgray;
+    --btn-action-background: #01A3D7;
+    --btn-action-color: white;
+    --hightlight-row: #d7ebf1; /* Light gray for highlighted rows */
+    --caret-color: gray;
+    --icon-delete: rgb(139, 137, 137);
+    --icon-delete-hover: black;
+    --icon-menu-questionnaire: black;
+  }

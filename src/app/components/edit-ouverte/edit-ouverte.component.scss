@@ -1,0 +1,28 @@
+
+@use 'themes/variables' as *;
+@use 'themes/mixins' as *;
+
+::placeholder {
+    color: var(--lightgray-text);
+}
+
+.li-question{
+  @include question-style();
+}
+
+.libelle-question{
+  @include libelle-question-style();
+  border: none;
+  background-color: transparent;
+}
+.libelle-modalite{
+  color: var(--primary-text)
+}
+li::marker{
+  @include list-marker-style();
+}
+
+.reponse-question{
+  background-color: transparent;
+  color: var(--primary-text);
+}

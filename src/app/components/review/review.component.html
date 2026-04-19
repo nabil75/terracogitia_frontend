@@ -1,0 +1,139 @@
+<div class="review-page">
+  @if (selectedThemeLabel || selectedSubThemeLabel) {
+    <div class="selection-banner">
+      @if (selectedThemeLabel) {
+        <span class="chip chip-theme">Thème : {{ selectedThemeLabel }}</span>
+      }
+      @if (selectedThemeLabel && selectedSubThemeLabel) {
+        <span class="chip-separator">→</span>
+      }
+      @if (selectedSubThemeLabel) {
+        <span class="chip chip-subtheme">Parcours : {{ selectedSubThemeLabel }}</span>
+      }
+    </div>
+  }
+
+  <div
+    #reviewLayout
+    class="review-layout"
+    [style.--review-questions-col]="questionsColumnSize"
+    [style.--review-answer-col]="answerColumnSize"
+  >
+    <mat-card class="panel questions-panel">
+      <div class="panel-header">
+        <h3>Questions du parcours</h3>
+      </div>
+
+      @if (loadingQuestions) {
+        <div class="loading-state">
+          <mat-spinner diameter="28"></mat-spinner>
+          <span>Chargement des questions...</span>
+        </div>
+      } @else if (loadError) {
+        <p class="error-text">{{ loadError }}</p>
+      } @else if (questions.length === 0) {
+        <p>Aucune question disponible pour ce parcours.</p>
+      } @else {
+        <ul class="questions-list">
+          @for (question of questions; track question.id; let i = $index) {
+            <li
+              class="question-item"
+              [class.active]="i === selectedQuestionIndex"
+              (click)="selectQuestion(i)"
+            >
+              <span class="question-index">Q{{ i + 1 }}</span>
+              <span class="question-text">{{ question.label }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </mat-card>
+
+    <div
+      class="review-divider"
+      [class.active]="isResizingPanels"
+      cdkDrag
+      cdkDragLockAxis="x"
+      (cdkDragStarted)="onDividerDragStart()"
+      (cdkDragMoved)="onDividerDragMoved($event)"
+      (cdkDragEnded)="onDividerDragEnded($event)"
+      role="separator"
+      aria-label="Ajuster la largeur des cartes"
+      aria-orientation="vertical"
+    ></div>
+
+    <mat-card class="panel answer-panel">
+      <div class="panel-header">
+        <h3>Votre réponse</h3>
+      </div>
+
+      @if (selectedQuestion) {
+        <p class="selected-question">{{ selectedQuestion.label }}</p>
+        <textarea
+          class="answer-input"
+          rows="8"
+          [(ngModel)]="userAnswer"
+          placeholder="Saisissez votre réponse ici..."
+        ></textarea>
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="submitEvaluation()"
+          [disabled]="evaluating || !userAnswer.trim()"
+        >
+          Évaluer la réponse
+        </button>
+        @if (evaluating) {
+          <div class="loading-state">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span>Évaluation en cours...</span>
+          </div>
+        }
+        @if (evaluateError) {
+          <p class="error-text">{{ evaluateError }}</p>
+        }
+        <div class="evaluation-meta">
+          <div class="meta-field">
+            <label for="evaluation-note">Note</label>
+            <input
+              id="evaluation-note"
+              class="meta-input"
+              type="text"
+              [value]="latestEvaluationNote ?? ''"
+              readonly
+              placeholder="La note s'affichera ici..."
+            />
+          </div>
+        </div>
+        <p class="feedback-label">Retour d'évaluation</p>
+        @if (latestEvaluationFeedbackHtml) {
+          <div class="feedback-output markdown-output" [innerHTML]="latestEvaluationFeedbackHtml"></div>
+        } @else {
+          <div class="feedback-output feedback-placeholder">
+            Le retour de l'évaluation s'affichera ici...
+          </div>
+        }
+
+        <button
+          class="save-evaluation-button"
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="saveEvaluation()"
+          [disabled]="savingEvaluation || !latestEvaluationFeedback || latestEvaluationNote === null"
+        >
+          Enregistrer l'évaluation
+        </button>
+        @if (saveError) {
+          <p class="error-text">{{ saveError }}</p>
+        }
+        @if (saveSuccess) {
+          <p class="success-text">{{ saveSuccess }}</p>
+        }
+      } @else {
+        <p>Sélectionnez une question pour proposer une réponse.</p>
+      }
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,192 @@
+﻿// Mixin for anchor (drag handle button)
+@mixin ancre-style() {
+    cursor: move;
+    border: none;
+    background-color: transparent;
+    color: gray;
+    font-size: 2.5vh;
+    margin-top: -15px;
+}
+
+// Mixin for header-question style
+@mixin header-question-style() {
+    border-bottom: var(--hr-border);
+}
+
+// Mixin for question container
+@mixin question-style() {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: var(--div-background);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+// Mixin for input with border at the bottom
+@mixin input-border-bottom-style() {
+    border-top: transparent;
+    border-right: transparent;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+    border-left: transparent;
+    border-radius: 5px 5px 0 0;
+    background-color: transparent;
+
+}
+
+// Mixin for list marker (li)
+@mixin list-marker-style() {
+    margin-top: -10px;
+    font-size: 3vh;
+    color: var(--primary-text);
+    right: 15%;
+}
+
+// Mixin for question label (textarea)
+@mixin libelle-question-style() {
+    margin-top: 1%;
+    font-size: x-large;
+    resize: none;
+    overflow-y: hidden;
+    color: var(--primary-text);
+}
+
+// Mixin for type-question heading style
+@mixin type-question-style() {
+    color: var(--title-section-color);
+    font-size: clamp(15px, 1.5vw, 48px);
+    margin-top: -10px;
+    .text-uppercase{
+        color: var(--title-section-color);
+    }
+}
+
+@mixin menu-icon-style {
+    color: var(--gray-text);
+    font-size: 24px;
+}
+
+@mixin auto-mode-icon-style {
+    margin-right: 10px;
+    width: 35px;
+    height:35px;
+}
+
+@mixin menu-question-style {
+    margin-top: -1%;
+}
+
+@mixin cdk-drag-preview-style {
+    box-sizing: border-box;
+    border-radius: 4px;
+    font-size: 1.5em;
+    text-align: center;
+    opacity: 0.8;
+}
+
+@mixin table-modalites_style {
+    margin-top: 3px;
+}
+
+@mixin td-style {
+    background-color: var(--div-background) !important;
+}
+
+@mixin colonne-position-style {
+    width: 3px;
+    cursor: grab;
+    color: var(--primary-text);
+}
+
+@mixin colonne-actions-style {
+    width: 30px;
+    img{
+        cursor: pointer;
+    }
+}
+
+@mixin libelle-modalite-style {
+    width: 100%;
+    background-color: var(--div-background);
+    padding: 2px;
+    font-size: medium;
+    color: var(--primary-text);
+}
+
+@mixin title-modalites-style {
+    font-size: var(--font-size-title);
+    color: var(--title-section-color);
+    padding: 20px;
+}
+
+@mixin btn-extension-style {
+    width: fit-content;
+    border: none;
+    font-size: var(--font-size-title);
+    color: var(--title-section-color);
+    background-color: transparent;
+    margin-bottom: 35px;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+@mixin div-parameters-style {
+    margin-top: 5%;
+    margin-top: 5%;
+}
+
+@mixin label-parameters-style {
+    font-size: var(--font-size-label);
+    color: var(--title-section-color);
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+@mixin saisie-number-style {
+    width: 5vw;
+    text-align: center;
+    font-size: 2vw;
+    color: var(--primary-text);
+}
+
+@mixin img-toolbox-style{
+    cursor: pointer;
+    width: 5vh;
+    height: 5vh;
+    min-width: 4vh;
+    min-height: 4vh;
+    margin-left: 10px;
+    &:hover{
+        border: var(--div-border);
+        border-radius: 6px 6px 6px 6px;
+        padding:3px;
+    }
+}
+
+@mixin mat-button-toogle-group-style{
+    height: 45px;
+    mat-button-toggle {
+    height: 45px;
+    font-size: 16px;
+    color: var(--primary-text);
+    }
+}
+
+@mixin btn-action-style{
+    margin-top: 16px;
+    padding: 8px 12px;
+    border: none;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    &:hover{
+        font-size: large;
+    }
+}
+@mixin placeholder-style{
+    color: var(--gray-text);
+    opacity: 1; /* Firefox */
+}
+

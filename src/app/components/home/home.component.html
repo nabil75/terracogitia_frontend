@@ -1,0 +1,60 @@
+<div class="home-container">
+  <div class="home-header">
+    <img src="assets/images/logo_terra-cogitia.png" width="120px" height="80px" alt="Logo terra-cogitia"/>
+    <h1 class="accent-clair">terra-cogit<span class="accent-fonce"><em>ia</em></span></h1>
+    <p>Cultivez votre excellence, libérez votre potentiel.</p>
+  </div>
+
+  <div class="themes-grid">
+    @for (theme of themes; track theme.id) {
+      <mat-card class="theme-card" (click)="toggleTheme(theme.id)">
+        <div class="theme-ribbon"></div>
+        <mat-card-header>
+          <mat-card-title>{{ theme.label }}</mat-card-title>
+          <mat-card-subtitle>{{ theme.tagline }}</mat-card-subtitle>
+          <span class="theme-header-spacer"></span>
+          <mat-icon class="theme-chevron">
+            {{ expandedThemeId === theme.id ? 'expand_less' : 'expand_more' }}
+          </mat-icon>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="theme-description">
+            {{ theme.description }}
+          </p>
+        </mat-card-content>
+
+        @if (expandedThemeId === theme.id) {
+          <div class="subthemes-list">
+            @for (sub of theme.subThemes; track sub.id) {
+              <div class="subtheme-item">
+                <div class="subtheme-text">
+                  <h4>{{ sub.label }}</h4>
+                  <p>{{ sub.description }}</p>
+                </div>
+                <div class="subtheme-actions">
+                  <button
+                    mat-stroked-button
+                    color="primary"
+                    class="theme-button"
+                    (click)="$event.stopPropagation(); selectSubTheme(theme, sub)"
+                  >
+                    Explorer
+                  </button>
+                  <button
+                    mat-flat-button
+                    color="accent"
+                    class="theme-button"
+                    (click)="$event.stopPropagation(); reviewSubTheme(theme, sub)"
+                  >
+                    Review
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </mat-card>
+    }
+  </div>
+</div>
+
