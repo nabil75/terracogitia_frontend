@@ -1,0 +1,26 @@
+/* Overlay covering the entire page */
+.overlay-spinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4); /* Fond semi-transparent */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Au-dessus des autres éléments */
+}
+
+/* Spinner container centered vertically */
+.spinner-container {
+  display: flex;
+  flex-direction: column; /* Aligne le spinner et le texte verticalement */
+  align-items: center; /* Centre horizontalement */
+  text-align: center;
+}
+
+.spinner-container h1 {
+  color: white;
+  margin-top: 10px;
+}

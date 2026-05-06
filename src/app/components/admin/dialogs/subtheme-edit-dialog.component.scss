@@ -1,0 +1,20 @@
+.full-width {
+  width: 100%;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.theme-form-dialog-content {
+  min-width: min(92vw, 28rem);
+  padding-top: 0.85rem;
+  padding-bottom: 0.35rem;
+  overflow: visible !important;
+}
+
+:host ::ng-deep .theme-form-dialog-content .mdc-floating-label {
+  max-width: none;
+}
+
+:host ::ng-deep .theme-form-dialog-content .mat-mdc-text-field-wrapper {
+  overflow: visible;
+}

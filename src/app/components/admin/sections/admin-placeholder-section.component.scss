@@ -1,0 +1,38 @@
+@use '../../../styles/themes/mixins' as *;
+
+.admin-section h2 {
+  margin: 0 0 1rem;
+  font-family: var(--app-font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+  font-weight: 700;
+  color: var(--app-brand-ink);
+}
+
+.placeholder-card {
+  padding: 1.35rem 1.5rem;
+  @include app-glass-panel;
+}
+
+.lead {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--app-text);
+}
+
+.soon {
+  margin: 1rem 0 0.4rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--app-text-muted);
+}
+
+.placeholder-card ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--app-text-muted);
+  line-height: 1.5;
+}
+
+.placeholder-card li + li {
+  margin-top: 0.35rem;
+}

@@ -1,0 +1,111 @@
+@use '../../styles/themes/mixins' as *;
+
+.admin-page {
+  min-height: 100vh;
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+  @include app-mesh-background;
+  @include page-with-transverse-rail-padding;
+}
+
+.admin-page .app-page-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.admin-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-page__title-block h1 {
+  margin: 0;
+  font-family: var(--app-font-display);
+  font-size: clamp(1.55rem, 2.8vw, 2rem);
+  font-weight: 700;
+  color: var(--app-brand-ink);
+  letter-spacing: -0.02em;
+}
+
+.admin-page__subtitle {
+  margin: 0.35rem 0 0;
+  max-width: 40rem;
+  color: var(--app-text-muted);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+/* Même esprit que les onglets du tableau de bord (mat-tab-group .dashboard-tabs). */
+.admin-tabs {
+  background: transparent;
+  --mat-tab-header-active-label-text-color: var(--app-text);
+  --mat-tab-header-active-hover-label-text-color: var(--app-text);
+  --mat-tab-header-active-focus-label-text-color: var(--app-text);
+  --mat-tab-header-inactive-label-text-color: var(--app-text);
+  --mat-tab-header-inactive-hover-label-text-color: var(--app-text);
+  --mat-tab-header-inactive-focus-label-text-color: var(--app-text);
+  --mat-tab-header-active-hover-indicator-color: var(--app-logo-word-fonce);
+  --mat-tab-header-active-focus-indicator-color: var(--app-logo-word-fonce);
+
+  border-radius: var(--app-radius-sm);
+  border: 1px solid var(--app-stroke);
+  background: var(--app-surface);
+  backdrop-filter: var(--app-blur);
+  -webkit-backdrop-filter: var(--app-blur);
+  padding: 0.2rem 0.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.admin-tabs ::ng-deep .mat-mdc-tab-link-container {
+  border-bottom: none;
+}
+
+.admin-tabs ::ng-deep .mat-mdc-tab-link .mdc-tab-indicator__content--underline {
+  border-radius: 999px;
+  border-top-width: 3px;
+}
+
+.admin-tabs ::ng-deep .mat-mdc-tab-link.mdc-tab--active .mdc-tab-indicator__content--underline {
+  border-top-color: var(--app-logo-word-fonce) !important;
+}
+
+.admin-tabs ::ng-deep .mat-mdc-tab-link .mdc-tab__text-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--app-text) !important;
+}
+
+.admin-tabs ::ng-deep .mat-mdc-tab-link:not(.mdc-tab--active) .mdc-tab__text-label {
+  opacity: 0.72;
+}
+
+.admin-tabs ::ng-deep .mat-mdc-tab-link.mdc-tab--active .mdc-tab__text-label {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.admin-tabs ::ng-deep .mat-mdc-tab-link.mdc-tab--active:hover .mdc-tab__text-label,
+.admin-tabs ::ng-deep .mat-mdc-tab-link.mdc-tab--active:focus .mdc-tab__text-label {
+  color: var(--app-text) !important;
+}
+
+.admin-tabs mat-icon {
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+}
+
+.admin-page__main {
+  min-height: 12rem;
+}
+
+@media (max-width: 640px) {
+  .admin-page {
+    padding-top: 1.25rem;
+    padding-bottom: 2rem;
+  }
+}

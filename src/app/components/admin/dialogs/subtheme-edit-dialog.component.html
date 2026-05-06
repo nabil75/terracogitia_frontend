@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content class="theme-form-dialog-content" [formGroup]="form">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'subthemeEditDialog.pathLabel' | translate }}</mat-label>
+    <input matInput formControlName="label" autocomplete="off" />
+    @if (form.controls.label.hasError('required') && form.controls.label.touched) {
+      <mat-error>{{ 'common.labelRequired' | translate }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'common.description' | translate }}</mat-label>
+    <textarea matInput formControlName="description" rows="4"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="submit()">{{ 'common.save' | translate }}</button>
+</mat-dialog-actions>

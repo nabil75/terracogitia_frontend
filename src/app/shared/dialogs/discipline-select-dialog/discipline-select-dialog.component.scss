@@ -1,0 +1,269 @@
+.discipline-dialog-content {
+  min-width: min(92vw, 28rem);
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.discipline-dialog-intro {
+  margin: 0;
+  color: var(--app-text-muted, var(--app-text));
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.discipline-dialog-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 0;
+  color: var(--app-text);
+}
+
+.discipline-dialog-error {
+  margin: 0;
+  color: var(--app-danger, #c0392b);
+  font-weight: 600;
+}
+
+.discipline-dialog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.discipline-dialog-item {
+  display: block;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--app-radius-sm, 8px);
+  transition: background-color 0.15s ease;
+}
+
+.discipline-dialog-item:hover {
+  background: var(--app-surface-strong, rgba(45, 90, 61, 0.08));
+}
+
+.discipline-dialog-item__label {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.discipline-dialog-item__desc {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: var(--app-text-muted, var(--app-text));
+  line-height: 1.35;
+}
+
+.discipline-dialog-empty {
+  margin: 0;
+  font-style: italic;
+  color: var(--app-text-muted, var(--app-text));
+}
+
+.discipline-dialog-manage {
+  margin-top: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--app-stroke);
+  border-radius: var(--app-radius-sm, 8px);
+  background: var(--app-surface);
+}
+
+.discipline-dialog-manage__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.discipline-dialog-manage__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.discipline-dialog-manage__meta {
+  font-size: 0.8rem;
+  color: var(--app-text-muted, var(--app-text));
+}
+
+.discipline-dialog-manage__actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.discipline-dialog-manage__hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--app-text-muted, var(--app-text));
+}
+
+/* --- Bouton « Ajouter une discipline » : look lien (sans bordure ni fond) ---- */
+.discipline-dialog-add-toggle.mat-mdc-button-base {
+  align-self: flex-start;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0 0.25rem;
+  min-width: 0;
+  height: auto;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background: transparent !important;
+  color: var(--app-forest) !important;
+  --mdc-text-button-label-text-color: var(--app-forest);
+  --mat-text-button-state-layer-color: transparent;
+  --mat-text-button-ripple-color: transparent;
+  border-radius: 0;
+}
+
+.discipline-dialog-add-toggle.mat-mdc-button-base:hover {
+  background: transparent !important;
+  color: var(--app-brand-deep) !important;
+}
+
+.discipline-dialog-add-toggle .discipline-dialog-add-toggle__label {
+  text-decoration: none;
+  text-underline-offset: 0.18em;
+}
+
+.discipline-dialog-add-toggle:hover .discipline-dialog-add-toggle__label,
+.discipline-dialog-add-toggle:focus-visible .discipline-dialog-add-toggle__label {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.discipline-dialog-add-toggle mat-icon {
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+}
+
+/**
+ * Variante thème sombre — surcharge la règle globale qui force tous les
+ * `mat-mdc-button-base` à un fond parchemin et leurs `mat-icon` à une encre
+ * sombre. Le bouton garde son rôle de lien (transparent + accent ardoise).
+ */
+:host-context(body.dark-theme) .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]) {
+  background: transparent !important;
+  color: var(--app-text) !important;
+  --mdc-text-button-label-text-color: var(--app-text);
+}
+
+:host-context(body.dark-theme)
+  .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover {
+  background: transparent !important;
+  color: var(--app-text) !important;
+}
+
+:host-context(body.dark-theme)
+  .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled])
+  mat-icon,
+:host-context(body.dark-theme)
+  .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled])
+  .mdc-button__label,
+:host-context(body.dark-theme)
+  .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled])
+  .discipline-dialog-add-toggle__label {
+  color: var(--app-text) !important;
+}
+
+:host-context(body.dark-theme)
+  .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover
+  mat-icon,
+:host-context(body.dark-theme)
+  .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover
+  .mdc-button__label,
+:host-context(body.dark-theme)
+  .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover
+  .discipline-dialog-add-toggle__label {
+  color: var(--app-text) !important;
+}
+
+/* --- Section « Ajouter une discipline » ----------------------------------- */
+.discipline-dialog-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 0.9rem 0.5rem;
+  margin-top: 0.5rem;
+  border: 1px solid var(--app-stroke);
+  border-radius: var(--app-radius-sm, 8px);
+  background: var(--app-surface);
+  /* Le label flottant outline sort du cadre : éviter qu'il soit tronqué */
+  overflow: visible;
+}
+
+.discipline-dialog-add-form__title {
+  margin: 0 0 0.25rem;
+  font-family: var(--app-font-display, var(--app-font));
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--app-text);
+  letter-spacing: 0.01em;
+}
+
+/* Le titre du bloc édition reprend la même police que "Manage discipline ...". */
+.discipline-dialog-edit-form__title {
+  font-family: inherit;
+  margin-bottom: 0.7rem;
+}
+
+.discipline-dialog-add-form__field {
+  width: 100%;
+  display: block;
+}
+
+.discipline-dialog-add-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.discipline-dialog-add-form__error {
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--app-radius-xs, 6px);
+  background: rgba(239, 155, 155, 0.12);
+  border: 1px solid rgba(239, 155, 155, 0.45);
+  color: #b91c1c;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+/* Spinner inline dans le bouton « Ajouter » pendant la requête. */
+.discipline-dialog-add-form__spinner {
+  margin-right: 0.5rem;
+  display: inline-flex !important;
+  vertical-align: middle;
+}
+
+:host ::ng-deep .discipline-dialog-add-form__spinner circle {
+  stroke: currentColor !important;
+}
+
+/* Variante dark : bloc d'erreur lisible sur fond ardoise. */
+:host-context(body.dark-theme) .discipline-dialog-add-form__error {
+  background: rgba(239, 155, 155, 0.12);
+  border-color: rgba(239, 155, 155, 0.55);
+  color: #ef9b9b;
+}
+
+/* Labels outline : pas de troncature ni d'overflow caché */
+:host ::ng-deep .discipline-dialog-add-form .mdc-floating-label {
+  max-width: none;
+}
+
+:host ::ng-deep .discipline-dialog-add-form .mat-mdc-text-field-wrapper {
+  overflow: visible;
+}

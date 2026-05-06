@@ -1,0 +1,197 @@
+.transverse-rail {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 300;
+  width: 0;
+  pointer-events: none;
+}
+
+.transverse-rail__track {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  pointer-events: auto;
+  padding-left: max(0.35rem, env(safe-area-inset-left, 0px));
+}
+
+button.transverse-rail__sticker {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.transverse-rail__sticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0;
+  padding: 0.4rem;
+  border-radius: 0 var(--app-radius-sm) var(--app-radius-sm) 0;
+  background: var(--app-surface);
+  border: 1px solid var(--app-stroke);
+  border-left: none;
+  box-shadow:
+    2px 4px 18px rgba(44, 40, 36, 0.14),
+    1px 0 0 rgba(255, 252, 247, 0.5) inset;
+  text-decoration: none;
+  cursor: pointer;
+  color: var(--app-forest);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+:host-context(body.dark-theme) .transverse-rail__sticker {
+  color: var(--app-text);
+}
+
+.transverse-rail__sticker:hover {
+  background: var(--app-surface-strong);
+  box-shadow:
+    3px 6px 22px rgba(44, 40, 36, 0.18),
+    1px 0 0 rgba(255, 252, 247, 0.6) inset;
+}
+
+.transverse-rail__sticker--active {
+  background: var(--app-highlight-row);
+  border: 2px solid var(--app-forest);
+  border-left: none;
+  color: var(--app-forest);
+  box-shadow:
+    3px 6px 20px rgba(45, 90, 61, 0.2),
+    0 0 0 2px rgba(45, 90, 61, 0.1),
+    1px 0 0 rgba(255, 252, 247, 0.55) inset;
+}
+
+.transverse-rail__sticker--active:hover {
+  background: color-mix(in srgb, var(--app-highlight-row) 70%, var(--app-surface-strong));
+  border-color: var(--app-forest-light);
+}
+
+:host-context(body.dark-theme) .transverse-rail__sticker--active {
+  background: var(--app-highlight-row);
+  border: 2px solid var(--app-forest);
+  border-left: none;
+  color: var(--app-text);
+  box-shadow:
+    3px 6px 22px rgba(8, 10, 14, 0.45),
+    0 0 0 2px color-mix(in srgb, var(--app-forest) 40%, transparent),
+    inset 0 0 0 2px color-mix(in srgb, var(--app-forest) 18%, transparent);
+}
+
+:host-context(body.dark-theme) .transverse-rail__sticker--active:hover {
+  background: color-mix(in srgb, var(--app-highlight-row) 75%, var(--app-surface));
+  border-color: var(--app-forest-light);
+}
+
+.transverse-rail__sticker:focus-visible {
+  outline: 2px solid var(--app-forest);
+  outline-offset: 2px;
+}
+
+.transverse-rail__icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.transverse-rail__mat-icon {
+  width: 1.65rem;
+  height: 1.65rem;
+  font-size: 1.65rem;
+  color: inherit;
+}
+
+.transverse-rail__lang {
+  font-family: var(--app-font);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+/**
+ * Chip de discipline courante — positionné en haut à droite du viewport
+ * sur toutes les pages (rendu par `app-transverse-rail`).
+ * `pointer-events: none` ⇒ ne capte pas les clics, le contenu de la page
+ * reste interactif même quand le chip déborde par dessus.
+ */
+.transverse-rail__discipline-label {
+  position: fixed;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  z-index: 300;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  max-width: min(60vw, 26rem);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--app-radius-sm);
+  background: var(--app-surface);
+  border: 1px solid var(--app-stroke);
+  box-shadow:
+    2px 4px 14px rgba(44, 40, 36, 0.12),
+    1px 0 0 rgba(255, 252, 247, 0.5) inset;
+  color: var(--app-forest);
+  font-family: var(--app-font);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.transverse-rail__discipline-label__prefix {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--app-text-muted);
+}
+
+.transverse-rail__discipline-label__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host-context(body.dark-theme) .transverse-rail__discipline-label {
+  color: var(--app-text);
+  box-shadow:
+    2px 4px 18px rgba(8, 10, 14, 0.45),
+    1px 0 0 rgba(232, 228, 220, 0.06) inset;
+}
+
+:host-context(body.dark-theme) .transverse-rail__discipline-label__prefix {
+  color: var(--app-text-muted);
+}
+
+@media (max-width: 600px) {
+  .transverse-rail__discipline-label {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .transverse-rail__sticker {
+    width: 2.85rem;
+    height: 2.85rem;
+    padding: 0.3rem;
+    border-radius: 0 var(--app-radius-xs) var(--app-radius-xs) 0;
+  }
+}

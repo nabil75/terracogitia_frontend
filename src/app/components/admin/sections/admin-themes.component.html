@@ -1,0 +1,251 @@
+<div class="admin-themes-page">
+  @if (isGenerating) {
+    <app-spinner [message_spinner]="'adminThemes.isGenerating' | translate"></app-spinner>
+  }
+  <div class="admin-themes-page__columns">
+    <section class="admin-section">
+      <div class="admin-section__head">
+        <div>
+          <h2>
+            @if (themesSectionTitleThemeLabel(); as tl) {
+              {{ 'adminThemes.titleExpanded' | translate: { theme: tl } }}
+            } @else {
+              {{ 'adminThemes.title' | translate }}
+            }
+          </h2>
+          <p class="admin-section__hint">
+            {{ 'adminThemes.hint' | translate }}
+          </p>
+        </div>
+        <button
+          mat-stroked-button
+          type="button"
+          class="admin-section__primary review-button"
+          (click)="openCreateTheme()"
+          [disabled]="loading || saving"
+        >
+          <mat-icon>add</mat-icon>
+          {{ 'adminThemes.newTheme' | translate }}
+        </button>
+      </div>
+
+      @if (loading) {
+        <div class="admin-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <span>{{ 'adminThemes.loading' | translate }}</span>
+        </div>
+      } @else if (loadError) {
+        <mat-card class="admin-card admin-card--error">
+          <mat-icon color="warn">error_outline</mat-icon>
+          <div>
+            <p>{{ loadError }}</p>
+            <button mat-stroked-button color="primary" type="button" (click)="refresh()">
+              {{ 'common.retry' | translate }}
+            </button>
+          </div>
+        </mat-card>
+      } @else if (themes.length === 0) {
+        <mat-card class="admin-card">
+          <p>{{ 'adminThemes.noThemesApi' | translate }}</p>
+        </mat-card>
+      } @else {
+        <mat-accordion class="theme-admin-accordion" multi>
+          @for (theme of themes; track theme.id) {
+            <mat-expansion-panel
+              class="theme-admin-panel"
+              (opened)="onThemePanelOpened(theme)"
+              (closed)="onThemePanelClosed(theme)"
+            >
+              <mat-expansion-panel-header class="theme-admin-panel__header">
+                <mat-panel-title class="theme-accordion-header">
+                  <span class="theme-accordion-title">{{ theme.label }}</span>
+                  @if (theme.tagline) {
+                    <span
+                      class="theme-accordion-subtitle"
+                      [matTooltip]="theme.tagline"
+                      matTooltipClass="app-transverse-rail-tooltip"
+                      matTooltipPosition="below"
+                      matTooltipShowDelay="200"
+                      [matTooltipDisabled]="!isTaglineTooltipEnabled(theme)"
+                      (mouseenter)="onTaglineSubtitleMouseEnter($event, theme)"
+                      >{{ theme.tagline }}</span
+                    >
+                  }
+                  <span class="theme-accordion-meta">{{
+                    'adminThemes.parcoursCount' | translate: { count: subThemesOf(theme).length }
+                  }}</span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div class="theme-admin-panel__body">
+                @if (theme.description) {
+                  <p class="theme-admin-panel__description">{{ theme.description }}</p>
+                }
+
+                <div class="theme-admin-panel__toolbar">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="review-button"
+                    (click)="openEditTheme(theme)"
+                    [disabled]="saving"
+                  >
+                    <mat-icon>edit</mat-icon>
+                    {{ 'adminThemes.editTheme' | translate }}
+                  </button>
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="review-button"
+                    (click)="confirmDeleteTheme(theme)"
+                    [disabled]="saving"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                    {{ 'adminThemes.deleteTheme' | translate }}
+                  </button>
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="review-button"
+                    (click)="openCreateSubTheme(theme)"
+                    [disabled]="saving"
+                  >
+                    <mat-icon>add</mat-icon>
+                    {{ 'adminThemes.addPath' | translate }}
+                  </button>
+                </div>
+
+                <div class="subthemes-block">
+                  <h4 class="subthemes-block__title">{{ 'adminThemes.pathsHeading' | translate }}</h4>
+                  @if (subThemesOf(theme).length === 0) {
+                    <p class="subthemes-empty">{{ 'adminThemes.noPaths' | translate }}</p>
+                  } @else {
+                    <ul class="subthemes-list">
+                      @for (sub of subThemesOf(theme); track sub.id) {
+                        <li class="subtheme-row">
+                          <div class="subtheme-row__text">
+                            <strong>{{ sub.label }}</strong>
+                            @if (sub.description) {
+                              <span class="sub-desc">{{ sub.description }}</span>
+                            }
+                          </div>
+                          <div class="subtheme-row__actions">
+                            <button
+                              mat-stroked-button
+                              type="button"
+                              class="subtheme-row__btn-icon"
+                              (click)="openEditSubTheme(theme, sub)"
+                              [disabled]="saving"
+                              [attr.aria-label]="'adminThemes.ariaEditPath' | translate"
+                            >
+                              <mat-icon>edit</mat-icon>
+                            </button>
+                            <button
+                              mat-stroked-button
+                              type="button"
+                              class="subtheme-row__btn-icon subtheme-row__btn-icon--danger"
+                              (click)="confirmDeleteSubTheme(theme, sub)"
+                              [disabled]="saving"
+                              [attr.aria-label]="'adminThemes.ariaDeletePath' | translate"
+                            >
+                              <mat-icon>delete_outline</mat-icon>
+                            </button>
+                          </div>
+                        </li>
+                      }
+                    </ul>
+                  }
+
+                </div>
+              </div>
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+      }
+    </section>
+
+    <div
+      class="admin-section admin-section--ai"
+      [attr.aria-label]="'adminThemes.aiSectionAria' | translate"
+    >
+      <div class="admin-section__head admin-section__head--ai-stacked">
+        <h2 class="ai-page-title">{{ 'adminThemes.aiPageTitle' | translate }}</h2>
+        <p class="admin-section__hint admin-section__hint--ai-lead">
+          {{ 'adminThemes.aiLead' | translate }}
+        </p>
+      </div>
+
+      <div class="ai-panels">
+        <section class="ai-panel" aria-labelledby="ai-bulk-heading">
+          <div class="ai-panel__head">
+            <div class="ai-panel__title-row">
+              <mat-icon class="ai-panel__icon" aria-hidden="true">topic</mat-icon>
+              <h3 id="ai-bulk-heading" class="ai-panel__title">
+                {{ 'adminThemes.bulkAiPanelTitle' | translate }}
+              </h3>
+            </div>
+            <p class="ai-panel__desc">
+              {{ 'adminThemes.bulkAiPanelDesc' | translate }}
+            </p>
+          </div>
+
+          <mat-form-field appearance="outline" class="bulk-ai-theme-field">
+            <mat-label>{{ 'adminThemes.bulkAiThemeLabel' | translate }}</mat-label>
+            <mat-select
+              [value]="bulkAiSelectedThemeId"
+              (selectionChange)="bulkAiSelectedThemeId = $event.value"
+              [disabled]="
+                loading ||
+                themes.length === 0 ||
+                generatingBulkParcoursQuestions
+              "
+            >
+              @for (t of themes; track trackThemeId(t)) {
+                <mat-option [value]="trackThemeId(t)">{{ t.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (bulkAiSelectedTheme(); as sel) {
+            <div class="bulk-ai-theme-preview">
+              <p class="bulk-ai-theme-preview__label">
+                <strong>{{ 'adminThemes.bulkAiDescriptionLabel' | translate }}</strong>
+              </p>
+              <p class="bulk-ai-theme-preview__text">
+                @if (sel.description?.trim()) {
+                  {{ sel.description }}
+                } @else {
+                  <span class="bulk-ai-theme-preview__empty">{{
+                    'adminThemes.bulkAiNoDescription' | translate
+                  }}</span>
+                }
+              </p>
+            </div>
+          }
+
+          <div class="ai-panel__actions">
+            <button
+              mat-stroked-button
+              type="button"
+              class="review-button"
+              (click)="generateParcoursAndQuestionsFromBulkTheme()"
+              [disabled]="
+                generatingBulkParcoursQuestions ||
+                saving ||
+                bulkAiSelectedThemeId === null ||
+                loading
+              "
+            >
+              @if (generatingBulkParcoursQuestions) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <mat-icon>auto_awesome</mat-icon>
+              }
+              {{ 'adminThemes.generateParcoursQuestions' | translate }}
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>

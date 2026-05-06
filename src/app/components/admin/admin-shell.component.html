@@ -1,0 +1,59 @@
+<app-transverse-rail />
+
+<div class="admin-page">
+  <div class="app-page-inner">
+    <header class="admin-page__header">
+      <div class="admin-page__title-block">
+        <h1>{{ 'adminShell.title' | translate }}</h1>
+        <p class="admin-page__subtitle">
+          {{ 'adminShell.subtitle' | translate }}
+        </p>
+      </div>
+      <nav
+        mat-tab-nav-bar
+        [tabPanel]="adminTabPanel"
+        class="admin-tabs"
+        animationDuration="180ms"
+        [attr.aria-label]="'adminShell.navAria' | translate"
+      >
+        <a
+          mat-tab-link
+          routerLink="themes"
+          routerLinkActive
+          #rlaThemes="routerLinkActive"
+          [routerLinkActiveOptions]="{ exact: true }"
+          [active]="rlaThemes.isActive"
+        >
+          <mat-icon aria-hidden="true">category</mat-icon>
+          {{ 'adminShell.navThemes' | translate }}
+        </a>
+        <a
+          mat-tab-link
+          routerLink="notation"
+          routerLinkActive
+          #rlaNotation="routerLinkActive"
+          [active]="rlaNotation.isActive"
+        >
+          <mat-icon aria-hidden="true">functions</mat-icon>
+          {{ 'adminShell.navNotation' | translate }}
+        </a>
+        <a
+          mat-tab-link
+          routerLink="sources"
+          routerLinkActive
+          #rlaSources="routerLinkActive"
+          [active]="rlaSources.isActive"
+        >
+          <mat-icon aria-hidden="true">hub</mat-icon>
+          {{ 'adminShell.navSources' | translate }}
+        </a>
+      </nav>
+    </header>
+
+    <mat-tab-nav-panel #adminTabPanel>
+      <main class="admin-page__main">
+        <router-outlet />
+      </main>
+    </mat-tab-nav-panel>
+  </div>
+</div>

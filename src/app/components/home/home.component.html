@@ -1,13 +1,20 @@
+<app-transverse-rail />
+
 <div class="home-container">
+  <div class="app-page-inner">
   <div class="home-header">
-    <img src="assets/images/logo_terra-cogitia.png" width="120px" height="80px" alt="Logo terra-cogitia"/>
+    <img [src]="themeService.logoSrc()" width="120px" height="80px" [attr.alt]="'common.logoAlt' | translate"/>
     <h1 class="accent-clair">terra-cogit<span class="accent-fonce"><em>ia</em></span></h1>
-    <p>Cultivez votre excellence, libérez votre potentiel.</p>
+    <p>{{ 'home.tagline' | translate }}</p>
   </div>
 
   <div class="themes-grid">
     @for (theme of themes; track theme.id) {
-      <mat-card class="theme-card" (click)="toggleTheme(theme.id)">
+      <mat-card
+        class="theme-card"
+        [class.theme-card--expanded]="expandedThemeId === theme.id"
+        (click)="toggleTheme(theme.id)"
+      >
         <div class="theme-ribbon"></div>
         <mat-card-header>
           <mat-card-title>{{ theme.label }}</mat-card-title>
@@ -25,29 +32,35 @@
 
         @if (expandedThemeId === theme.id) {
           <div class="subthemes-list">
-            @for (sub of theme.subThemes; track sub.id) {
+            @for (sub of theme.subThemes ?? []; track sub.id) {
               <div class="subtheme-item">
                 <div class="subtheme-text">
                   <h4>{{ sub.label }}</h4>
                   <p>{{ sub.description }}</p>
                 </div>
-                <div class="subtheme-actions">
-                  <button
-                    mat-stroked-button
-                    color="primary"
-                    class="theme-button"
-                    (click)="$event.stopPropagation(); selectSubTheme(theme, sub)"
-                  >
-                    Explorer
-                  </button>
-                  <button
-                    mat-flat-button
-                    color="accent"
-                    class="theme-button"
-                    (click)="$event.stopPropagation(); reviewSubTheme(theme, sub)"
-                  >
-                    Review
-                  </button>
+                <div class="subtheme-actions" (click)="$event.stopPropagation()">
+                  <div class="subtheme-actions__pair">
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="subtheme-actions__btn-icon review-button"
+                      [matTooltip]="'home.review' | translate"
+                      [attr.aria-label]="'home.review' | translate"
+                      (click)="reviewSubTheme(theme, sub)"
+                    >
+                      <mat-icon>rate_review</mat-icon>
+                    </button>
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="subtheme-actions__btn-icon discover-button"
+                      [matTooltip]="'home.discover' | translate"
+                      [attr.aria-label]="'home.discover' | translate"
+                      (click)="discoverSubTheme(theme, sub)"
+                    >
+                      <mat-icon>lightbulb</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             }
@@ -55,6 +68,7 @@
         }
       </mat-card>
     }
+  </div>
   </div>
 </div>
 

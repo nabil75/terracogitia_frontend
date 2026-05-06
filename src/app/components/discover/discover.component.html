@@ -1,0 +1,171 @@
+<app-transverse-rail />
+
+<div class="discover-page">
+  <div class="app-page-inner">
+    <header class="discover-header">
+      <h1>{{ 'discover.title' | translate }}</h1>
+      <p class="discover-header__intro">{{ 'discover.intro' | translate }}</p>
+    </header>
+
+    <div class="discover-body">
+    @if (loadingThemes) {
+      <div class="discover-state discover-state--center discover-state--body-fill">
+        <mat-progress-spinner diameter="40" mode="indeterminate" />
+        <span>{{ 'discover.loadingThemes' | translate }}</span>
+      </div>
+    } @else if (loadThemesError) {
+      <p class="discover-error">{{ loadThemesError }}</p>
+    } @else {
+      <div class="discover-layout">
+        <section class="discover-panel discover-panel--themes" aria-label="Thèmes et parcours">
+          <h2 class="discover-panel__title">{{ 'discover.panelThemes' | translate }}</h2>
+          <div class="themes-grid discover-themes">
+            @for (theme of themes; track theme.id) {
+              <mat-card
+                class="theme-card"
+                [class.theme-card--expanded]="expandedThemeId === theme.id"
+                (click)="toggleTheme(theme.id)"
+              >
+                <div class="theme-ribbon"></div>
+                <mat-card-header>
+                  <mat-card-title>{{ theme.label }}</mat-card-title>
+                  <mat-card-subtitle>{{ theme.tagline }}</mat-card-subtitle>
+                  <span class="theme-header-spacer"></span>
+                  <mat-icon class="theme-chevron">
+                    {{ expandedThemeId === theme.id ? 'expand_less' : 'expand_more' }}
+                  </mat-icon>
+                </mat-card-header>
+                @if (expandedThemeId === theme.id) {
+                  <div class="subthemes-list">
+                    @for (sub of theme.subThemes ?? []; track sub.id) {
+                      <div
+                        class="subtheme-item"
+                        [class.subtheme-item--selected]="isSubSelected(sub)"
+                        (click)="$event.stopPropagation(); selectSubTheme(theme, sub)"
+                        role="button"
+                        tabindex="0"
+                      >
+                        <div class="subtheme-text">
+                          <h4>{{ sub.label }}</h4>
+                          <p>{{ sub.description }}</p>
+                        </div>
+                        @if (isSubSelected(sub)) {
+                          <mat-icon class="subtheme-check" aria-hidden="true">check_circle</mat-icon>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </mat-card>
+            }
+          </div>
+        </section>
+
+        <section class="discover-panel discover-panel--questions" aria-label="Questions du parcours">
+          @if (!selectedSubThemeId) {
+            <div class="discover-placeholder discover-placeholder--questions-fill">
+              <mat-icon aria-hidden="true">touch_app</mat-icon>
+              <p>{{ 'discover.pickPath' | translate }}</p>
+            </div>
+          } @else {
+            <div class="discover-questions-inner">
+              <div class="discover-detail-head">
+                <p class="discover-breadcrumb">
+                  <span>{{ selectedThemeLabel }}</span>
+                  <span class="discover-breadcrumb__sep">/</span>
+                  <span>{{ selectedSubThemeLabel }}</span>
+                </p>
+              </div>
+
+              @if (loadingQuestions) {
+                <div class="discover-state discover-state--questions-fill">
+                  <mat-progress-spinner diameter="32" mode="indeterminate" />
+                  <span>{{ 'discover.loadingQuestions' | translate }}</span>
+                </div>
+              } @else if (loadQuestionsError) {
+                <p class="discover-error">{{ loadQuestionsError }}</p>
+              } @else if (questions.length === 0) {
+                <p class="discover-muted discover-muted--grow">{{ 'discover.noQuestions' | translate }}</p>
+              } @else {
+                <h2 class="discover-panel__title discover-questions-heading">{{ 'discover.questionsTitle' | translate }}</h2>
+                <ul class="discover-questions">
+                  @for (q of questions; track q.id) {
+                    <li
+                      class="discover-q-row"
+                      [class.discover-q-row--active]="selectedQuestionId === q.id"
+                    >
+                      <button type="button" class="discover-q" (click)="selectQuestion(q.id)">
+                        <span class="discover-q__label">{{ q.label }}</span>
+                      </button>
+                      @if (selectedQuestionId === q.id) {
+                        <button
+                          mat-icon-button
+                          type="button"
+                          color="primary"
+                          class="discover-q-discover-btn"
+                          [attr.aria-label]="'discover.cta' | translate"
+                          [matTooltip]="'discover.ctaTooltip' | translate"
+                          matTooltipClass="app-transverse-rail-tooltip"
+                          matTooltipPosition="above"
+                          matTooltipShowDelay="200"
+                          (click)="$event.stopPropagation(); discover()"
+                        >
+                          <mat-icon aria-hidden="true">auto_stories</mat-icon>
+                        </button>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="discover-panel discover-panel--answer" aria-labelledby="discover-answer-heading">
+          <h2 id="discover-answer-heading" class="discover-panel__title">
+            {{ 'discover.proposedAnswerTitle' | translate }}
+          </h2>
+
+          @if (!selectedSubThemeId) {
+            <div class="discover-placeholder discover-placeholder--compact">
+              <mat-icon aria-hidden="true">touch_app</mat-icon>
+              <p>{{ 'discover.pickPath' | translate }}</p>
+            </div>
+          } @else if (loadingQuestions) {
+            <div class="discover-state discover-state--compact">
+              <mat-progress-spinner diameter="28" mode="indeterminate" />
+              <span>{{ 'discover.loadingQuestions' | translate }}</span>
+            </div>
+          } @else if (loadQuestionsError) {
+            <p class="discover-muted">{{ 'discover.loadQuestionsError' | translate }}</p>
+          } @else if (questions.length === 0) {
+            <p class="discover-muted">{{ 'discover.noQuestions' | translate }}</p>
+          } @else if (!selectedQuestionId) {
+            <p class="discover-muted">{{ 'discover.proposedAnswerPickQuestion' | translate }}</p>
+          } @else if (isGenerating) {
+            <div class="discover-state discover-state--compact discover-state--answer-generating">
+              <mat-progress-spinner diameter="28" mode="indeterminate" />
+              <span>{{ 'discover.propositionGenerating' | translate }}</span>
+            </div>
+          } @else if (!hasAnswerColumnContent()) {
+            <p class="discover-muted">{{ 'discover.proposedAnswerEmpty' | translate }}</p>
+          } @else {
+            <div class="discover-answer-stack">
+              @if (answerColumnBody().length > 0) {
+                <div class="discover-answer-body">{{ answerColumnBody() }}</div>
+              }
+              @if (discoveredKeyPoints.length > 0) {
+                <ul class="discover-answer-keypoints">
+                  @for (pt of discoveredKeyPoints; track $index) {
+                    <li>{{ pt }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </section>
+      </div>
+    }
+    </div>
+  </div>
+</div>

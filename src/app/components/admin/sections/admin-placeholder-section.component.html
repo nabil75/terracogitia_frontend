@@ -1,0 +1,12 @@
+<section class="admin-section">
+  <h2>{{ ('adminPlaceholder.' + section + '.title') | translate }}</h2>
+  <mat-card class="placeholder-card">
+    <p class="lead">{{ ('adminPlaceholder.' + section + '.body') | translate }}</p>
+    <p class="soon">{{ ('adminPlaceholder.' + section + '.soon') | translate }}</p>
+    <ul>
+      @for (n of [1, 2, 3]; track n) {
+        <li>{{ ('adminPlaceholder.' + section + '.bullet' + n) | translate }}</li>
+      }
+    </ul>
+  </mat-card>
+</section>

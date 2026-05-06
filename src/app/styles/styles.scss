@@ -1,4 +1,522 @@
-/* You can add global styles to this file, and also import other style files */
+/* Styles globaux — variables via @use (Sass module system) */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+@use 'themes/variables';
+
+/* Harmonise le thème Material (azure-blue) avec la palette « forêt / parchemin » */
+:root {
+  --mat-sys-color-primary: #2d5a3d;
+  --mat-sys-color-on-primary: #faf8f5;
+  --mat-sys-color-primary-container: #d4e5d9;
+  --mat-sys-color-on-primary-container: #0f2918;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--app-font);
+  font-size: 16px;
+  color: var(--app-text);
+  background-color: var(--app-page-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/**
+ * Mode sombre — esprit blog universitaire :
+ * primaire = bleu ardoise discret ; boutons = parchemin (--app-button-*) sur encre.
+ */
+body.dark-theme {
+  --mat-sys-color-primary: #8fa3b8;
+  --mat-sys-color-on-primary: #12151c;
+  --mat-sys-color-primary-container: #2c3545;
+  --mat-sys-color-on-primary-container: #d8dee8;
+
+  .mat-mdc-button-base:not([disabled]) {
+    --mat-mdc-button-persistent-ripple-color: rgba(26, 30, 40, 0.18);
+    --mat-mdc-button-ripple-color: rgba(26, 30, 40, 0.12);
+
+    --mdc-filled-button-container-color: var(--app-button-bg, #dfd6c4);
+    --mdc-filled-button-label-text-color: var(--app-button-fg, #1a1e28);
+    --mdc-protected-button-container-color: var(--app-button-bg, #dfd6c4);
+    --mdc-protected-button-label-text-color: var(--app-button-fg, #1a1e28);
+    --mdc-outlined-button-label-text-color: var(--app-button-fg, #1a1e28);
+    --mdc-outlined-button-outline-color: rgba(26, 30, 40, 0.35);
+    --mdc-text-button-label-text-color: var(--app-button-fg, #1a1e28);
+
+    background-color: var(--app-button-bg, #dfd6c4) !important;
+    color: var(--app-button-fg, #1a1e28) !important;
+  }
+
+  .mat-mdc-button-base:not([disabled]) .mdc-button__label,
+  .mat-mdc-button-base:not([disabled]) .mat-icon,
+  .mat-mdc-button-base:not([disabled]) mat-icon {
+    color: var(--app-button-fg, #1a1e28) !important;
+  }
+
+  .mat-mdc-button-base[disabled] {
+    --mdc-filled-button-container-color: rgba(223, 214, 196, 0.35);
+    --mdc-protected-button-container-color: rgba(223, 214, 196, 0.35);
+    background-color: rgba(223, 214, 196, 0.35) !important;
+    color: rgba(26, 30, 40, 0.4) !important;
+  }
+
+  .mat-mdc-button-base[disabled] .mat-icon,
+  .mat-mdc-button-base[disabled] mat-icon {
+    color: rgba(26, 30, 40, 0.4) !important;
+  }
+
+  .mat-mdc-raised-button.mat-primary:not([disabled]),
+  .mat-mdc-unelevated-button.mat-primary:not([disabled]) {
+    box-shadow: 0 3px 14px rgba(8, 10, 14, 0.45) !important;
+  }
+
+  .mat-mdc-button-toggle-group .mat-button-toggle:not(.mat-button-toggle-disabled) .mat-button-toggle-button {
+    background-color: var(--app-button-bg, #dfd6c4) !important;
+    color: var(--app-button-fg, #1a1e28) !important;
+  }
+
+  .mat-mdc-button-toggle-group
+    .mat-button-toggle.mat-button-toggle-checked:not(.mat-button-toggle-disabled)
+    .mat-button-toggle-button {
+    background-color: #cbbfa8 !important;
+    color: #1a1e28 !important;
+  }
+
+  /* Panneau mat-select des jauges (dashboard) : overlay CDK — texte lisible */
+  .cdk-overlay-container .gauge-card-select-panel.mat-mdc-select-panel {
+    background-color: var(--app-surface-strong);
+    border: 1px solid var(--app-stroke-strong);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .cdk-overlay-container
+    .gauge-card-select-panel
+    .mat-mdc-option
+    .mdc-list-item__primary-text {
+    color: var(--app-text) !important;
+  }
+
+  .cdk-overlay-container .gauge-card-select-panel .mat-mdc-option {
+    color: var(--app-text);
+  }
+
+  .cdk-overlay-container
+    .gauge-card-select-panel
+    .mat-mdc-option:hover:not(.mat-mdc-option-disabled) {
+    background-color: rgba(143, 169, 194, 0.14) !important;
+  }
+
+  .cdk-overlay-container
+    .gauge-card-select-panel
+    .mat-mdc-option.mat-mdc-option-active:not(.mat-mdc-option-disabled) {
+    background-color: rgba(143, 169, 194, 0.12) !important;
+  }
+
+  .cdk-overlay-container
+    .gauge-card-select-panel
+    .mat-mdc-option.mdc-list-item--selected:not(.mat-mdc-option-disabled) {
+    background-color: rgba(143, 169, 194, 0.2) !important;
+  }
+
+  /**
+   * Dialogue « Choisir une discipline » (panelClass: app-discipline-dialog)
+   * Le dialogue est rendu dans le cdk-overlay-container, hors de la racine
+   * de l'app. On surcharge ici les tokens de surface + les couleurs des
+   * mat-radio-button pour rester lisible en thème sombre.
+   */
+  .cdk-overlay-container .app-discipline-dialog {
+    --mdc-dialog-container-color: var(--app-surface-strong);
+    --mat-dialog-container-color: var(--app-surface-strong);
+    --mdc-dialog-subhead-color: var(--app-text);
+    --mat-dialog-subhead-color: var(--app-text);
+    --mdc-dialog-supporting-text-color: var(--app-text);
+    --mat-dialog-supporting-text-color: var(--app-text);
+
+    --mdc-radio-unselected-icon-color: rgba(232, 228, 220, 0.55);
+    --mdc-radio-unselected-hover-icon-color: var(--app-text);
+    --mdc-radio-unselected-focus-icon-color: var(--app-text);
+    --mdc-radio-unselected-pressed-icon-color: var(--app-text);
+    --mdc-radio-selected-icon-color: var(--app-forest-light);
+    --mdc-radio-selected-hover-icon-color: var(--app-forest-light);
+    --mdc-radio-selected-focus-icon-color: var(--app-forest-light);
+    --mdc-radio-selected-pressed-icon-color: var(--app-forest-light);
+    --mat-radio-label-text-color: var(--app-text);
+    --mat-radio-disabled-label-color: rgba(232, 228, 220, 0.4);
+  }
+
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-dialog-surface,
+  .cdk-overlay-container .app-discipline-dialog .mdc-dialog__surface {
+    background-color: var(--app-surface-strong) !important;
+    border: 1px solid var(--app-stroke-strong);
+    color: var(--app-text);
+  }
+
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-dialog-title,
+  .cdk-overlay-container .app-discipline-dialog .mdc-dialog__title {
+    color: var(--app-text) !important;
+  }
+
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-dialog-content {
+    color: var(--app-text);
+  }
+
+  /**
+   * Bouton texte « Ajouter une discipline » (look lien) : la règle globale
+   * `body.dark-theme .mat-mdc-button-base …` impose `color: #1a1e28 !important`
+   * sur le bouton, le `.mdc-button__label` et les `mat-icon`. Dans l’overlay,
+   * cela surpasse souvent les styles encapsulés du composant → texte illisible.
+   */
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]) {
+    background-color: transparent !important;
+    color: var(--app-text) !important;
+    --mdc-text-button-label-text-color: var(--app-text);
+  }
+
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):focus-visible {
+    background-color: transparent !important;
+    color: var(--app-text) !important;
+    --mdc-text-button-label-text-color: var(--app-text);
+  }
+
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled])
+    .mdc-button__label,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled])
+    .discipline-dialog-add-toggle__label,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled])
+    mat-icon,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled])
+    .mat-icon {
+    color: var(--app-text) !important;
+  }
+
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover
+    .mdc-button__label,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover
+    .discipline-dialog-add-toggle__label,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover
+    mat-icon,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):focus-visible
+    .mdc-button__label,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):focus-visible
+    .discipline-dialog-add-toggle__label,
+  .cdk-overlay-container
+    .app-discipline-dialog
+    .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):focus-visible
+    mat-icon {
+    color: var(--app-text) !important;
+  }
+
+  /* Texte des radio-button (libellé projeté + label MDC) */
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-radio-button label,
+  .cdk-overlay-container .app-discipline-dialog .mdc-form-field > label,
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-item__label {
+    color: var(--app-text) !important;
+  }
+
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-item__desc,
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-intro,
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-empty {
+    color: var(--app-text-muted) !important;
+  }
+
+  /* Survol : tint ardoise translucide pour rester visible sur fond foncé */
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-item:hover {
+    background: rgba(125, 149, 176, 0.14) !important;
+  }
+
+  /* Erreur de chargement plus lisible (rouge clair) */
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-error {
+    color: #ef9b9b !important;
+  }
+
+  /* Section « Ajouter une discipline » : panneau interne en dark */
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-add-form {
+    background: rgba(40, 45, 58, 0.55);
+    border-color: var(--app-stroke-strong);
+  }
+
+  .cdk-overlay-container .app-discipline-dialog .discipline-dialog-add-form__title {
+    color: var(--app-text);
+  }
+
+  /* Champs `mat-form-field appearance="outline"` à l'intérieur de la popup */
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-form-field {
+    --mdc-outlined-text-field-outline-color: rgba(232, 228, 220, 0.25);
+    --mdc-outlined-text-field-hover-outline-color: rgba(232, 228, 220, 0.45);
+    --mdc-outlined-text-field-focus-outline-color: var(--app-forest-light);
+    --mdc-outlined-text-field-label-text-color: var(--app-text-muted);
+    --mdc-outlined-text-field-hover-label-text-color: var(--app-text);
+    --mdc-outlined-text-field-focus-label-text-color: var(--app-forest-light);
+    --mdc-outlined-text-field-input-text-color: var(--app-text);
+    --mdc-outlined-text-field-caret-color: var(--app-forest-light);
+
+    --mat-form-field-container-text-color: var(--app-text);
+    --mat-form-field-subscript-text-color: var(--app-text-muted);
+  }
+
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-form-field input,
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-form-field textarea {
+    color: var(--app-text) !important;
+    caret-color: var(--app-forest-light);
+  }
+
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-form-field input::placeholder,
+  .cdk-overlay-container .app-discipline-dialog .mat-mdc-form-field textarea::placeholder {
+    color: var(--app-text-muted);
+  }
+}
+
+.mat-typography {
+  font-family: var(--app-font);
+}
+
+.mat-typography .mat-mdc-button,
+.mat-typography .mat-mdc-raised-button,
+.mat-typography .mat-mdc-outlined-button {
+  font-family: var(--app-font);
+}
+
+/**
+ * Conteneur principal des pages : largeur = parent moins deux gouttières fixes.
+ * Les marges latérales réelles sont donc au plus --app-page-edge-max (plus le min vw/rem),
+ * contrairement à un max-width en 72rem centré qui laissait d’immenses bandes vides.
+ */
+.app-page-inner {
+  --app-page-gutter: min(
+    var(--app-page-edge-max),
+    max(0.5rem, 1.25vw)
+  );
+  box-sizing: border-box;
+  width: calc(100% - 2 * var(--app-page-gutter));
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Titres d’ambiance « portail » (composants peuvent surcharger) */
+.app-display {
+  font-family: var(--app-font-display);
+}
+
+/* Material — formes sobres, couleur primaire proche du vert forêt */
+.mat-mdc-raised-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-outlined-button,
+.mat-mdc-stroked-button {
+  border-radius: var(--app-radius-sm) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+}
+
+.mat-mdc-raised-button.mat-primary {
+  box-shadow: 0 3px 12px rgba(45, 90, 61, 0.28) !important;
+}
+
+.mat-mdc-card {
+  border-radius: var(--app-radius) !important;
+}
+
+.mat-mdc-tab-group .mat-mdc-tab-header {
+  border-bottom: none;
+}
+
+.mat-mdc-tab .mdc-tab {
+  border-radius: var(--app-radius-sm) var(--app-radius-sm) 0 0;
+  font-family: var(--app-font);
+  letter-spacing: 0.02em;
+}
+
+.mat-mdc-form-field {
+  font-family: var(--app-font);
+}
+
+/* Infobulles barre transverse (panneau dans l’overlay CDK) */
+.cdk-overlay-container .app-transverse-rail-tooltip .mdc-tooltip__surface {
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/**
+ * Bouton contour type « Review » (accueil, admin…) : fond transparent, libellé clair, survol plus soutenu.
+ * Utiliser sur `mat-stroked-button` avec la classe `review-button`.
+ */
+button.review-button.mat-mdc-button-base:not([disabled]) {
+  --mdc-outlined-button-outline-width: 1.5px;
+  --mdc-outlined-button-outline-color: var(--app-brand-from);
+  --mdc-outlined-button-label-text-color: var(--app-forest-light);
+  --mat-outlined-button-ripple-color: rgba(45, 90, 61, 0.12);
+  --mat-outlined-button-state-layer-color: var(--app-brand-from);
+  background-color: transparent !important;
+  color: var(--app-forest-light) !important;
+}
+
+button.review-button.mat-mdc-button-base:not([disabled]):hover {
+  --mdc-outlined-button-outline-color: var(--app-ochre);
+  --mdc-outlined-button-label-text-color: var(--app-brand-deep);
+  background-color: rgba(45, 90, 61, 0.14) !important;
+  color: var(--app-brand-deep) !important;
+}
+
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]) {
+  --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.45);
+  --mdc-outlined-button-label-text-color: var(--app-text);
+  --mat-outlined-button-ripple-color: rgba(234, 231, 224, 0.14);
+  --mat-outlined-button-state-layer-color: var(--app-text);
+  background-color: transparent !important;
+  color: var(--app-text) !important;
+}
+
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]):hover {
+  --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.65);
+  --mdc-outlined-button-label-text-color: var(--app-text);
+  background-color: rgba(15, 17, 23, 0.42) !important;
+  color: var(--app-text) !important;
+}
+
+button.review-button.mat-mdc-button-base:not([disabled]) .mdc-button__label {
+  color: var(--app-forest-light) !important;
+}
+
+button.review-button.mat-mdc-button-base:not([disabled]):hover .mdc-button__label {
+  color: var(--app-brand-deep) !important;
+}
+
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]) .mdc-button__label,
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]):hover .mdc-button__label {
+  color: var(--app-text) !important;
+}
+
+/**
+ * Boutons contour `review-button` : le libellé est déjà forcé en ivoire (ci-dessus),
+ * mais la règle globale `body.dark-theme .mat-mdc-button-base … mat-icon` garde une
+ * encre sombre sur les icônes — illisible sur fond transparent du panneau admin (et accueil).
+ */
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]) mat-icon,
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]) .mat-icon {
+  color: var(--app-text) !important;
+}
+
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]):hover mat-icon,
+body.dark-theme button.review-button.mat-mdc-button-base:not([disabled]):hover .mat-icon {
+  color: var(--app-text) !important;
+}
+
+/** Admin shell — onglets (Thèmes / Notation…) : icônes alignées sur le contraste du libellé de tab */
+body.dark-theme .admin-page .admin-tabs .mat-mdc-tab-link:not(.mdc-tab--active) mat-icon {
+  color: var(--app-text);
+  opacity: 0.72;
+}
+
+body.dark-theme .admin-page .admin-tabs .mat-mdc-tab-link.mdc-tab--active mat-icon,
+body.dark-theme .admin-page .admin-tabs .mat-mdc-tab-link:not(.mdc-tab--disabled):hover mat-icon,
+body.dark-theme .admin-page .admin-tabs .mat-mdc-tab-link:not(.mdc-tab--disabled):focus-visible mat-icon {
+  color: var(--app-text);
+  opacity: 1;
+}
+
+/** Admin thèmes — boutons icône (edit / delete) sur chaque ligne parcours : libellé/icône vs surcharge dark globale. */
+.admin-themes-page .subtheme-row__actions .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]) .mdc-button__label {
+  color: var(--app-text-muted) !important;
+}
+
+.admin-themes-page .subtheme-row__actions .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):hover .mdc-button__label {
+  color: var(--app-text) !important;
+}
+
+.admin-themes-page
+  .subtheme-row__actions
+  .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled])
+  .mdc-button__label {
+  color: var(--app-terracotta) !important;
+}
+
+.admin-themes-page
+  .subtheme-row__actions
+  .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):hover
+  .mdc-button__label {
+  color: var(--app-terracotta) !important;
+}
+
+body.dark-theme .admin-themes-page .subtheme-row__actions .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]) .mdc-button__label {
+  color: var(--app-text) !important;
+}
+
+body.dark-theme
+  .admin-themes-page
+  .subtheme-row__actions
+  .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):hover
+  .mdc-button__label {
+  color: var(--app-text) !important;
+}
+
+body.dark-theme
+  .admin-themes-page
+  .subtheme-row__actions
+  .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled])
+  .mdc-button__label {
+  color: var(--app-text) !important;
+}
+
+body.dark-theme
+  .admin-themes-page
+  .subtheme-row__actions
+  .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):hover
+  .mdc-button__label {
+  color: var(--app-text) !important;
+}
+
+body.dark-theme .admin-themes-page .subtheme-row__actions .subtheme-row__btn-icon mat-icon {
+  color: var(--app-text) !important;
+}
+
+/** Tableau de bord — boutons filtre radar (surcharge du thème global des boutons). */
+body.dark-theme .dashboard-page .radar-controls button.mat-mdc-button-base:not([disabled]) {
+  background-color: transparent !important;
+  color: var(--app-text) !important;
+  --mdc-outlined-button-label-text-color: var(--app-text);
+  --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.45);
+}
+
+body.dark-theme .dashboard-page .radar-controls button.mat-mdc-button-base:not([disabled]) .mdc-button__label {
+  color: var(--app-text) !important;
+}
+
+body.dark-theme .dashboard-page .radar-controls button.mat-mdc-button-base:not([disabled]):hover {
+  background-color: rgba(15, 17, 23, 0.35) !important;
+}
+
+body.dark-theme .dashboard-page .radar-controls button.mat-primary.mat-mdc-button-base:not([disabled]) {
+  --mdc-outlined-button-outline-color: rgba(184, 201, 220, 0.75);
+}

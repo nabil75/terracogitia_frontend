@@ -1,37 +1,48 @@
+@use '../../styles/themes/mixins' as *;
+
 .home-container {
   min-height: 100vh;
-  padding: 2.5rem 1.5rem;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  @include app-mesh-background;
+  @include page-with-transverse-rail-padding;
+}
+
+.home-container .app-page-inner {
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  background:
-    radial-gradient(circle at top left, #dbeafe, transparent 55%),
-    radial-gradient(circle at bottom right, #fce7f3, transparent 55%),
-    linear-gradient(to bottom, #f9fafb, #eef2ff);
 }
 
 .home-header {
   text-align: center;
 }
 
-.accent-clair{
-  color: #B8A6D5;
+.accent-clair {
+  color: var(--app-logo-word-clair);
 }
 
-.accent-fonce{
-  color: #303889;
+.accent-fonce {
+  color: var(--app-logo-word-fonce);
 }
 
 .home-header h1 {
   margin: 0;
-  font-size: 3rem;
-  font-weight: 800;
+  font-family: var(--app-font-display);
+  font-size: clamp(2.1rem, 4.8vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
 }
 
 .home-header p {
   margin-top: 0.75rem;
-  font-size: 1.5rem;
-  color: #4b5563;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  color: var(--app-text-muted);
+  font-weight: 500;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .themes-grid {
@@ -45,23 +56,35 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ffffff, #eef2ff);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, translate 0.18s ease;
+  border-radius: var(--app-radius);
+  @include app-glass-panel;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
 }
 
 .theme-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+  transform: translateY(-3px);
+  box-shadow: var(--app-shadow-hover);
+  border-color: var(--app-stroke-strong);
+}
+
+.theme-card.theme-card--expanded {
+  border-width: 2px;
+  border-color: var(--app-forest);
+  box-shadow: var(--app-shadow-hover);
 }
 
 .theme-ribbon {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.12), transparent 55%);
+  background: linear-gradient(
+    125deg,
+    rgba(45, 90, 61, 0.09) 0%,
+    transparent 40%,
+    rgba(166, 124, 50, 0.07) 100%
+  );
   pointer-events: none;
 }
 
@@ -73,14 +96,17 @@
 }
 
 .theme-card mat-card-title {
-  font-size: 1.5rem;
+  font-family: var(--app-font-display);
+  font-size: 1.28rem;
   font-weight: 700;
-  color: #906dca;
+  color: var(--app-brand-ink);
+  letter-spacing: -0.01em;
 }
 
 .theme-card mat-card-subtitle {
-  font-size: 1rem;
-  color: #303889;
+  font-size: 0.95rem;
+  color: var(--app-brand-from);
+  font-weight: 600;
 }
 
 .theme-header-spacer {
@@ -95,18 +121,19 @@
   height: 28px;
   line-height: 28px;
   font-size: 24px;
-  color: #6b7280;
+  color: var(--app-text-muted);
   transition: transform 0.15s ease, color 0.15s ease;
 }
 
 .theme-card:hover .theme-chevron {
-  color: #2563eb;
+  color: var(--app-brand-from);
 }
 
 .theme-description {
   margin: 0.5rem 0 0.25rem;
-  font-size: 1rem;
-  color: #374151;
+  font-size: 0.95rem;
+  color: var(--app-text-muted);
+  line-height: 1.55;
 }
 
 .subthemes-list {
@@ -122,7 +149,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.6rem 0;
-  border-top: 1px dashed rgba(148, 163, 184, 0.6);
+  border-top: 1px dashed rgba(107, 99, 90, 0.35);
 }
 
 .subtheme-item:first-child {
@@ -138,7 +165,7 @@
 .subtheme-text p {
   margin: 0;
   font-size: 0.85rem;
-  color: #4b5563;
+  color: var(--app-text-muted);
 }
 
 .theme-button {
@@ -149,11 +176,139 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  flex: 0 0 auto;
+}
+
+/* Deux pictos empilés verticalement (style identique aux pictos du panneau admin) */
+.subtheme-actions__pair {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+/* Bouton icône type « stroked » carré, calé sur .subtheme-row__btn-icon de admin-themes */
+.subtheme-actions__btn-icon.mat-mdc-button-base {
+  min-width: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: var(--app-radius-xs);
+  --mdc-outlined-button-outline-width: 1.5px;
+  --mdc-outlined-button-outline-color: var(--app-stroke-strong);
+  background-color: transparent !important;
+  color: var(--app-text-muted) !important;
+}
+
+.subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled]):hover {
+  background-color: rgba(45, 90, 61, 0.08) !important;
+  color: var(--app-text) !important;
+  --mdc-outlined-button-outline-color: var(--app-brand-from);
+}
+
+.subtheme-actions__btn-icon .mdc-button__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.subtheme-actions__btn-icon mat-icon {
+  margin: 0;
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* Variante « Découvrir » : teinte ocre comme accent (analogue au --danger admin) */
+.subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]) {
+  --mdc-outlined-button-outline-color: rgba(166, 124, 50, 0.5);
+  color: var(--app-ochre) !important;
+}
+
+.subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]):hover {
+  --mdc-outlined-button-outline-color: var(--app-ochre);
+  background-color: rgba(166, 124, 50, 0.12) !important;
+  color: var(--app-ochre) !important;
+}
+
+/* Variante « Review » : accent forêt sur l'outline */
+.subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not([disabled]) {
+  --mdc-outlined-button-outline-color: rgba(45, 90, 61, 0.45);
+  color: var(--app-forest) !important;
+}
+
+.subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not([disabled]):hover {
+  --mdc-outlined-button-outline-color: var(--app-forest);
+  background-color: rgba(45, 90, 61, 0.1) !important;
+  color: var(--app-forest) !important;
+}
+
+/* Thème sombre : reprise stricte du comportement admin */
+:host-context(body.dark-theme) .subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled]) {
+  background-color: transparent !important;
+  --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.4);
+  color: var(--app-text) !important;
+}
+
+:host-context(body.dark-theme) .subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled]):hover {
+  background-color: rgba(15, 17, 23, 0.42) !important;
+  color: var(--app-text) !important;
+  --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.65);
+}
+
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]) {
+  --mdc-outlined-button-outline-color: rgba(191, 164, 106, 0.5);
+  color: var(--app-text) !important;
+}
+
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]):hover {
+  --mdc-outlined-button-outline-color: rgba(214, 188, 130, 0.75);
+  background-color: rgba(191, 164, 106, 0.15) !important;
+  color: var(--app-text) !important;
+}
+
+/**
+ * Pictos en thème sombre : on doit surclasser la règle globale `body.dark-theme
+ * .mat-mdc-button-base mat-icon { color: ... !important; }` (styles.scss).
+ * D'où une spécificité égale + `!important`. Chaque variante garde sa teinte
+ * d'accent (forêt clair / ocre) pour rester lisible et fidèle au thème clair.
+ */
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled])
+  mat-icon {
+  color: var(--app-text) !important;
+}
+
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not([disabled])
+  mat-icon {
+  color: var(--app-forest-light) !important;
+}
+
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled])
+  mat-icon {
+  color: var(--app-ochre) !important;
+}
+
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not([disabled]):hover
+  mat-icon,
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]):hover
+  mat-icon {
+  color: var(--app-text) !important;
 }
 
 @media (max-width: 600px) {
   .home-container {
-    padding: 1.8rem 1rem;
+    padding-top: 1.8rem;
+    padding-bottom: 1.8rem;
+    @include page-with-transverse-rail-padding;
   }
 
   .theme-footer {

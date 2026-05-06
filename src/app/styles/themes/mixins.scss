@@ -1,4 +1,40 @@
-﻿// Mixin for anchor (drag handle button)
+﻿// --- Enveloppe « portail de connaissance » (pages principales) ---------------
+
+@mixin app-mesh-background {
+  background-color: var(--app-page-bg);
+  background-image:
+    radial-gradient(ellipse 120% 90% at 0% -35%, var(--app-mesh-1), transparent 52%),
+    radial-gradient(ellipse 95% 75% at 100% 0%, var(--app-mesh-2), transparent 48%),
+    radial-gradient(ellipse 80% 55% at 50% 115%, var(--app-mesh-3), transparent 48%),
+    linear-gradient(180deg, var(--app-mesh-top-fade) 0%, transparent 38%);
+}
+
+/** Carte type « feuille / fiche » — peu de verre, plutôt papier légèrement levé */
+@mixin app-glass-panel {
+  background: var(--app-surface);
+  backdrop-filter: saturate(1.05) var(--app-blur);
+  -webkit-backdrop-filter: saturate(1.05) var(--app-blur);
+  border: 1px solid var(--app-stroke);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow);
+}
+
+/** Marge gauche pour le sticker `app-transverse-rail` (pages qui affichent la barre). */
+@mixin page-with-transverse-rail-padding {
+  padding-left: min(
+    var(--app-page-edge-max),
+    clamp(2.75rem, 4vw, 3.5rem)
+  );
+
+  @media (max-width: 600px) {
+    padding-left: min(
+      var(--app-page-edge-max),
+      clamp(3.1rem, 14vw, 3.5rem)
+    );
+  }
+}
+
+// Mixin for anchor (drag handle button)
 @mixin ancre-style() {
     cursor: move;
     border: none;

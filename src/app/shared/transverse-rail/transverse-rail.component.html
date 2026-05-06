@@ -1,0 +1,197 @@
+<aside class="transverse-rail" [attr.aria-label]="'transverseRail.ariaRail' | translate">
+  <div class="transverse-rail__track">
+    <a
+      routerLink="/"
+      routerLinkActive="transverse-rail__sticker--active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="transverse-rail__sticker"
+      [matTooltip]="'transverseRail.tooltipHome' | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="'transverseRail.ariaHome' | translate"
+    >
+      <svg
+        class="transverse-rail__icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+        width="48"
+        height="48"
+      >
+        <path
+          d="M10 22.5 24 11l14 11.5V38a2 2 0 0 1-2 2H29v-12H19v12H12a2 2 0 0 1-2-2V22.5Z"
+          stroke="currentColor"
+          stroke-width="2.25"
+          stroke-linejoin="round"
+          fill="currentColor"
+          fill-opacity="0.12"
+        />
+      </svg>
+    </a>
+    <button
+      type="button"
+      class="transverse-rail__sticker"
+      [class.transverse-rail__sticker--active]="disciplineService.selectedDisciplineId() !== null"
+      (click)="openDisciplineSelector()"
+      [matTooltip]="'transverseRail.tooltipDiscipline' | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="'transverseRail.ariaDiscipline' | translate"
+    >
+      <svg
+        class="transverse-rail__icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+        width="48"
+        height="48"
+      >
+        <path
+          d="M24 8 6 16l18 8 18-8-18-8Zm0 14L8.5 15.5v9L24 31l15.5-6.5v-9L24 22Z"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linejoin="round"
+          fill="currentColor"
+          fill-opacity="0.18"
+        />
+        <path
+          d="M14 28v6c0 1.5 4.5 4 10 4s10-2.5 10-4v-6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"
+        />
+        <path d="M40 18v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </button>
+    <a
+      routerLink="/discover"
+      routerLinkActive="transverse-rail__sticker--active"
+      class="transverse-rail__sticker"
+      [matTooltip]="'transverseRail.tooltipDiscover' | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="'transverseRail.ariaDiscover' | translate"
+    >
+      <svg
+        class="transverse-rail__icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+        width="48"
+        height="48"
+      >
+        <circle cx="24" cy="22" r="10" stroke="currentColor" stroke-width="2.25" fill="currentColor" fill-opacity="0.1" />
+        <path
+          d="M24 12v4M24 28v4M14 22h4M30 22h4"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+        <path d="M20 34h8l-1 6h-6l-1-6Z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.75" />
+      </svg>
+    </a>
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="transverse-rail__sticker--active"
+      class="transverse-rail__sticker"
+      [matTooltip]="'transverseRail.tooltipDashboard' | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="'transverseRail.ariaDashboard' | translate"
+    >
+      <svg
+        class="transverse-rail__icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+        width="48"
+        height="48"
+      >
+        <rect x="6" y="26" width="10" height="14" rx="1.5" fill="currentColor" fill-opacity="1" />
+        <rect x="19" y="16" width="10" height="24" rx="1.5" fill="currentColor" fill-opacity="0.82" />
+        <rect x="32" y="8" width="10" height="32" rx="1.5" fill="currentColor" fill-opacity="1" />
+      </svg>
+    </a>
+    <a
+      routerLink="/admin"
+      routerLinkActive="transverse-rail__sticker--active"
+      class="transverse-rail__sticker"
+      [matTooltip]="'transverseRail.tooltipAdmin' | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="'transverseRail.ariaAdmin' | translate"
+    >
+      <svg
+        class="transverse-rail__icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+        width="48"
+        height="48"
+      >
+        <path
+          d="M22 10h4l.6 3.2a14 14 0 0 1 3.9 1.6l2.9-1.7 2.8 2.8-1.7 2.9a14 14 0 0 1 1.6 3.9L42 26v4l-3.2.6a14 14 0 0 1-1.6 3.9l1.7 2.9-2.8 2.8-2.9-1.7a14 14 0 0 1-3.9 1.6L26 42h-4l-.6-3.2a14 14 0 0 1-3.9-1.6l-2.9 1.7-2.8-2.8 1.7-2.9a14 14 0 0 1-1.6-3.9L6 30v-4l3.2-.6a14 14 0 0 1 1.6-3.9l-1.7-2.9 2.8-2.8 2.9 1.7a14 14 0 0 1 3.9-1.6L22 10Z"
+          stroke="currentColor"
+          stroke-width="2"
+          fill="currentColor"
+          fill-opacity="0.1"
+        />
+        <circle cx="24" cy="24" r="5" fill="currentColor" />
+      </svg>
+    </a>
+    <button
+      type="button"
+      class="transverse-rail__sticker"
+      (click)="languageService.toggleLanguage()"
+      [matTooltip]="languageService.languageSwitchTooltipKey() | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="'transverseRail.ariaLangSwitch' | translate"
+    >
+      <span class="transverse-rail__lang">{{ languageService.getCurrentLang() === 'fr' ? 'FR' : 'EN' }}</span>
+    </button>
+    <button
+      type="button"
+      class="transverse-rail__sticker"
+      (click)="toggleTheme()"
+      [matTooltip]="themeTooltipKey() | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="themeTooltipKey() | translate"
+    >
+      <mat-icon class="transverse-rail__mat-icon" aria-hidden="true">
+        {{ themeService.activeTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}
+      </mat-icon>
+    </button>
+  </div>
+
+  @if (disciplineService.selectedDisciplineLabel(); as discLabel) {
+    <span
+      class="transverse-rail__discipline-label"
+      role="status"
+      aria-live="polite"
+      [attr.aria-label]="
+        'transverseRail.currentDisciplineAria' | translate: { label: discLabel }
+      "
+    >
+      <span class="transverse-rail__discipline-label__prefix">
+        {{ 'transverseRail.currentDisciplinePrefix' | translate }}
+      </span>
+      <span class="transverse-rail__discipline-label__value">{{ discLabel }}</span>
+    </span>
+  }
+</aside>

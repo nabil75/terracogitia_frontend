@@ -1,0 +1,212 @@
+<app-transverse-rail />
+
+<div class="login-container">
+  <div class="app-page-inner login-page-inner">
+    <mat-card class="login-card">
+      <div class="login-ribbon"></div>
+
+      <div class="login-brand">
+        <img
+          [src]="themeService.logoSrc()"
+          width="72"
+          height="48"
+          [attr.alt]="'common.logoAlt' | translate"
+        />
+        <div class="login-brand-text">
+          <h1 class="accent-clair">
+            terra-cogit<span class="accent-fonce"><em>ia</em></span>
+          </h1>
+          <p>
+            {{
+              (mode === 'login' ? 'login.subtitleLogin' : 'login.subtitleReset') | translate
+            }}
+          </p>
+        </div>
+      </div>
+
+      @if (mode === 'login') {
+        <form
+          [formGroup]="loginForm"
+          (ngSubmit)="submitLogin()"
+          class="login-form"
+          novalidate
+        >
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.email' | translate }}</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              [class.field-error]="errorField === 'email'"
+            />
+            <mat-icon matSuffix>mail_outline</mat-icon>
+            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
+              <mat-error>{{ 'login.emailRequired' | translate }}</mat-error>
+            }
+            @if (loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched) {
+              <mat-error>{{ 'login.emailInvalid' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.password' | translate }}</mat-label>
+            <input
+              matInput
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+              autocomplete="current-password"
+              [class.field-error]="errorField === 'password'"
+            />
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="hidePassword = !hidePassword"
+              [attr.aria-label]="
+                (hidePassword ? 'login.passwordToggleShow' : 'login.passwordToggleHide') | translate
+              "
+            >
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+              <mat-error>{{ 'login.passwordRequired' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="login-links">
+            <button mat-button color="primary" type="button" (click)="switchMode('reset')">
+              {{ 'login.forgotPassword' | translate }}
+            </button>
+          </div>
+
+          @if (errorMessage) {
+            <div class="auth-alert auth-alert--error" role="alert">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ errorMessage }}</span>
+            </div>
+          }
+          @if (successMessage) {
+            <div class="auth-alert auth-alert--success" role="status">
+              <mat-icon>check_circle_outline</mat-icon>
+              <span>{{ successMessage }}</span>
+            </div>
+          }
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="submit-button"
+            [disabled]="loading"
+          >
+            @if (loading) {
+              <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+            } @else {
+              <span>{{ 'login.submitLogin' | translate }}</span>
+            }
+          </button>
+        </form>
+      }
+
+      @if (mode === 'reset') {
+        <form
+          [formGroup]="resetForm"
+          (ngSubmit)="submitReset()"
+          class="login-form"
+          novalidate
+        >
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.email' | translate }}</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              [class.field-error]="errorField === 'email'"
+            />
+            <mat-icon matSuffix>mail_outline</mat-icon>
+            @if (resetForm.get('email')?.hasError('required') && resetForm.get('email')?.touched) {
+              <mat-error>{{ 'login.emailRequired' | translate }}</mat-error>
+            }
+            @if (resetForm.get('email')?.hasError('email') && resetForm.get('email')?.touched) {
+              <mat-error>{{ 'login.emailInvalid' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.newPassword' | translate }}</mat-label>
+            <input
+              matInput
+              [type]="hideNewPassword ? 'password' : 'text'"
+              formControlName="newPassword"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="hideNewPassword = !hideNewPassword"
+            >
+              <mat-icon>{{ hideNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (resetForm.get('newPassword')?.hasError('required') && resetForm.get('newPassword')?.touched) {
+              <mat-error>{{ 'login.newPasswordRequired' | translate }}</mat-error>
+            }
+            @if (resetForm.get('newPassword')?.hasError('minlength') && resetForm.get('newPassword')?.touched) {
+              <mat-error>{{ 'login.newPasswordMin' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'common.confirmPassword' | translate }}</mat-label>
+            <input
+              matInput
+              [type]="hideNewPassword ? 'password' : 'text'"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+            />
+            @if (resetForm.get('confirmPassword')?.hasError('required') && resetForm.get('confirmPassword')?.touched) {
+              <mat-error>{{ 'login.confirmRequired' | translate }}</mat-error>
+            }
+            @if (resetForm.get('confirmPassword')?.hasError('mismatch')) {
+              <mat-error>{{ 'login.confirmMismatch' | translate }}</mat-error>
+            }
+          </mat-form-field>
+
+          @if (errorMessage) {
+            <div class="auth-alert auth-alert--error" role="alert">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ errorMessage }}</span>
+            </div>
+          }
+          @if (successMessage) {
+            <div class="auth-alert auth-alert--success" role="status">
+              <mat-icon>check_circle_outline</mat-icon>
+              <span>{{ successMessage }}</span>
+            </div>
+          }
+
+          <div class="reset-actions">
+            <button mat-stroked-button color="primary" type="button" (click)="switchMode('login')">
+              {{ 'login.backToLogin' | translate }}
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              class="submit-button"
+              [disabled]="loading"
+            >
+              @if (loading) {
+                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+              } @else {
+                <span>{{ 'login.submitReset' | translate }}</span>
+              }
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card>
+  </div>
+</div>
