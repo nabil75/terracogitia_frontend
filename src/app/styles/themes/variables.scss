@@ -1,189 +1,193 @@
 ﻿:root {
-    /* Portail de connaissance & découverte — tons papier, encre et nature */
-    --app-font-display: 'Source Serif 4', 'Georgia', 'Times New Roman', serif;
-    --app-font: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  /* Portail de connaissance & découverte — tons papier, encre et nature */
+  --app-font-display: "Source Serif 4", "Georgia", "Times New Roman", serif;
+  --app-font: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
 
-    --app-page-bg: #f5f1e8;
-    --app-mesh-1: rgba(45, 90, 61, 0.11);
-    --app-mesh-2: rgba(139, 90, 43, 0.09);
-    --app-mesh-3: rgba(61, 90, 120, 0.07);
+  --app-page-bg: #f5f1e8;
+  --app-mesh-1: rgba(45, 90, 61, 0.11);
+  --app-mesh-2: rgba(139, 90, 43, 0.09);
+  --app-mesh-3: rgba(61, 90, 120, 0.07);
 
-    --app-surface: rgba(255, 252, 247, 0.94);
-    --app-surface-strong: #fffdf8;
-    --app-stroke: rgba(61, 51, 41, 0.1);
-    --app-stroke-strong: rgba(61, 51, 41, 0.16);
-    --app-shadow: 0 2px 16px rgba(44, 40, 36, 0.06), 0 1px 2px rgba(44, 40, 36, 0.04);
-    --app-shadow-hover: 0 12px 36px rgba(44, 40, 36, 0.1);
+  --app-surface: rgba(255, 252, 247, 0.94);
+  --app-surface-strong: #fffdf8;
+  --app-stroke: rgba(61, 51, 41, 0.1);
+  --app-stroke-strong: rgba(61, 51, 41, 0.16);
+  --app-shadow:
+    0 2px 16px rgba(44, 40, 36, 0.06), 0 1px 2px rgba(44, 40, 36, 0.04);
+  --app-shadow-hover: 0 12px 36px rgba(44, 40, 36, 0.1);
 
-    --app-radius: 1rem;
-    --app-radius-sm: 0.625rem;
-    --app-radius-xs: 0.375rem;
+  --app-radius: 1rem;
+  --app-radius-sm: 0.625rem;
+  --app-radius-xs: 0.375rem;
 
-    --app-text: #2c2825;
-    --app-text-muted: #6b635a;
+  --app-text: #2c2825;
+  --app-text-muted: #6b635a;
 
-    --app-ink: #1e3a2f;
-    --app-forest: #2d5a3d;
-    --app-forest-light: #3d6b4f;
-    --app-sage: #8faa95;
-    --app-ochre: #a67c32;
-    --app-terracotta: #9c5b3d;
-    --app-accent-soft: #c4a574;
-    --app-brand-ink: var(--app-ink);
-    /* Titre logo « terra-cogit » / « ia » (voir aussi body.dark-theme) */
-    --app-logo-word-clair: var(--app-accent-soft);
-    --app-logo-word-fonce: var(--app-brand-ink);
-    --app-brand-from: var(--app-forest);
-    --app-brand-to: var(--app-forest-light);
-    --app-brand-deep: #163524;
-    --app-brand-magenta: var(--app-terracotta);
+  --app-ink: #1e3a2f;
+  --app-forest: #2d5a3d;
+  --app-forest-light: #3d6b4f;
+  --app-sage: #8faa95;
+  --app-ochre: #a67c32;
+  --app-terracotta: #9c5b3d;
+  --app-accent-soft: #c4a574;
+  --app-brand-ink: var(--app-ink);
+  /* Titre logo « terra-cogit » / « ia » (voir aussi body.dark-theme) */
+  --app-logo-word-clair: var(--app-accent-soft);
+  --app-logo-word-fonce: var(--app-brand-ink);
+  --app-brand-from: var(--app-forest);
+  --app-brand-to: var(--app-forest-light);
+  --app-brand-deep: #163524;
+  --app-brand-magenta: var(--app-terracotta);
 
-    --app-blur: blur(14px);
-    --app-highlight-row: rgba(45, 90, 61, 0.08);
+  --app-blur: blur(14px);
+  --app-highlight-row: rgba(45, 90, 61, 0.08);
 
-    /** Voile du dégradé vertical dans `app-mesh-background` (clair / sombre). */
-    --app-mesh-top-fade: rgba(255, 252, 247, 0.35);
+  /** Voile du dégradé vertical dans `app-mesh-background` (clair / sombre). */
+  --app-mesh-top-fade: rgba(255, 252, 247, 0.35);
 
-    /** Marge latérale max (gouttière de `.app-page-inner`), hors zone rail gauche */
-    --app-page-edge-max: 1.5cm;
+  /** Marge latérale max (gouttière de `.app-page-inner`), hors zone rail gauche */
+  --app-page-edge-max: 1.5cm;
 
-    // Common Variables
-    --font-body-text: 16px;
-    --font-body-text-small: 12px;
-    --font-size-label: 0.75vw;
-    --font-size-title: 1vw;
-    --font-size-title-page: 3vw;
-    --padding-base: 1rem;
-    --font-icon-menu-questionnaire:64px!important;
+  // Common Variables
+  --font-body-text: 16px;
+  --font-body-text-small: 12px;
+  --font-size-label: 0.75vw;
+  --font-size-title: 1vw;
+  --font-size-title-page: 3vw;
+  --padding-base: 1rem;
+  --font-icon-menu-questionnaire: 64px !important;
 
-    /* Legacy (admin / questionnaires) — thème clair par défaut sur :root */
-    --body-background: #F5F5F5;
-    --title-section-color: #01A3D7;
-    --primary-text: #1C1C1C;
-    --secondary-text: rgba(167, 164, 164, 0.5);
-    --gray-text: darkgray;
-    --lightgray-text: rgba(181, 178, 178, 0.728);
-    --hr-border: solid 2px rgb(244, 238, 238);
-    --div-background: #FFFFFF;
-    --div-border: 5px solid rgb(200, 200, 200);
-    --div-border-hover: 5px solid rgb(160, 160, 160);
-    --hover-background: #E0E0E0;
-    --success-alert: #4CAF50;
-    --warning-alert: #FF9800;
-    --error-alert: #F44336;
-    --light-color: white;
-    --paginator-background: lightgray;
-    --btn-action-background: #01A3D7;
-    --btn-action-color: white;
-    --hightlight-row: #d7ebf1;
-    --caret-color: gray;
-    --icon-delete: rgb(139, 137, 137);
-    --icon-delete-hover: black;
-    --icon-menu-questionnaire: black;
-    --question-num-color: #1c1c1c;
-    --question-num-bg: #ffffff;
-  }
+  /* Legacy (admin / questionnaires) — thème clair par défaut sur :root */
+  --body-background: #f5f5f5;
+  --title-section-color: #01a3d7;
+  --primary-text: #1c1c1c;
+  --secondary-text: rgba(167, 164, 164, 0.5);
+  --gray-text: darkgray;
+  --lightgray-text: rgba(181, 178, 178, 0.728);
+  --hr-border: solid 2px rgb(244, 238, 238);
+  --div-background: #ffffff;
+  --div-border: 5px solid rgb(200, 200, 200);
+  --div-border-hover: 5px solid rgb(160, 160, 160);
+  --hover-background: #e0e0e0;
+  --success-alert: #4caf50;
+  --warning-alert: #ff9800;
+  --error-alert: #f44336;
+  --light-color: white;
+  --paginator-background: lightgray;
+  --btn-action-background: #01a3d7;
+  --btn-action-color: white;
+  --hightlight-row: #d7ebf1;
+  --caret-color: gray;
+  --icon-delete: rgb(139, 137, 137);
+  --icon-delete-hover: black;
+  --icon-menu-questionnaire: black;
+  --question-num-color: #1c1c1c;
+  --question-num-bg: #ffffff;
+}
 
-  /**
+/**
    * Thème sombre « blog universitaire » : encre profonde, ivoire de lecture,
    * accents bleu bibliothèque et or parchemin discrets (pas de noir pur ni d’orange flashy).
    */
-  body.dark-theme {
-    /* Fond & mailles — halos bleus gris et chaleur papier très faibles */
-    --app-page-bg: #171a22;
-    --app-mesh-1: rgba(132, 156, 186, 0.07);
-    --app-mesh-2: rgba(196, 181, 148, 0.045);
-    --app-mesh-3: rgba(100, 118, 140, 0.06);
+body.dark-theme {
+  /* Fond & mailles — halos bleus gris et chaleur papier très faibles */
+  --app-page-bg: #171a22;
+  --app-mesh-1: rgba(132, 156, 186, 0.07);
+  --app-mesh-2: rgba(196, 181, 148, 0.045);
+  --app-mesh-3: rgba(100, 118, 140, 0.06);
 
-    --app-surface: rgba(31, 35, 46, 0.94);
-    --app-surface-strong: #282d3a;
-    --app-stroke: rgba(232, 228, 220, 0.09);
-    --app-stroke-strong: rgba(232, 228, 220, 0.14);
-    --app-shadow: 0 2px 20px rgba(8, 10, 14, 0.4), 0 1px 2px rgba(0, 0, 0, 0.25);
-    --app-shadow-hover: 0 14px 40px rgba(8, 10, 14, 0.5);
+  --app-surface: rgba(31, 35, 46, 0.94);
+  --app-surface-strong: #282d3a;
+  --app-stroke: rgba(232, 228, 220, 0.09);
+  --app-stroke-strong: rgba(232, 228, 220, 0.14);
+  --app-shadow: 0 2px 20px rgba(8, 10, 14, 0.4), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --app-shadow-hover: 0 14px 40px rgba(8, 10, 14, 0.5);
 
-    --app-text: #eae7e0;
-    --app-text-muted: #9399a7;
+  --app-text: #eae7e0;
+  --app-text-muted: #9399a7;
 
-    /* Accents « chaire & reliure » : bleus ardoise + or parchemin + cuir discret */
-    --app-ink: #d8dee8;
-    --app-forest: #7d95b0;
-    --app-forest-light: #9eb2c8;
-    --app-sage: rgba(125, 149, 176, 0.42);
-    --app-ochre: #bfa46a;
-    --app-terracotta: #9d7b6e;
-    --app-accent-soft: #f2ece3; /* titres logo « terra-cogit » : ton parchemin clair sur fond sombre */
-    --app-logo-word-clair: #fefbf6;
-    /* Jaune du masque droit de `logo_terra-cogitia_light.png` (moyenne ~#fef592) */
-    --app-logo-word-fonce: #ddd89c;
-    --app-brand-ink: #b8c9dc;
-    --app-brand-from: #8fa3b8;
-    --app-brand-to: #a8bdd4;
-    --app-brand-deep: #0f1117;
-    --app-brand-magenta: #9d7b6e;
+  /* Accents « chaire & reliure » : bleus ardoise + or parchemin + cuir discret */
+  --app-ink: #d8dee8;
+  --app-forest: #7d95b0;
+  --app-forest-light: #9eb2c8;
+  --app-sage: rgba(125, 149, 176, 0.42);
+  --app-ochre: #bfa46a;
+  --app-terracotta: #9d7b6e;
+  --app-accent-soft: #f2ece3; /* titres logo « terra-cogit » : ton parchemin clair sur fond sombre */
+  --app-logo-word-clair: #fefbf6;
+  /* Jaune du masque droit de `logo_terra-cogitia_light.png` (moyenne ~#fef592) */
+  --app-logo-word-fonce: #ddd89c;
+  --app-brand-ink: #b8c9dc;
+  --app-brand-from: #8fa3b8;
+  --app-brand-to: #a8bdd4;
+  --app-brand-deep: #0f1117;
+  --app-brand-magenta: #9d7b6e;
 
-    --app-blur: blur(14px);
-    --app-highlight-row: rgba(143, 169, 194, 0.11);
+  --app-blur: blur(14px);
+  --app-highlight-row: rgba(143, 169, 194, 0.11);
 
-    --app-mesh-top-fade: rgba(23, 26, 34, 0.65);
+  --app-mesh-top-fade: rgba(23, 26, 34, 0.65);
 
-    /* Boutons : parchemin tiré sur le ton des cabiers (lisible, sobre) */
-    --app-button-bg: #dfd6c4;
-    --app-button-fg: #1a1e28;
+  /* Boutons Material (mode sombre) : transparent, texte blanc, bordure grise — voir mixin dark-theme-mat-buttons */
+  --app-button-bg: transparent;
+  --app-button-fg: #ffffff;
+  --app-dark-button-border: rgba(234, 231, 224, 0.45);
+  --app-dark-button-border-hover: rgba(234, 231, 224, 0.65);
+  --app-dark-button-hover-bg: rgba(15, 17, 23, 0.42);
 
-    /* Legacy (admin / questionnaires) — même esprit */
-    --body-background: #171a22;
-    --title-section-color: #b8c9dc;
-    --primary-text: #eae7e0;
-    --secondary-text: rgba(147, 153, 167, 0.75);
-    --gray-text: #9aa0aa;
-    --lightgray-text: rgba(180, 184, 192, 0.7);
-    --hr-border: solid 1px rgba(232, 228, 220, 0.12);
-    --div-background: #1f232e;
-    --div-border: 1px solid rgba(232, 228, 220, 0.1);
-    --div-border-hover: 1px solid rgba(184, 201, 220, 0.35);
-    --hover-background: #323848;
-    --success-alert: #6b9b7a;
-    --warning-alert: #c9a227;
-    --error-alert: #c4776b;
-    --light-color: #c8cdd5;
-    --paginator-background: #282d3a;
-    --btn-action-background: var(--app-button-bg);
-    --btn-action-color: var(--app-button-fg);
-    --hightlight-row: rgba(143, 169, 194, 0.14);
-    --caret-color: #eae7e0;
-    --icon-delete: #9aa0aa;
-    --icon-delete-hover: #eae7e0;
-    --icon-menu-questionnaire: #eae7e0;
-    --question-num-color: #1a1e28;
-    --question-num-bg: #e8e2d8;
-  }
-  
-  .light-theme {
-    // Light Theme Variables
-    --body-background: #F5F5F5; /* Light gray background */
-    --title-section-color: #01A3D7; /* Darker, muted cyan for titles */
-    --primary-text: #1C1C1C; /* Dark gray for primary text */
-    --secondary-text:rgba(167, 164, 164, 0.5);
-    --gray-text: darkgray;
-    --lightgray-text: rgba(181, 178, 178, 0.728);
-    --hr-border: solid 2px rgb(244, 238, 238);
-    --div-background: #FFFFFF; /* White background for divs */
-    --div-border: 5px solid rgb(200, 200, 200); /* Light gray for div borders */
-    --div-border-hover: 5px solid rgb(160, 160, 160); /* Slightly darker gray for hover border */
-    --hover-background: #E0E0E0; /* Light gray for hover background */
-    --success-alert: #4CAF50; /* Bright green for success alerts */
-    --warning-alert: #FF9800; /* Bright orange for warnings */
-    --error-alert: #F44336; /* Bright red for errors */
-    --light-color:white;
-    --paginator-background:lightgray;
-    --btn-action-background: #01A3D7;
-    --btn-action-color: white;
-    --hightlight-row: #d7ebf1; /* Light gray for highlighted rows */
-    --caret-color: gray;
-    --icon-delete: rgb(139, 137, 137);
-    --icon-delete-hover: black;
-    --icon-menu-questionnaire: black;
-    --question-num-color: #1c1c1c;
-    --question-num-bg: #ffffff;
-  }
+  /* Legacy (admin / questionnaires) — même esprit */
+  --body-background: #171a22;
+  --title-section-color: #b8c9dc;
+  --primary-text: #eae7e0;
+  --secondary-text: rgba(147, 153, 167, 0.75);
+  --gray-text: #9aa0aa;
+  --lightgray-text: rgba(180, 184, 192, 0.7);
+  --hr-border: solid 1px rgba(232, 228, 220, 0.12);
+  --div-background: #1f232e;
+  --div-border: 1px solid rgba(232, 228, 220, 0.1);
+  --div-border-hover: 1px solid rgba(184, 201, 220, 0.35);
+  --hover-background: #323848;
+  --success-alert: #6b9b7a;
+  --warning-alert: #c9a227;
+  --error-alert: #c4776b;
+  --light-color: #c8cdd5;
+  --paginator-background: #282d3a;
+  --btn-action-background: var(--app-button-bg);
+  --btn-action-color: var(--app-button-fg);
+  --hightlight-row: rgba(143, 169, 194, 0.14);
+  --caret-color: #eae7e0;
+  --icon-delete: #9aa0aa;
+  --icon-delete-hover: #eae7e0;
+  --icon-menu-questionnaire: #eae7e0;
+  --question-num-color: #1a1e28;
+  --question-num-bg: #e8e2d8;
+}
+
+.light-theme {
+  // Light Theme Variables
+  --body-background: #f5f5f5; /* Light gray background */
+  --title-section-color: #01a3d7; /* Darker, muted cyan for titles */
+  --primary-text: #1c1c1c; /* Dark gray for primary text */
+  --secondary-text: rgba(167, 164, 164, 0.5);
+  --gray-text: darkgray;
+  --lightgray-text: rgba(181, 178, 178, 0.728);
+  --hr-border: solid 2px rgb(244, 238, 238);
+  --div-background: #ffffff; /* White background for divs */
+  --div-border: 5px solid rgb(200, 200, 200); /* Light gray for div borders */
+  --div-border-hover: 5px solid rgb(160, 160, 160); /* Slightly darker gray for hover border */
+  --hover-background: #e0e0e0; /* Light gray for hover background */
+  --success-alert: #4caf50; /* Bright green for success alerts */
+  --warning-alert: #ff9800; /* Bright orange for warnings */
+  --error-alert: #f44336; /* Bright red for errors */
+  --light-color: white;
+  --paginator-background: lightgray;
+  --btn-action-background: #01a3d7;
+  --btn-action-color: white;
+  --hightlight-row: #d7ebf1; /* Light gray for highlighted rows */
+  --caret-color: gray;
+  --icon-delete: rgb(139, 137, 137);
+  --icon-delete-hover: black;
+  --icon-menu-questionnaire: black;
+  --question-num-color: #1c1c1c;
+  --question-num-bg: #ffffff;
+}

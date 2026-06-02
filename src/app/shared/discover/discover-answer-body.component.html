@@ -1,0 +1,19 @@
+@if (text.trim()) {
+  <div class="discover-answer-body">{{ text }}</div>
+}
+@if (safeImageLinks.length > 0) {
+  <p class="discover-answer-image-links__lead">{{ 'discover.imageLinksLead' | translate }}</p>
+  <ul class="discover-answer-image-links">
+    @for (link of safeImageLinks; track link.url) {
+      <li>
+        <a
+          class="discover-answer-image-links__a"
+          [href]="link.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          (click)="openImageLink($event, link)"
+        >{{ link.label }}</a>
+      </li>
+    }
+  </ul>
+}

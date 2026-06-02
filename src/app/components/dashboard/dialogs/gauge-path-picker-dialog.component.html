@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>
+  {{ 'dashboard.gaugeDialogTitle' | translate: { theme: data.themeLabel } }}
+</h2>
+
+<mat-dialog-content class="gauge-path-dialog-content">
+  <button
+    mat-stroked-button
+    type="button"
+    class="gauge-path-option"
+    [class.gauge-path-option--active]="data.selectedId === ''"
+    (click)="choose('')"
+  >
+    <mat-icon aria-hidden="true">apps</mat-icon>
+    <span>{{ 'dashboard.gaugeAllPaths' | translate }}</span>
+  </button>
+
+  @for (opt of data.options; track opt.id) {
+    <button
+      mat-stroked-button
+      type="button"
+      class="gauge-path-option"
+      [class.gauge-path-option--active]="data.selectedId === opt.id"
+      (click)="choose(opt.id)"
+    >
+      <mat-icon aria-hidden="true">route</mat-icon>
+      <span>{{ opt.label }}</span>
+    </button>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" [mat-dialog-close]="undefined">
+    {{ 'common.cancel' | translate }}
+  </button>
+</mat-dialog-actions>

@@ -6,6 +6,7 @@ import {
   NgZone,
   OnInit,
   ViewChild,
+  inject,
 } from '@angular/core';
 import {
   CdkDragEnd,
@@ -18,6 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import {
   ApiService,
   EvaluationRecord,
@@ -26,12 +28,23 @@ import {
 import { SpinnerComponent } from '../../shared/spinner/spinner.component';
 import { TransverseRailComponent } from '../../shared/transverse-rail/transverse-rail.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { assignQuestionNumbers } from '../../shared/utils/question-order.util';
+import {
+  QuestionDrawingDialogComponent,
+  QuestionDrawingDialogResult,
+  QUESTION_DRAWING_DIALOG_INITIAL_HEIGHT,
+  QUESTION_DRAWING_DIALOG_INITIAL_WIDTH,
+} from './dialogs/question-drawing-dialog.component';
 
 interface ReviewQuestion {
   id: string;
   label: string;
+  /** Numéro fixe Q1…Qn (rang par `id_question` croissant). */
+  qNum: number;
   /** Fourni par l’API avec les questions (ex. champ evaluation_count). */
   evaluationCount: number;
+  /** True si la colonne `question.dessin` est renseignée en base. */
+  hasDessin: boolean;
 }
 
 interface QuestionAnswerHistoryEntry {
@@ -69,6 +82,7 @@ interface ParsedEvaluation {
     MatCardModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
     SpinnerComponent,
     TranslateModule,
   ],
@@ -125,6 +139,8 @@ export class ReviewComponent implements OnInit {
   reponseByQuestionId: Record<string, string> = {};
   evaluationHistoryByQuestionId: Record<string, QuestionAnswerHistoryEntry[]> =
     {};
+
+  private readonly dialog = inject(MatDialog);
 
   constructor(
     private route: ActivatedRoute,
@@ -340,6 +356,31 @@ export class ReviewComponent implements OnInit {
     if (q) {
       this.loadEvaluationHistoryForQuestion(q.id);
     }
+  }
+
+  openDrawingDialog(): void {
+    const question = this.selectedQuestion;
+    if (!question) {
+      return;
+    }
+    const ref = this.dialog.open(QuestionDrawingDialogComponent, {
+      width: QUESTION_DRAWING_DIALOG_INITIAL_WIDTH,
+      maxWidth: QUESTION_DRAWING_DIALOG_INITIAL_WIDTH,
+      height: QUESTION_DRAWING_DIALOG_INITIAL_HEIGHT,
+      maxHeight: '100vh',
+      panelClass: 'app-question-drawing-dialog',
+      data: {
+        questionId: question.id,
+        questionLabel: question.label,
+      },
+    });
+    ref.afterClosed().subscribe((result: QuestionDrawingDialogResult) => {
+      if (result === 'saved') {
+        question.hasDessin = true;
+      } else if (result === 'deleted') {
+        question.hasDessin = false;
+      }
+    });
   }
 
   onHistoryRowClick(entry: QuestionAnswerHistoryEntry): void {
@@ -608,7 +649,7 @@ export class ReviewComponent implements OnInit {
 
     this.apiService.getQuestionsBySubTheme(this.selectedSubThemeId).subscribe({
       next: (response: any) => {
-        this.questions = this.normalizeQuestions(response);
+        this.questions = assignQuestionNumbers(this.normalizeQuestions(response));
         if (this.questions.length) {
           this.loadEvaluationHistoryForQuestion(
             this.questions[this.selectedQuestionIndex].id,
@@ -625,7 +666,7 @@ export class ReviewComponent implements OnInit {
     });
   }
 
-  private normalizeQuestions(response: any): ReviewQuestion[] {
+  private normalizeQuestions(response: any): Omit<ReviewQuestion, 'qNum'>[] {
     const records = Array.isArray(response)
       ? response
       : response?.questions || response?.data || [];
@@ -636,9 +677,10 @@ export class ReviewComponent implements OnInit {
         const label = this.decodeQuestionText(rawLabel);
         const id = String(record?.id ?? record?.id_question ?? index);
         const evaluationCount = this.parseEvaluationCountFromRecord(record);
-        return { id, label, evaluationCount };
+        const hasDessin = this.parseHasDessinFromRecord(record);
+        return { id, label, evaluationCount, hasDessin };
       })
-      .filter((q: ReviewQuestion) => !!q.label);
+      .filter((q: Omit<ReviewQuestion, 'qNum'>) => !!q.label);
   }
 
   private parseEvaluationCountFromRecord(record: any): number {
@@ -652,6 +694,20 @@ export class ReviewComponent implements OnInit {
     }
     const n = Number(raw);
     return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+  }
+
+  private parseHasDessinFromRecord(record: any): boolean {
+    if (record?.has_dessin === true || record?.hasDessin === true) {
+      return true;
+    }
+    const raw = record?.dessin;
+    if (raw == null || raw === '') {
+      return false;
+    }
+    if (typeof raw === 'object') {
+      return Object.keys(raw).length > 0;
+    }
+    return true;
   }
 
   private decodeQuestionText(value: string): string {

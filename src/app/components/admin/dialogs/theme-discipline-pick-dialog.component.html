@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>{{ 'themeDisciplinePick.title' | translate }}</h2>
+
+<mat-dialog-content class="theme-discipline-pick">
+  @if (loading) {
+    <div class="theme-discipline-pick__loading">
+      <mat-spinner diameter="36" />
+      <p>{{ 'themeDisciplinePick.loading' | translate }}</p>
+    </div>
+  } @else if (loadError) {
+    <p class="theme-discipline-pick__error" role="alert">
+      {{ 'themeDisciplinePick.error' | translate }}
+    </p>
+  } @else if (!disciplines.length) {
+    <p class="theme-discipline-pick__empty" role="status">
+      {{ 'themeDisciplinePick.empty' | translate }}
+    </p>
+  } @else {
+    <p class="theme-discipline-pick__intro">{{ 'themeDisciplinePick.intro' | translate }}</p>
+    <mat-radio-group
+      class="theme-discipline-pick__list"
+      [(ngModel)]="selectedId"
+      [attr.aria-label]="'themeDisciplinePick.title' | translate"
+    >
+      @for (d of disciplines; track d.id_discipline) {
+        <mat-radio-button class="theme-discipline-pick__item" [value]="d.id_discipline">
+          <span class="theme-discipline-pick__label">{{ d.label }}</span>
+          @if (d.description?.trim()) {
+            <span class="theme-discipline-pick__desc">{{ d.description }}</span>
+          }
+        </mat-radio-button>
+      }
+    </mat-radio-group>
+    @if (selectionTouched && selectedId == null) {
+      <p class="theme-discipline-pick__hint" role="alert">
+        {{ 'themeDisciplinePick.selectRequired' | translate }}
+      </p>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">
+    {{ 'themeDisciplinePick.cancel' | translate }}
+  </button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    [disabled]="loading || loadError || !disciplines.length"
+    (click)="confirm()"
+  >
+    {{ 'themeDisciplinePick.confirm' | translate }}
+  </button>
+</mat-dialog-actions>

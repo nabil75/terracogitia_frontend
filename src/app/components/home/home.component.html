@@ -3,25 +3,41 @@
 <div class="home-container">
   <div class="app-page-inner">
   <div class="home-header">
-    <img [src]="themeService.logoSrc()" width="120px" height="80px" [attr.alt]="'common.logoAlt' | translate"/>
+    <img
+      [src]="themeService.logoSrc()"
+      width="100"
+      height="130"
+      [attr.alt]="'common.logoAlt' | translate"
+    />
     <h1 class="accent-clair">terra-cogit<span class="accent-fonce"><em>ia</em></span></h1>
     <p>{{ 'home.tagline' | translate }}</p>
   </div>
 
   <div class="themes-grid">
-    @for (theme of themes; track theme.id) {
+    @for (theme of visibleThemes(); track (theme?.id ?? theme?.id_theme ?? theme?.label)) {
+      @let isInactive = !themeHasPaths(theme);
+      @let themeId = '' + (theme?.id ?? theme?.id_theme ?? '');
       <mat-card
         class="theme-card"
-        [class.theme-card--expanded]="expandedThemeId === theme.id"
-        (click)="toggleTheme(theme.id)"
+        [class.theme-card--expanded]="expandedThemeId === themeId"
+        [class.theme-card--inactive]="isInactive"
+        [attr.aria-disabled]="isInactive"
+        [matTooltip]="isInactive ? ('home.themeInactiveTooltip' | translate) : ''"
+        (click)="toggleTheme(theme)"
       >
         <div class="theme-ribbon"></div>
         <mat-card-header>
           <mat-card-title>{{ theme.label }}</mat-card-title>
           <mat-card-subtitle>{{ theme.tagline }}</mat-card-subtitle>
           <span class="theme-header-spacer"></span>
+          @if (isInactive) {
+            <span class="theme-inactive-pill">
+              <mat-icon aria-hidden="true">block</mat-icon>
+              {{ 'home.inactive' | translate }}
+            </span>
+          }
           <mat-icon class="theme-chevron">
-            {{ expandedThemeId === theme.id ? 'expand_less' : 'expand_more' }}
+            {{ expandedThemeId === themeId ? 'expand_less' : 'expand_more' }}
           </mat-icon>
         </mat-card-header>
         <mat-card-content>
@@ -30,9 +46,9 @@
           </p>
         </mat-card-content>
 
-        @if (expandedThemeId === theme.id) {
+        @if (!isInactive && expandedThemeId === themeId) {
           <div class="subthemes-list">
-            @for (sub of theme.subThemes ?? []; track sub.id) {
+            @for (sub of (theme.subThemes ?? theme.sub_themes ?? theme.parcours ?? theme.subthemes ?? theme.paths ?? []); track sub.id) {
               <div class="subtheme-item">
                 <div class="subtheme-text">
                   <h4>{{ sub.label }}</h4>

@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
@@ -8,11 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../services/theme.service';
 import { LanguageService } from '../services/language.service';
 import { DisciplineService } from '../services/discipline.service';
-import {
-  DisciplineSelectDialogComponent,
-  DisciplineSelectionResult
-} from '../dialogs/discipline-select-dialog/discipline-select-dialog.component';
-
+import { InactiveThemeVisibilityService } from '../services/inactive-theme-visibility.service';
 /**
  * Barre latérale fixe (sticker) pour les fonctions transverses.
  * Icônes en SVG inline (`currentColor`) pour suivre le thème comme le bouton clair/sombre.
@@ -28,7 +23,8 @@ export class TransverseRailComponent {
   readonly themeService = inject(ThemeService);
   readonly languageService = inject(LanguageService);
   readonly disciplineService = inject(DisciplineService);
-  private readonly dialog = inject(MatDialog);
+  readonly inactiveThemeVisibility = inject(InactiveThemeVisibilityService);
+  private readonly router = inject(Router);
 
   /** Bascule clair ↔ sombre (persisté dans localStorage par ThemeService). */
   toggleTheme(): void {
@@ -42,20 +38,25 @@ export class TransverseRailComponent {
       : 'transverseRail.tooltipThemeDark';
   }
 
-  /** Ouvre la popup de sélection de discipline et persiste le choix validé. */
-  openDisciplineSelector(): void {
-    const ref = this.dialog.open<
-      DisciplineSelectDialogComponent,
-      void,
-      DisciplineSelectionResult | undefined
-    >(DisciplineSelectDialogComponent, {
-      autoFocus: 'first-tabbable',
-      restoreFocus: true,
-      panelClass: 'app-discipline-dialog'
-    });
-    ref.afterClosed().subscribe((result) => {
-      if (!result) return;
-      this.disciplineService.setSelectedDiscipline(result.id, result.label);
-    });
+  showInactiveThemesButton(): boolean {
+    if (!this.inactiveThemeVisibility.hasInactiveThemes()) return false;
+    const url = this.router.url;
+    return url === '/' || url.startsWith('/dashboard') || url.startsWith('/admin');
+  }
+
+  inactiveThemesTooltipKey(): string {
+    const onHome = this.router.url === '/';
+    if (this.inactiveThemeVisibility.showInactiveThemes()) {
+      return onHome
+        ? 'transverseRail.tooltipInactiveHomeHide'
+        : 'transverseRail.tooltipInactiveGenericHide';
+    }
+    return onHome
+      ? 'transverseRail.tooltipInactiveHomeShowAll'
+      : 'transverseRail.tooltipInactiveGenericShowAllPaths';
+  }
+
+  toggleInactiveThemes(): void {
+    this.inactiveThemeVisibility.toggleShowInactiveThemes();
   }
 }

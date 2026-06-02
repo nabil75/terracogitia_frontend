@@ -1,0 +1,416 @@
+<app-transverse-rail />
+
+<div class="discipline-page">
+  <div class="app-page-inner">
+    <header class="discipline-page__header">
+      <div class="discipline-page__title-block">
+        <h1>{{ 'disciplinePage.title' | translate }}</h1>
+      </div>
+    </header>
+
+    <div class="discipline-page__layout">
+      <aside class="discipline-page__list-panel" aria-labelledby="discipline-list-heading">
+        <h2 id="discipline-list-heading" class="discipline-page__panel-title">
+          {{ 'disciplinePage.listTitle' | translate }}
+        </h2>
+
+        @if (loading) {
+          <div class="discipline-page__state">
+            <mat-spinner diameter="32" />
+            <span>{{ 'disciplineDialog.loading' | translate }}</span>
+          </div>
+        } @else if (loadError) {
+          <p class="discipline-page__error" role="alert">{{ 'disciplineDialog.error' | translate }}</p>
+        } @else {
+          <p class="discipline-page__intro">{{ 'disciplineDialog.intro' | translate }}</p>
+
+          <mat-radio-group
+            class="discipline-dialog-list"
+            [(ngModel)]="selectedKey"
+            (ngModelChange)="onSelectedKeyChange()"
+            [attr.aria-label]="'disciplinePage.listTitle' | translate"
+          >
+            <mat-radio-button class="discipline-dialog-item" value="all">
+              <span class="discipline-dialog-item__label">
+                {{ 'disciplineDialog.all' | translate }}
+              </span>
+            </mat-radio-button>
+
+            @for (d of disciplines; track d.id_discipline) {
+              <div class="discipline-dialog-item-row">
+                <mat-radio-button
+                  class="discipline-dialog-item"
+                  [value]="d.id_discipline.toString()"
+                >
+                  <span class="discipline-dialog-item__label">{{ d.label }}</span>
+                  @if (d.description) {
+                    <span class="discipline-dialog-item__desc">{{ d.description }}</span>
+                  }
+                </mat-radio-button>
+                <div class="subtheme-row__actions">
+                  @let deleteTooltipKey = deleteBlockedByParcoursKey(d);
+                  <span
+                    class="discipline-delete-btn-wrap"
+                    [class.discipline-delete-btn-wrap--blocked]="deleteTooltipKey"
+                    [matTooltip]="
+                      deleteTooltipKey
+                        ? (deleteTooltipKey | translate: deleteBlockedByParcoursParams(d))
+                        : ''
+                    "
+                    [matTooltipDisabled]="!deleteTooltipKey"
+                    matTooltipPosition="above"
+                    matTooltipShowDelay="250"
+                  >
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="subtheme-row__btn-icon subtheme-row__btn-icon--danger"
+                      [attr.aria-label]="'disciplineDialog.deleteDiscipline' | translate"
+                      [disabled]="!canDeleteDisciplineRow(d)"
+                      (click)="requestDeleteDiscipline(d, $event)"
+                    >
+                      <mat-icon aria-hidden="true">delete_outline</mat-icon>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            }
+
+            @if (!disciplines.length) {
+              <p class="discipline-dialog-empty">{{ 'disciplineDialog.empty' | translate }}</p>
+            }
+          </mat-radio-group>
+
+          <p class="discipline-page__hint">{{ 'disciplineDialog.deleteHint' | translate }}</p>
+
+          @if (deleteErrorKey) {
+            <p class="discipline-page__error" role="alert">
+              {{ deleteErrorKey | translate: deleteErrorParams }}
+            </p>
+          }
+
+          <button
+            mat-button
+            type="button"
+            class="discipline-dialog-add-toggle"
+            [attr.aria-expanded]="showAddForm"
+            (click)="toggleAddForm()"
+          >
+            <mat-icon aria-hidden="true">{{ showAddForm ? 'close' : 'add' }}</mat-icon>
+            <span class="discipline-dialog-add-toggle__label">
+              {{ 'disciplineDialog.addDiscipline' | translate }}
+            </span>
+          </button>
+
+          @if (showAddForm) {
+            <section class="discipline-dialog-add-form" aria-labelledby="discipline-add-heading">
+              <h3 id="discipline-add-heading" class="discipline-dialog-add-form__title">
+                {{ 'disciplineDialog.addFormTitle' | translate }}
+              </h3>
+
+              <p class="discipline-dialog-add-form__lead">
+                {{ 'disciplineDialog.addWishLead' | translate }}
+              </p>
+
+              <mat-form-field appearance="outline" class="discipline-dialog-add-form__field">
+                <mat-label>{{ 'disciplineDialog.addWishLabel' | translate }}</mat-label>
+                <textarea
+                  matInput
+                  rows="3"
+                  name="newDisciplineWish"
+                  [(ngModel)]="newDisciplineWish"
+                  (ngModelChange)="onAddWishInput()"
+                  [disabled]="proposingDiscipline || addingDiscipline"
+                ></textarea>
+              </mat-form-field>
+
+              <div class="discipline-dialog-add-form__propose-row">
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="review-button"
+                  [disabled]="
+                    proposingDiscipline ||
+                    addingDiscipline ||
+                    newDisciplineWish.trim().length < 3
+                  "
+                  (click)="proposeDisciplineFromWish()"
+                >
+                  @if (proposingDiscipline) {
+                    <mat-spinner diameter="18" class="discipline-dialog-add-form__spinner" />
+                  } @else {
+                    <mat-icon aria-hidden="true">auto_awesome</mat-icon>
+                  }
+                  <span>{{
+                    (addProposalReady
+                      ? 'disciplineDialog.addRegenerateProposal'
+                      : 'disciplineDialog.addGenerateProposal'
+                    ) | translate
+                  }}</span>
+                </button>
+              </div>
+
+              @if (addProposalReady) {
+                <p class="discipline-dialog-add-form__proposal-title">
+                  {{ 'disciplineDialog.addProposalTitle' | translate }}
+                </p>
+
+                <mat-form-field appearance="outline" class="discipline-dialog-add-form__field">
+                  <mat-label>{{ 'disciplinePage.fieldLabel' | translate }}</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    name="newDisciplineLabel"
+                    [(ngModel)]="newDisciplineLabel"
+                    (ngModelChange)="onAddProposalFieldEdit()"
+                    [disabled]="addingDiscipline"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="discipline-dialog-add-form__field">
+                  <mat-label>{{ 'disciplinePage.fieldDescription' | translate }}</mat-label>
+                  <textarea
+                    matInput
+                    rows="4"
+                    name="newDisciplineDescription"
+                    [(ngModel)]="newDisciplineDescription"
+                    (ngModelChange)="onAddProposalFieldEdit()"
+                    [disabled]="addingDiscipline"
+                  ></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="discipline-dialog-add-form__field">
+                  <mat-label>{{ 'disciplinePage.sectionCompetences' | translate }}</mat-label>
+                  <textarea
+                    matInput
+                    rows="3"
+                    name="newCompetencesText"
+                    [(ngModel)]="newCompetencesText"
+                    (ngModelChange)="onAddProposalFieldEdit()"
+                    [disabled]="addingDiscipline"
+                    [placeholder]="'disciplinePage.listLinesHint' | translate"
+                  ></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="discipline-dialog-add-form__field">
+                  <mat-label>{{ 'disciplinePage.sectionPrerequis' | translate }}</mat-label>
+                  <textarea
+                    matInput
+                    rows="3"
+                    name="newPrerequisText"
+                    [(ngModel)]="newPrerequisText"
+                    (ngModelChange)="onAddProposalFieldEdit()"
+                    [disabled]="addingDiscipline"
+                    [placeholder]="'disciplinePage.listLinesHint' | translate"
+                  ></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="discipline-dialog-add-form__field">
+                  <mat-label>{{ 'disciplinePage.fieldLevel' | translate }}</mat-label>
+                  <mat-select
+                    name="newNiveau"
+                    [(ngModel)]="newNiveau"
+                    (ngModelChange)="onAddProposalFieldEdit()"
+                    [disabled]="addingDiscipline"
+                  >
+                    <mat-option [value]="null">{{ 'disciplinePage.levelNone' | translate }}</mat-option>
+                    @for (opt of niveauOptions; track opt.value) {
+                      <mat-option [value]="opt.value">{{ opt.labelKey | translate }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="discipline-dialog-add-form__field">
+                  <mat-label>{{ 'disciplinePage.fieldProjection' | translate }}</mat-label>
+                  <textarea
+                    matInput
+                    rows="3"
+                    name="newProjection"
+                    [(ngModel)]="newProjection"
+                    (ngModelChange)="onAddProposalFieldEdit()"
+                    [disabled]="addingDiscipline"
+                  ></textarea>
+                </mat-form-field>
+
+                @if (addProposalValidated) {
+                  <p class="discipline-dialog-add-form__validated" role="status">
+                    <mat-icon aria-hidden="true">check_circle</mat-icon>
+                    {{ 'disciplineDialog.addProposalValidated' | translate }}
+                  </p>
+                }
+
+                <div class="discipline-dialog-add-form__proposal-actions">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="review-button"
+                    [disabled]="proposingDiscipline || addingDiscipline || !newDisciplineLabel.trim()"
+                    (click)="validateDisciplineProposal()"
+                  >
+                    {{ 'disciplineDialog.addConfirmProposal' | translate }}
+                  </button>
+                </div>
+              }
+
+              @if (addErrorKey) {
+                <p class="discipline-dialog-add-form__error" role="alert">
+                  {{ addErrorKey | translate }}
+                </p>
+              }
+
+              <div class="discipline-dialog-add-form__actions">
+                <button mat-button type="button" [disabled]="addingDiscipline" (click)="toggleAddForm()">
+                  {{ 'disciplineDialog.cancel' | translate }}
+                </button>
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="review-button"
+                  [disabled]="addingDiscipline || !addProposalValidated || !newDisciplineLabel.trim()"
+                  (click)="validateNewDiscipline()"
+                >
+                  @if (addingDiscipline) {
+                    <mat-spinner diameter="18" class="discipline-dialog-add-form__spinner" />
+                  }
+                  <span>{{ 'disciplineDialog.addValidate' | translate }}</span>
+                </button>
+              </div>
+            </section>
+          }
+
+        }
+      </aside>
+
+      <main class="discipline-page__detail-panel" aria-labelledby="discipline-detail-heading">
+        <h2 id="discipline-detail-heading" class="discipline-page__panel-title">
+          {{ 'disciplinePage.detailTitle' | translate }}
+        </h2>
+
+        @if (showAddForm) {
+          <p class="discipline-page__muted">{{ 'disciplinePage.detailWhileAdding' | translate }}</p>
+        } @else if (selectedKey === 'all') {
+          <p class="discipline-page__muted">{{ 'disciplinePage.detailAllSelected' | translate }}</p>
+        } @else if (detailLoading) {
+          <div class="discipline-page__state">
+            <mat-spinner diameter="36" />
+            <span>{{ 'disciplinePage.detailLoading' | translate }}</span>
+          </div>
+        } @else if (detailError) {
+          <p class="discipline-page__error" role="alert">{{ 'disciplinePage.detailError' | translate }}</p>
+        } @else if (detail) {
+          <div class="discipline-page__detail-scroll">
+            <mat-form-field appearance="outline" class="discipline-page__field">
+              <mat-label>{{ 'disciplinePage.fieldLabel' | translate }}</mat-label>
+              <input matInput type="text" name="editLabel" [(ngModel)]="editLabel" autocomplete="off" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="discipline-page__field">
+              <mat-label>{{ 'disciplinePage.fieldDescription' | translate }}</mat-label>
+              <textarea matInput rows="4" name="editDescription" [(ngModel)]="editDescription"></textarea>
+            </mat-form-field>
+
+            <section class="discipline-page__readonly-block" aria-labelledby="discipline-notions-heading">
+              <h3 id="discipline-notions-heading" class="discipline-page__section-title">
+                {{ 'disciplinePage.sectionNotions' | translate }}
+              </h3>
+              @if (detail.themes.length === 0) {
+                <p class="discipline-page__muted">{{ 'disciplinePage.emptyThemes' | translate }}</p>
+              } @else {
+                <ul class="discipline-page__readonly-list discipline-page__notions-list">
+                  @for (t of detail.themes; track t.id_theme) {
+                    <li>
+                      <strong>{{ t.label }}</strong>
+                      @if (t.description) {
+                        <span class="discipline-page__notion-desc">{{ t.description }}</span>
+                      } @else if (t.tagline) {
+                        <span class="discipline-page__notion-desc">{{ t.tagline }}</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+
+            <section class="discipline-page__readonly-block" aria-labelledby="discipline-competences-heading">
+              <h3 id="discipline-competences-heading" class="discipline-page__section-title">
+                {{ 'disciplinePage.sectionCompetences' | translate }}
+              </h3>
+              @if (detail.competences.length === 0) {
+                <p class="discipline-page__muted">{{ 'disciplinePage.emptyCompetences' | translate }}</p>
+              } @else {
+                <ul class="discipline-page__readonly-list">
+                  @for (c of detail.competences; track c.id) {
+                    <li>{{ c.label }}</li>
+                  }
+                </ul>
+              }
+            </section>
+
+            <section class="discipline-page__readonly-block" aria-labelledby="discipline-prerequis-heading">
+              <h3 id="discipline-prerequis-heading" class="discipline-page__section-title">
+                {{ 'disciplinePage.sectionPrerequis' | translate }}
+              </h3>
+              @if (detail.prerequis.length === 0) {
+                <p class="discipline-page__muted">{{ 'disciplinePage.emptyPrerequis' | translate }}</p>
+              } @else {
+                <ul class="discipline-page__readonly-list">
+                  @for (p of detail.prerequis; track p.id) {
+                    <li>{{ p.label }}</li>
+                  }
+                </ul>
+              }
+            </section>
+
+            <mat-form-field appearance="outline" class="discipline-page__field">
+              <mat-label>{{ 'disciplinePage.fieldLevel' | translate }}</mat-label>
+              <mat-select name="editNiveau" [(ngModel)]="editNiveau">
+                <mat-option [value]="null">{{ 'disciplinePage.levelNone' | translate }}</mat-option>
+                @for (opt of niveauOptions; track opt.value) {
+                  <mat-option [value]="opt.value">{{ opt.labelKey | translate }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="discipline-page__field">
+              <mat-label>{{ 'disciplinePage.fieldProjection' | translate }}</mat-label>
+              <textarea matInput rows="3" name="editProjection" [(ngModel)]="editProjection"></textarea>
+            </mat-form-field>
+
+            @if (selectedDisciplineParcoursCount !== null) {
+              <p class="discipline-page__meta">
+                {{
+                  'disciplineDialog.parcoursCount'
+                    | translate: { count: selectedDisciplineParcoursCount }
+                }}
+              </p>
+            }
+            @if (loadingParcoursCounts) {
+              <p class="discipline-page__meta">{{ 'disciplineDialog.countLoading' | translate }}</p>
+            }
+            @if (saveErrorKey) {
+              <p class="discipline-dialog-add-form__error" role="alert">{{ saveErrorKey | translate }}</p>
+            }
+
+            <div class="discipline-page__detail-actions">
+              <button
+                mat-stroked-button
+                type="button"
+                class="review-button"
+                [disabled]="savingDetail || !editLabel.trim()"
+                (click)="saveDetail()"
+              >
+                @if (savingDetail) {
+                  <mat-spinner diameter="18" class="discipline-dialog-add-form__spinner" />
+                }
+                <span>{{ 'disciplineDialog.saveEdit' | translate }}</span>
+              </button>
+            </div>
+          </div>
+        } @else {
+          <p class="discipline-page__muted">{{ 'disciplinePage.detailPickOne' | translate }}</p>
+        }
+      </main>
+    </div>
+  </div>
+</div>

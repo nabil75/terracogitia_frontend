@@ -77,7 +77,11 @@ button.transverse-rail__sticker {
 }
 
 .transverse-rail__sticker--active:hover {
-  background: color-mix(in srgb, var(--app-highlight-row) 70%, var(--app-surface-strong));
+  background: color-mix(
+    in srgb,
+    var(--app-highlight-row) 70%,
+    var(--app-surface-strong)
+  );
   border-color: var(--app-forest-light);
 }
 
@@ -93,7 +97,11 @@ button.transverse-rail__sticker {
 }
 
 :host-context(body.dark-theme) .transverse-rail__sticker--active:hover {
-  background: color-mix(in srgb, var(--app-highlight-row) 75%, var(--app-surface));
+  background: color-mix(
+    in srgb,
+    var(--app-highlight-row) 75%,
+    var(--app-surface)
+  );
   border-color: var(--app-forest-light);
 }
 

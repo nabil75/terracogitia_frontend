@@ -30,11 +30,10 @@
         />
       </svg>
     </a>
-    <button
-      type="button"
+    <a
+      routerLink="/discipline"
+      routerLinkActive="transverse-rail__sticker--active"
       class="transverse-rail__sticker"
-      [class.transverse-rail__sticker--active]="disciplineService.selectedDisciplineId() !== null"
-      (click)="openDisciplineSelector()"
       [matTooltip]="'transverseRail.tooltipDiscipline' | translate"
       matTooltipClass="app-transverse-rail-tooltip"
       matTooltipPosition="right"
@@ -68,16 +67,16 @@
         />
         <path d="M40 18v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
       </svg>
-    </button>
+    </a>
     <a
-      routerLink="/discover"
+      routerLink="/resume"
       routerLinkActive="transverse-rail__sticker--active"
       class="transverse-rail__sticker"
-      [matTooltip]="'transverseRail.tooltipDiscover' | translate"
+      [matTooltip]="'transverseRail.tooltipResume' | translate"
       matTooltipClass="app-transverse-rail-tooltip"
       matTooltipPosition="right"
       matTooltipShowDelay="150"
-      [attr.aria-label]="'transverseRail.ariaDiscover' | translate"
+      [attr.aria-label]="'transverseRail.ariaResume' | translate"
     >
       <svg
         class="transverse-rail__icon"
@@ -88,14 +87,14 @@
         width="48"
         height="48"
       >
-        <circle cx="24" cy="22" r="10" stroke="currentColor" stroke-width="2.25" fill="currentColor" fill-opacity="0.1" />
         <path
-          d="M24 12v4M24 28v4M14 22h4M30 22h4"
+          d="M10 12h12v8H10V12Zm16 0h12v14H26V12ZM10 24h12v12H10V24Zm16 6h12v6H26V30Z"
           stroke="currentColor"
           stroke-width="2"
-          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="currentColor"
+          fill-opacity="0.12"
         />
-        <path d="M20 34h8l-1 6h-6l-1-6Z" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.75" />
       </svg>
     </a>
     <a
@@ -151,6 +150,27 @@
         <circle cx="24" cy="24" r="5" fill="currentColor" />
       </svg>
     </a>
+    @if (showInactiveThemesButton()) {
+      <button
+        type="button"
+        class="transverse-rail__sticker"
+        [class.transverse-rail__sticker--active]="!inactiveThemeVisibility.showInactiveThemes()"
+        (click)="toggleInactiveThemes()"
+        [matTooltip]="inactiveThemesTooltipKey() | translate"
+        matTooltipClass="app-transverse-rail-tooltip"
+        matTooltipPosition="right"
+        matTooltipShowDelay="150"
+        [attr.aria-label]="inactiveThemesTooltipKey() | translate"
+      >
+        <mat-icon class="transverse-rail__mat-icon" aria-hidden="true">
+          {{
+            inactiveThemeVisibility.showInactiveThemes()
+              ? 'visibility'
+              : 'visibility_off'
+          }}
+        </mat-icon>
+      </button>
+    }
     <button
       type="button"
       class="transverse-rail__sticker"

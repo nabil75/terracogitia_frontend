@@ -3,9 +3,21 @@
 @mixin app-mesh-background {
   background-color: var(--app-page-bg);
   background-image:
-    radial-gradient(ellipse 120% 90% at 0% -35%, var(--app-mesh-1), transparent 52%),
-    radial-gradient(ellipse 95% 75% at 100% 0%, var(--app-mesh-2), transparent 48%),
-    radial-gradient(ellipse 80% 55% at 50% 115%, var(--app-mesh-3), transparent 48%),
+    radial-gradient(
+      ellipse 120% 90% at 0% -35%,
+      var(--app-mesh-1),
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 95% 75% at 100% 0%,
+      var(--app-mesh-2),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse 80% 55% at 50% 115%,
+      var(--app-mesh-3),
+      transparent 48%
+    ),
     linear-gradient(180deg, var(--app-mesh-top-fade) 0%, transparent 38%);
 }
 
@@ -21,208 +33,529 @@
 
 /** Marge gauche pour le sticker `app-transverse-rail` (pages qui affichent la barre). */
 @mixin page-with-transverse-rail-padding {
-  padding-left: min(
-    var(--app-page-edge-max),
-    clamp(2.75rem, 4vw, 3.5rem)
-  );
+  padding-left: min(var(--app-page-edge-max), clamp(2.75rem, 4vw, 3.5rem));
 
   @media (max-width: 600px) {
-    padding-left: min(
-      var(--app-page-edge-max),
-      clamp(3.1rem, 14vw, 3.5rem)
-    );
+    padding-left: min(var(--app-page-edge-max), clamp(3.1rem, 14vw, 3.5rem));
+  }
+}
+
+/**
+ * Boutons icône edit / delete (Admin thèmes, page Discipline).
+ * À inclure dans styles.scss sous `.admin-themes-page, .discipline-page` uniquement
+ * (évite l’encapsulation Angular qui bloque la surcharge du thème Material global).
+ */
+@mixin subtheme-row-icon-actions {
+  .subtheme-row__actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.45rem;
+    align-items: center;
+  }
+
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    ),
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    )
+    * {
+    cursor: pointer !important;
+  }
+
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon.mat-mdc-button-base[disabled],
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon.mat-mdc-button-base.mat-mdc-button-disabled {
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+    box-shadow: inset 0 0 0 1.5px
+      color-mix(in srgb, var(--app-stroke-strong) 45%, transparent) !important;
+  }
+
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon--danger.mat-mdc-button-base[disabled],
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon--danger.mat-mdc-button-base.mat-mdc-button-disabled {
+    box-shadow: inset 0 0 0 1.5px
+      color-mix(in srgb, var(--app-terracotta) 35%, transparent) !important;
+  }
+
+  .subtheme-row__actions button.subtheme-row__btn-icon.mat-mdc-button-base {
+    min-width: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: var(--app-radius-xs);
+    --mdc-filled-button-container-color: transparent;
+    --mdc-protected-button-container-color: transparent;
+    --mdc-outlined-button-outline-width: 0 !important;
+    background-color: transparent !important;
+    color: var(--app-text-muted) !important;
+    box-shadow: inset 0 0 0 1.5px var(--app-stroke-strong) !important;
+  }
+
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    ):hover {
+    background-color: rgba(45, 90, 61, 0.08) !important;
+    color: var(--app-text) !important;
+    box-shadow: inset 0 0 0 1.5px var(--app-brand-from) !important;
+  }
+
+  .subtheme-row__actions .subtheme-row__btn-icon .mdc-button__label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    gap: 0.35rem;
+  }
+
+  .subtheme-row__actions
+    .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    )
+    .mdc-button__label {
+    color: var(--app-text-muted) !important;
+  }
+
+  .subtheme-row__actions
+    .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    ):hover
+    .mdc-button__label {
+    color: var(--app-text) !important;
+  }
+
+  .subtheme-row__actions .subtheme-row__btn-icon mat-icon {
+    margin: 0;
+    font-size: 1.15rem;
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    ) {
+    box-shadow: inset 0 0 0 1.5px rgba(156, 91, 61, 0.55) !important;
+    color: var(--app-terracotta) !important;
+  }
+
+  .subtheme-row__actions
+    .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    )
+    .mdc-button__label {
+    color: var(--app-terracotta) !important;
+  }
+
+  .subtheme-row__actions
+    button.subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    ):hover {
+    box-shadow: inset 0 0 0 1.5px var(--app-terracotta) !important;
+    background-color: rgba(156, 91, 61, 0.1) !important;
+    color: var(--app-terracotta) !important;
+  }
+
+  .subtheme-row__actions
+    .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+      .mat-mdc-button-disabled
+    ):hover
+    .mdc-button__label {
+    color: var(--app-terracotta) !important;
+  }
+
+  .subtheme-row__actions
+    .subtheme-row__btn-icon--with-label.mat-mdc-button-base {
+    min-width: 0;
+    width: auto;
+    height: auto;
+    min-height: 2.25rem;
+    padding: 0 0.7rem;
+  }
+
+  body.dark-theme & {
+    .subtheme-row__actions
+      button.subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      ) {
+      background-color: transparent !important;
+      color: var(--app-text) !important;
+      box-shadow: inset 0 0 0 1.5px rgba(234, 231, 224, 0.45) !important;
+    }
+
+    .subtheme-row__actions
+      .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      )
+      .mdc-button__label {
+      color: var(--app-text) !important;
+    }
+
+    .subtheme-row__actions
+      button.subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      ):hover {
+      background-color: rgba(15, 17, 23, 0.42) !important;
+      color: var(--app-text) !important;
+      box-shadow: inset 0 0 0 1.5px rgba(234, 231, 224, 0.65) !important;
+    }
+
+    .subtheme-row__actions
+      .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      ):hover
+      .mdc-button__label {
+      color: var(--app-text) !important;
+    }
+
+    .subtheme-row__actions
+      button.subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      ) {
+      box-shadow: inset 0 0 0 1.5px rgba(232, 200, 195, 0.65) !important;
+      color: var(--app-text) !important;
+    }
+
+    .subtheme-row__actions
+      .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      )
+      .mdc-button__label {
+      color: var(--app-text) !important;
+    }
+
+    .subtheme-row__actions
+      button.subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      ):hover {
+      box-shadow: inset 0 0 0 1.5px rgba(240, 220, 215, 0.9) !important;
+      background-color: rgba(232, 200, 195, 0.12) !important;
+      color: var(--app-text) !important;
+    }
+
+    .subtheme-row__actions
+      .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):not(
+        .mat-mdc-button-disabled
+      ):hover
+      .mdc-button__label {
+      color: var(--app-text) !important;
+    }
+
+    .subtheme-row__actions .subtheme-row__btn-icon mat-icon {
+      color: var(--app-text) !important;
+    }
   }
 }
 
 // Mixin for anchor (drag handle button)
 @mixin ancre-style() {
-    cursor: move;
-    border: none;
-    background-color: transparent;
-    color: gray;
-    font-size: 2.5vh;
-    margin-top: -15px;
+  cursor: move;
+  border: none;
+  background-color: transparent;
+  color: gray;
+  font-size: 2.5vh;
+  margin-top: -15px;
 }
 
 // Mixin for header-question style
 @mixin header-question-style() {
-    border-bottom: var(--hr-border);
+  border-bottom: var(--hr-border);
 }
 
 // Mixin for question container
 @mixin question-style() {
-    margin-bottom: 40px;
-    padding: 20px;
-    background-color: var(--div-background);
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 40px;
+  padding: 20px;
+  background-color: var(--div-background);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
 }
 
 // Mixin for input with border at the bottom
 @mixin input-border-bottom-style() {
-    border-top: transparent;
-    border-right: transparent;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.5);
-    border-left: transparent;
-    border-radius: 5px 5px 0 0;
-    background-color: transparent;
-
+  border-top: transparent;
+  border-right: transparent;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+  border-left: transparent;
+  border-radius: 5px 5px 0 0;
+  background-color: transparent;
 }
 
 // Mixin for list marker (li)
 @mixin list-marker-style() {
-    margin-top: -10px;
-    font-size: 3vh;
-    color: var(--primary-text);
-    right: 15%;
+  margin-top: -10px;
+  font-size: 3vh;
+  color: var(--primary-text);
+  right: 15%;
 }
 
 // Mixin for question label (textarea)
 @mixin libelle-question-style() {
-    margin-top: 1%;
-    font-size: x-large;
-    resize: none;
-    overflow-y: hidden;
-    color: var(--primary-text);
+  margin-top: 1%;
+  font-size: x-large;
+  resize: none;
+  overflow-y: hidden;
+  color: var(--primary-text);
 }
 
 // Mixin for type-question heading style
 @mixin type-question-style() {
+  color: var(--title-section-color);
+  font-size: clamp(15px, 1.5vw, 48px);
+  margin-top: -10px;
+  .text-uppercase {
     color: var(--title-section-color);
-    font-size: clamp(15px, 1.5vw, 48px);
-    margin-top: -10px;
-    .text-uppercase{
-        color: var(--title-section-color);
-    }
+  }
 }
 
 @mixin menu-icon-style {
-    color: var(--gray-text);
-    font-size: 24px;
+  color: var(--gray-text);
+  font-size: 24px;
 }
 
 @mixin auto-mode-icon-style {
-    margin-right: 10px;
-    width: 35px;
-    height:35px;
+  margin-right: 10px;
+  width: 35px;
+  height: 35px;
 }
 
 @mixin menu-question-style {
-    margin-top: -1%;
+  margin-top: -1%;
 }
 
 @mixin cdk-drag-preview-style {
-    box-sizing: border-box;
-    border-radius: 4px;
-    font-size: 1.5em;
-    text-align: center;
-    opacity: 0.8;
+  box-sizing: border-box;
+  border-radius: 4px;
+  font-size: 1.5em;
+  text-align: center;
+  opacity: 0.8;
 }
 
 @mixin table-modalites_style {
-    margin-top: 3px;
+  margin-top: 3px;
 }
 
 @mixin td-style {
-    background-color: var(--div-background) !important;
+  background-color: var(--div-background) !important;
 }
 
 @mixin colonne-position-style {
-    width: 3px;
-    cursor: grab;
-    color: var(--primary-text);
+  width: 3px;
+  cursor: grab;
+  color: var(--primary-text);
 }
 
 @mixin colonne-actions-style {
-    width: 30px;
-    img{
-        cursor: pointer;
-    }
+  width: 30px;
+  img {
+    cursor: pointer;
+  }
 }
 
 @mixin libelle-modalite-style {
-    width: 100%;
-    background-color: var(--div-background);
-    padding: 2px;
-    font-size: medium;
-    color: var(--primary-text);
+  width: 100%;
+  background-color: var(--div-background);
+  padding: 2px;
+  font-size: medium;
+  color: var(--primary-text);
 }
 
 @mixin title-modalites-style {
-    font-size: var(--font-size-title);
-    color: var(--title-section-color);
-    padding: 20px;
+  font-size: var(--font-size-title);
+  color: var(--title-section-color);
+  padding: 20px;
 }
 
 @mixin btn-extension-style {
-    width: fit-content;
-    border: none;
-    font-size: var(--font-size-title);
-    color: var(--title-section-color);
-    background-color: transparent;
-    margin-bottom: 35px;
-    &:hover {
-        text-decoration: underline;
-    }
+  width: fit-content;
+  border: none;
+  font-size: var(--font-size-title);
+  color: var(--title-section-color);
+  background-color: transparent;
+  margin-bottom: 35px;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 @mixin div-parameters-style {
-    margin-top: 5%;
-    margin-top: 5%;
+  margin-top: 5%;
+  margin-top: 5%;
 }
 
 @mixin label-parameters-style {
-    font-size: var(--font-size-label);
-    color: var(--title-section-color);
-    padding-right: 10px;
-    padding-bottom: 10px;
+  font-size: var(--font-size-label);
+  color: var(--title-section-color);
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+/**
+ * Boutons Material en `body.dark-theme` — même esprit qu’Admin (`review-button`) :
+ * fond transparent, libellé/icône blancs, bordure grise (contour MDC ou inset).
+ */
+@mixin dark-theme-mat-buttons {
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled) {
+    --mdc-filled-button-container-color: transparent;
+    --mdc-protected-button-container-color: transparent;
+    --mdc-outlined-button-outline-color: var(--app-dark-button-border);
+    --mdc-outlined-button-outline-width: 1.5px;
+    --mdc-outlined-button-label-text-color: var(--app-button-fg);
+    --mdc-text-button-label-text-color: var(--app-button-fg);
+    --mat-mdc-button-persistent-ripple-color: rgba(255, 255, 255, 0.14);
+    --mat-mdc-button-ripple-color: rgba(255, 255, 255, 0.1);
+    --mat-outlined-button-ripple-color: rgba(255, 255, 255, 0.12);
+    --mat-outlined-button-state-layer-color: var(--app-button-fg);
+
+    background-color: transparent !important;
+    color: var(--app-button-fg) !important;
+  }
+
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):not(
+      .mat-mdc-outlined-button
+    ) {
+    box-shadow: inset 0 0 0 1.5px var(--app-dark-button-border) !important;
+  }
+
+  .mat-mdc-raised-button.mat-primary:not([disabled]):not(.mat-mdc-button-disabled),
+  .mat-mdc-unelevated-button.mat-primary:not([disabled]):not(.mat-mdc-button-disabled),
+  .mat-mdc-raised-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled),
+  .mat-mdc-unelevated-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled),
+  .mat-mdc-raised-button.mat-accent:not([disabled]):not(.mat-mdc-button-disabled),
+  .mat-mdc-unelevated-button.mat-accent:not([disabled]):not(.mat-mdc-button-disabled) {
+    box-shadow: inset 0 0 0 1.5px var(--app-dark-button-border) !important;
+  }
+
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):hover,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):focus-visible {
+    background-color: var(--app-dark-button-hover-bg) !important;
+    color: var(--app-button-fg) !important;
+    --mdc-outlined-button-outline-color: var(--app-dark-button-border-hover);
+    --mdc-outlined-button-label-text-color: var(--app-button-fg);
+    --mdc-text-button-label-text-color: var(--app-button-fg);
+  }
+
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):not(
+      .mat-mdc-outlined-button
+    ):hover,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):not(
+      .mat-mdc-outlined-button
+    ):focus-visible {
+    box-shadow: inset 0 0 0 1.5px var(--app-dark-button-border-hover) !important;
+  }
+
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled)
+    .mdc-button__label,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled) mat-icon,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled) .mat-icon {
+    color: var(--app-button-fg) !important;
+  }
+
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):hover
+    .mdc-button__label,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):hover
+    mat-icon,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):hover
+    .mat-icon,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):focus-visible
+    .mdc-button__label,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):focus-visible
+    mat-icon,
+  .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled):focus-visible
+    .mat-icon {
+    color: var(--app-button-fg) !important;
+  }
+
+  .mat-mdc-button-base[disabled],
+  .mat-mdc-button-base.mat-mdc-button-disabled {
+    --mdc-filled-button-container-color: transparent;
+    --mdc-protected-button-container-color: transparent;
+    background-color: transparent !important;
+    color: rgba(255, 255, 255, 0.38) !important;
+    box-shadow: inset 0 0 0 1.5px rgba(234, 231, 224, 0.22) !important;
+  }
+
+  .mat-mdc-button-base[disabled] .mdc-button__label,
+  .mat-mdc-button-base.mat-mdc-button-disabled .mdc-button__label,
+  .mat-mdc-button-base[disabled] mat-icon,
+  .mat-mdc-button-base.mat-mdc-button-disabled mat-icon,
+  .mat-mdc-button-base[disabled] .mat-icon,
+  .mat-mdc-button-base.mat-mdc-button-disabled .mat-icon {
+    color: rgba(255, 255, 255, 0.38) !important;
+  }
+
+  .mat-mdc-raised-button.mat-primary:not([disabled]):not(.mat-mdc-button-disabled),
+  .mat-mdc-unelevated-button.mat-primary:not([disabled]):not(.mat-mdc-button-disabled) {
+    box-shadow: inset 0 0 0 1.5px var(--app-dark-button-border) !important;
+  }
+
+  .mat-mdc-button-toggle-group
+    .mat-button-toggle:not(.mat-button-toggle-disabled)
+    .mat-button-toggle-button {
+    background-color: transparent !important;
+    color: var(--app-button-fg) !important;
+    box-shadow: inset 0 0 0 1.5px var(--app-dark-button-border) !important;
+  }
+
+  .mat-mdc-button-toggle-group
+    .mat-button-toggle.mat-button-toggle-checked:not(.mat-button-toggle-disabled)
+    .mat-button-toggle-button {
+    background-color: var(--app-dark-button-hover-bg) !important;
+    color: var(--app-button-fg) !important;
+    box-shadow: inset 0 0 0 1.5px var(--app-dark-button-border-hover) !important;
+  }
 }
 
 @mixin saisie-number-style {
-    width: 5vw;
-    text-align: center;
-    font-size: 2vw;
-    color: var(--primary-text);
+  width: 5vw;
+  text-align: center;
+  font-size: 2vw;
+  color: var(--primary-text);
 }
 
-@mixin img-toolbox-style{
-    cursor: pointer;
-    width: 5vh;
-    height: 5vh;
-    min-width: 4vh;
-    min-height: 4vh;
-    margin-left: 10px;
-    &:hover{
-        border: var(--div-border);
-        border-radius: 6px 6px 6px 6px;
-        padding:3px;
-    }
+@mixin img-toolbox-style {
+  cursor: pointer;
+  width: 5vh;
+  height: 5vh;
+  min-width: 4vh;
+  min-height: 4vh;
+  margin-left: 10px;
+  &:hover {
+    border: var(--div-border);
+    border-radius: 6px 6px 6px 6px;
+    padding: 3px;
+  }
 }
 
-@mixin mat-button-toogle-group-style{
-    height: 45px;
-    mat-button-toggle {
+@mixin mat-button-toogle-group-style {
+  height: 45px;
+  mat-button-toggle {
     height: 45px;
     font-size: 16px;
     color: var(--primary-text);
-    }
+  }
 }
 
-@mixin btn-action-style{
-    margin-top: 16px;
-    padding: 8px 12px;
-    border: none;
-    background-color: black;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-    &:hover{
-        font-size: large;
-    }
+@mixin btn-action-style {
+  margin-top: 16px;
+  padding: 8px 12px;
+  border: none;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  &:hover {
+    font-size: large;
+  }
 }
-@mixin placeholder-style{
-    color: var(--gray-text);
-    opacity: 1; /* Firefox */
+@mixin placeholder-style {
+  color: var(--gray-text);
+  opacity: 1; /* Firefox */
 }
-

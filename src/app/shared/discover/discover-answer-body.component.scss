@@ -1,0 +1,39 @@
+.discover-answer-image-links__lead {
+  margin: 0.65rem 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.discover-answer-image-links {
+  margin: 0;
+  padding: 0.5rem 0 0 1.1rem;
+  list-style: disc;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  border-top: 1px dashed var(--app-stroke-strong);
+}
+
+.discover-answer-image-links__a {
+  color: var(--app-forest-light);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-word;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--app-ochre);
+  }
+}
+
+:host-context(body.dark-theme) .discover-answer-image-links__a {
+  color: var(--app-forest-light);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--app-ochre);
+  }
+}

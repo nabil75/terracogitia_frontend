@@ -1,4 +1,4 @@
-@use '../../styles/themes/mixins' as *;
+@use "../../styles/themes/mixins" as *;
 
 .review-page {
   --review-divider-width: 12px;
@@ -194,7 +194,7 @@
 }
 
 .review-divider::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0.35rem;
   bottom: 0.35rem;
@@ -223,6 +223,7 @@
   margin: 0;
   font-family: var(--app-font-display);
   font-weight: 700;
+  font-size: 1.05rem;
   color: var(--app-text);
 }
 
@@ -283,6 +284,8 @@
 
 .question-text {
   white-space: pre-wrap;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
 .selected-question {
@@ -343,7 +346,11 @@
   padding: 0.75rem 0.9rem;
   border-radius: var(--app-radius-sm);
   border: 1px solid rgba(45, 90, 61, 0.35);
-  background: linear-gradient(135deg, rgba(45, 90, 61, 0.1), rgba(125, 154, 132, 0.08));
+  background: linear-gradient(
+    135deg,
+    rgba(45, 90, 61, 0.1),
+    rgba(125, 154, 132, 0.08)
+  );
 }
 
 .eval-block__title {
@@ -538,32 +545,97 @@
 }
 
 .answer-actions {
-  margin-top: 0.85rem; /* même écart qu'entre l'évaluation détaillée et le bouton "Enregistrer" */
-  display: flex;
+  margin-top: 0.85rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
   align-items: stretch;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
 }
 
-.answer-actions .question-audio {
-  margin-top: 0;
-  height: var(--review-action-height);
+.answer-actions__slot {
+  min-width: 0;
+  display: flex;
 }
 
-.answer-actions .audio-toolbar {
+.answer-actions__slot--audio .audio-toolbar {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
   height: var(--review-action-height);
-  padding-top: 0;
-  padding-bottom: 0;
+  min-height: var(--review-action-height);
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: var(--app-radius-sm);
+  background: transparent;
+  box-shadow: none;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.answer-actions__btn {
+  width: 100%;
+  min-width: 0;
+  height: var(--review-action-height);
+  min-height: var(--review-action-height);
+  margin: 0;
+  padding: 0 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  box-sizing: border-box;
+}
+
+.answer-actions__btn .mat-icon {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.answer-actions__btn-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.answer-actions .recording-indicator {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  color: #b91c1c;
+  pointer-events: none;
+}
+
+.answer-actions__slot--audio {
+  position: relative;
 }
 
 .answer-actions .evaluate-button {
-  height: var(--review-action-height);
-  width: var(--review-action-width);
-  min-width: var(--review-action-width);
-  padding: 0 1.5rem;
-  line-height: var(--review-action-height);
-  margin-left: auto; /* pousse à droite même si le flex-wrap s'applique */
+  margin-left: 0;
+}
+
+@media (max-width: 720px) {
+  .answer-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+:host-context(body.dark-theme) {
+  .answer-actions__slot--audio .audio-toolbar {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.14);
+  }
 }
 
 .question-audio {
@@ -659,6 +731,11 @@
   color: var(--app-ochre);
 }
 
+/* Titres de colonnes : même bleu que le titre page Découverte (--app-brand-ink) */
+:host-context(body.dark-theme) .panel h3 {
+  color: var(--app-brand-ink);
+}
+
 /* --- Panneau « Questions » -------------------------------------------- */
 :host-context(body.dark-theme) .question-item {
   background: rgba(40, 45, 58, 0.55);
@@ -693,6 +770,10 @@
 }
 
 /* --- Zone d'évaluation détaillée -------------------------------------- */
+:host-context(body.dark-theme) .feedback-label {
+  color: var(--app-brand-ink);
+}
+
 :host-context(body.dark-theme) .feedback-output {
   background: linear-gradient(
     180deg,

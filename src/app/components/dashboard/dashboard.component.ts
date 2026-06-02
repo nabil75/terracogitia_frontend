@@ -5,20 +5,22 @@ import {
   effect,
   ElementRef,
   inject,
+  Injector,
   OnDestroy,
   OnInit,
   QueryList,
   ViewChild,
-  ViewChildren
+  ViewChildren,
+  afterNextRender
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin, of } from 'rxjs';
 
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
@@ -32,8 +34,17 @@ import {
 import { TransverseRailComponent } from '../../shared/transverse-rail/transverse-rail.component';
 import { ThemeService } from '../../shared/services/theme.service';
 import { DisciplineService } from '../../shared/services/discipline.service';
+import { InactiveThemeVisibilityService } from '../../shared/services/inactive-theme-visibility.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import {
+  GaugePathPickerDialogComponent,
+  GaugePathPickerDialogData
+} from './dialogs/gauge-path-picker-dialog.component';
+import {
+  RadarThemePickerDialogComponent,
+  RadarThemePickerDialogData
+} from './dialogs/radar-theme-picker-dialog.component';
 
 Chart.register(...registerables);
 
@@ -122,11 +133,10 @@ function explorationTier(count: number): ExplorationTier {
     TransverseRailComponent,
     MatButtonModule,
     MatCardModule,
-    MatFormFieldModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSelectModule,
     MatTabsModule,
+    MatTooltipModule,
     TranslateModule
   ],
   templateUrl: './dashboard.component.html',
@@ -185,17 +195,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private resizeObserver?: ResizeObserver;
 
   private readonly apiService = inject(ApiService);
+  private readonly injector = inject(Injector);
   private readonly themeService = inject(ThemeService);
   private readonly disciplineService = inject(DisciplineService);
+  private readonly inactiveThemeVisibility = inject(InactiveThemeVisibilityService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
   private langSub?: Subscription;
+  private gaugeCanvasListSub?: Subscription;
 
   /** Re-dessine graphiques + mindmap quand on bascule clair / sombre. */
   private readonly rechartOnTheme = effect(() => {
     this.themeService.activeTheme();
     if (!this.loading && this.themes.length > 0) {
-      queueMicrotask(() => this.renderAllVisualizations());
+      this.scheduleVisualizationRender();
     }
   });
 
@@ -210,29 +224,89 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadDashboardData();
   });
 
+  /** Re-dessine quand on masque/affiche les thèmes sans parcours depuis la transverse rail. */
+  private readonly rechartOnInactiveToggle = effect(() => {
+    this.inactiveThemeVisibility.showInactiveThemes();
+    if (!this.loading && this.themes.length > 0) {
+      if (
+        this.selectedThemeIdForRadar &&
+        !this.themesForVisuals().some((t) => t.id === this.selectedThemeIdForRadar)
+      ) {
+        this.selectedThemeIdForRadar = null;
+      }
+      this.sanitizeGaugeSelections();
+      this.scheduleVisualizationRender();
+    }
+  });
+
   ngOnInit(): void {
     this.langSub = this.translate.onLangChange.subscribe(() => {
       if (!this.loading && this.themes.length > 0) {
-        queueMicrotask(() => this.renderAllVisualizations());
+        this.scheduleVisualizationRender();
       }
     });
     this.loadDashboardData();
   }
 
   ngAfterViewInit(): void {
-    // Les rendus se feront une fois les données reçues dans loadDashboardData().
+    /* Les canvas des jauges / radar / progression ne sont pas tous montés tant que l’onglet
+       correspondant n’a pas été affiché : on re-rend quand la liste change. */
+    this.gaugeCanvasListSub = this.gaugeCanvases?.changes.subscribe(() => {
+      if (!this.loading && this.themes.length > 0) {
+        this.scheduleVisualizationRender();
+      }
+    });
+  }
+
+  /**
+   * Quand les corps d’onglets Material passent visible/invisible, Chart.js et le layout du SVG
+   * ont besoin d’un rendu après stabilisation du cadre (évite canvas à taille 0 au premier chargement).
+   */
+  onDashboardTabChanged(): void {
+    if (this.loading || this.themes.length === 0) return;
+    this.scheduleVisualizationRender();
+  }
+
+  private scheduleVisualizationRender(): void {
+    afterNextRender(
+      () => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => this.renderAllVisualizations());
+        });
+      },
+      { injector: this.injector }
+    );
   }
 
   ngOnDestroy(): void {
     this.langSub?.unsubscribe();
+    this.gaugeCanvasListSub?.unsubscribe();
     this.destroyCharts();
     this.resizeObserver?.disconnect();
+    this.inactiveThemeVisibility.setInactiveThemesCount(0);
+  }
+
+  private themeHasPaths(theme: ThemeNode): boolean {
+    return Array.isArray(theme.subThemes) && theme.subThemes.length > 0;
+  }
+
+  private themesForVisuals(): ThemeNode[] {
+    if (this.inactiveThemeVisibility.showInactiveThemes()) return this.themes;
+    return this.themes.filter((theme) => this.themeHasPaths(theme));
+  }
+
+  private updateInactiveThemesCount(): void {
+    const count = this.themes.reduce(
+      (acc, theme) => acc + (this.themeHasPaths(theme) ? 0 : 1),
+      0
+    );
+    this.inactiveThemeVisibility.setInactiveThemesCount(count);
   }
 
   /** Liste des sous-thèmes avec leurs stats. */
   get flatSubThemes(): Array<{ theme: ThemeNode; sub: SubThemeNode }> {
     const out: Array<{ theme: ThemeNode; sub: SubThemeNode }> = [];
-    for (const t of this.themes) {
+    for (const t of this.themesForVisuals()) {
       for (const s of t.subThemes) {
         out.push({ theme: t, sub: s });
       }
@@ -247,7 +321,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
    * - min_note / max_note : min et max globaux sur les sous-thèmes
    */
   get themeStats(): ThemeAggregate[] {
-    return this.themes.map((theme) => {
+    return this.themesForVisuals().map((theme) => {
       let totalCount = 0;
       let weightedSum = 0;
       let weightedCount = 0;
@@ -286,6 +360,28 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderRadarChart();
   }
 
+  openRadarThemeDialog(): void {
+    const data: RadarThemePickerDialogData = {
+      selectedId: this.selectedThemeIdForRadar ?? '',
+      options: this.themesForVisuals().map((t) => ({ id: t.id, label: t.label }))
+    };
+    this.dialog
+      .open(RadarThemePickerDialogComponent, { data })
+      .afterClosed()
+      .subscribe((selected) => {
+        if (selected == null) return;
+        this.selectThemeForRadar(selected || null);
+      });
+  }
+
+  radarSelectedThemeLabel(): string {
+    if (this.selectedThemeIdForRadar == null) {
+      return this.translate.instant('dashboard.radarAllThemes');
+    }
+    const theme = this.themesForVisuals().find((t) => t.id === this.selectedThemeIdForRadar);
+    return theme?.label ?? this.translate.instant('dashboard.radarAllThemes');
+  }
+
   /** Valeur du select « parcours » pour une jauge thème (vide = tous les parcours). */
   gaugeParcoursSelection(themeId: string): string {
     return this.gaugeParcoursByThemeId[themeId] ?? '';
@@ -298,7 +394,29 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.gaugeParcoursByThemeId = { ...this.gaugeParcoursByThemeId, [themeId]: subThemeId };
     }
-    queueMicrotask(() => this.renderGaugeCharts());
+    this.scheduleVisualizationRender();
+  }
+
+  openGaugeParcoursDialog(theme: ThemeNode): void {
+    const data: GaugePathPickerDialogData = {
+      themeLabel: theme.label,
+      selectedId: this.gaugeParcoursSelection(theme.id),
+      options: theme.subThemes.map((s) => ({ id: s.id, label: s.label }))
+    };
+    this.dialog
+      .open(GaugePathPickerDialogComponent, { data })
+      .afterClosed()
+      .subscribe((selected) => {
+        if (selected == null) return;
+        this.onGaugeParcoursChange(theme.id, selected);
+      });
+  }
+
+  gaugeSelectedPathLabel(theme: ThemeNode): string {
+    const selectedId = this.gaugeParcoursSelection(theme.id);
+    if (!selectedId) return this.translate.instant('dashboard.gaugeAllPaths');
+    const sub = theme.subThemes.find((s) => s.id === selectedId);
+    return sub?.label ?? this.translate.instant('dashboard.gaugeAllPaths');
   }
 
   /**
@@ -337,7 +455,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const next: Record<string, string> = {};
     for (const [themeId, subId] of Object.entries(this.gaugeParcoursByThemeId)) {
-      const theme = this.themes.find((t) => t.id === themeId);
+      const theme = this.themesForVisuals().find((t) => t.id === themeId);
       if (theme?.subThemes.some((s) => s.id === subId)) {
         next[themeId] = subId;
       }
@@ -383,19 +501,27 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }).subscribe({
       next: ({ themes, allThemes, stats, evaluations }) => {
         this.themes = this.normalizeThemes(themes);
+        this.updateInactiveThemesCount();
         this.allEvaluations = evaluations ?? [];
         this.statsBySubThemeKey = this.indexStats(stats ?? []);
         this.mergeStatsIntoThemes();
         this.indexAllThemes(allThemes ?? themes);
         this.computeGlobalSummary();
         this.sanitizeGaugeSelections();
+        if (
+          this.selectedThemeIdForRadar &&
+          !this.themesForVisuals().some((t) => t.id === this.selectedThemeIdForRadar)
+        ) {
+          this.selectedThemeIdForRadar = null;
+        }
         this.loading = false;
-        // Laisse Angular injecter les @ViewChild après le *ngIf = !loading
-        setTimeout(() => this.renderAllVisualizations(), 0);
+        /* Attendre le rendu du DOM / mat-tab (dimensions réelles pour Chart.js & mind map). */
+        this.scheduleVisualizationRender();
       },
       error: () => {
         this.loadError = this.translate.instant('dashboard.loadError');
         this.loading = false;
+        this.inactiveThemeVisibility.setInactiveThemesCount(0);
       }
     });
   }
@@ -565,7 +691,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const root: MindMapNode = {
       name: this.translate.instant('dashboard.mindMapRoot'),
       level: 'root',
-      children: this.themes.map((t) => ({
+      children: this.themesForVisuals().map((t) => ({
         name: t.label,
         level: 'theme',
         data: t,
@@ -808,8 +934,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const source =
       this.selectedThemeIdForRadar === null
-        ? this.themes
-        : this.themes.filter((t) => t.id === this.selectedThemeIdForRadar);
+        ? this.themesForVisuals()
+        : this.themesForVisuals().filter((t) => t.id === this.selectedThemeIdForRadar);
 
     // On construit un radar par parcours (un dataset) pour faciliter la comparaison.
     const labels = [
@@ -1116,7 +1242,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const palette = ['#2d5a3d', '#9c5b3d', '#a67c32', '#3d6b7a', '#5c4d7a', '#4a7c59'];
 
-    this.themes.forEach((theme, tIdx) => {
+    this.themesForVisuals().forEach((theme, tIdx) => {
       const themeIdNum = Number(theme.id);
       if (!Number.isFinite(themeIdNum)) return;
       const mask = sorted.map((e) => e.id_theme === themeIdNum);

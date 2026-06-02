@@ -1,4 +1,4 @@
-@use '../../styles/themes/mixins' as *;
+@use "../../styles/themes/mixins" as *;
 
 .dashboard-page {
   min-height: 100vh;
@@ -66,7 +66,9 @@
   gap: 0.35rem;
   border-radius: var(--app-radius);
   @include app-glass-panel;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .kpi-card:hover {
@@ -174,7 +176,9 @@
     border-top-width: 3px;
   }
 
-  ::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab-indicator__content--underline {
+  ::ng-deep
+    .mat-mdc-tab.mdc-tab--active
+    .mdc-tab-indicator__content--underline {
     border-top-color: var(--app-logo-word-fonce) !important;
   }
 
@@ -260,44 +264,55 @@
 // --- Layout Radars & jauges (2 colonnes) -------------------------------------
 .radar-gauges-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
   margin: 1rem 0;
-  align-items: stretch;
+  align-items: start;
 }
 
 .radar-gauges-layout > .panel {
   margin: 0;
-  display: flex;
-  flex-direction: column;
 }
 
-// Partie droite : radar → 1/3 haut (boutons) + 2/3 bas (graphique)
 .panel--radar {
-  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 180px);
+  min-height: 640px;
 }
 
 .panel--radar .radar-top {
-  flex: 1 1 33.333%;
-  min-height: 140px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex: 0 0 auto;
+  padding-bottom: 0.5rem;
 }
 
 .panel--radar .radar-host {
-  flex: 2 1 66.666%;
-  height: auto;
-  min-height: 240px;
+  flex: 1 1 0;
+  min-height: 0;
+  margin-top: 0.25rem;
 }
 
 // --- Radar -------------------------------------------------------------------
-.radar-controls {
+.radar-title-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.radar-change-theme-btn.mat-mdc-icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  flex: 0 0 auto;
+  background: transparent !important;
+  color: var(--app-text) !important;
+}
+
+.radar-change-theme-btn.mat-mdc-icon-button .mat-icon {
+  font-size: 1.32rem;
+  width: 1.32rem;
+  height: 1.32rem;
 }
 
 .radar-host {
@@ -402,9 +417,72 @@
 .gauge-card__title {
   margin: 0;
   font-family: var(--app-font-display);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--app-text);
+}
+
+.gauge-card__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.gauge-card__change-path-btn.mat-mdc-icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  flex: 0 0 auto;
+  background: transparent !important;
+  color: var(--app-text) !important;
+}
+
+.gauge-card__change-path-btn.mat-mdc-icon-button .mat-icon {
+  font-size: 1.32rem;
+  width: 1.32rem;
+  height: 1.32rem;
+}
+
+:host-context(body.dark-theme) .gauge-card__change-path-btn.mat-mdc-icon-button,
+:host-context(body.dark-theme) .radar-change-theme-btn.mat-mdc-icon-button {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+:host-context(body.dark-theme) .gauge-card__change-path-btn.mat-mdc-icon-button .mat-icon,
+:host-context(body.dark-theme) .radar-change-theme-btn.mat-mdc-icon-button .mat-icon {
+  color: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  .gauge-card__change-path-btn.mat-mdc-icon-button:hover,
+:host-context(body.dark-theme)
+  .radar-change-theme-btn.mat-mdc-icon-button:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+/* Override fort MDC (state layer) pour rendre le hover visible en dark. */
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__change-path-btn.mat-mdc-icon-button
+  .mat-mdc-button-persistent-ripple::before,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .radar-change-theme-btn.mat-mdc-icon-button
+  .mat-mdc-button-persistent-ripple::before {
+  background-color: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__change-path-btn.mat-mdc-icon-button:hover
+  .mat-mdc-button-persistent-ripple::before,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .radar-change-theme-btn.mat-mdc-icon-button:hover
+  .mat-mdc-button-persistent-ripple::before {
+  opacity: 0.18 !important;
 }
 
 .gauge-card__select {
@@ -422,7 +500,9 @@
     --mdc-outlined-text-field-container-height: 42px;
   }
 
-  .mat-mdc-text-field-wrapper .mat-mdc-form-field-flex .mat-mdc-form-field-infix {
+  .mat-mdc-text-field-wrapper
+    .mat-mdc-form-field-flex
+    .mat-mdc-form-field-infix {
     min-height: 32px;
     padding-top: 6px;
     padding-bottom: 6px;
@@ -433,30 +513,159 @@
     align-items: center;
   }
 
+  .mat-mdc-select-arrow,
+  .mat-mdc-select-arrow svg {
+    color: #111111 !important;
+    fill: #111111 !important;
+  }
+
   .mat-mdc-form-field-subscript-wrapper {
     display: none;
   }
+}
+
+/* Hover stable pour les selects des jauges (light). */
+:host
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-notched-outline__trailing {
+  border-color: #111111 !important;
+}
+
+:host
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-floating-label,
+:host
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-floating-label--float-above {
+  color: #111111 !important;
+}
+
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mat-mdc-select-arrow,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mat-mdc-select-arrow
+  svg,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mat-mdc-select-arrow,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mat-mdc-select-arrow
+  svg {
+  color: #111111 !important;
+  fill: #111111 !important;
+}
+
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-notched-outline__trailing {
+  border-color: #111111 !important;
+}
+
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-floating-label,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-floating-label--float-above,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mat-mdc-floating-label {
+  color: #111111 !important;
+}
+
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-notched-outline__trailing {
+  border-color: #111111 !important;
+}
+
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-floating-label,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-floating-label--float-above,
+:host
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mat-mdc-floating-label {
+  color: #111111 !important;
 }
 
 /* Contraste lisible en thème sombre (Material azure-blue reste très « light » sur les textes). */
 :host-context(body.dark-theme) .gauge-card__select.mat-mdc-form-field {
   /* Étiquette « Parcours » : plus claire que --app-text-muted pour rester lisible sur la carte */
   --mat-form-field-outlined-label-text-color: var(--app-ink);
-  --mat-form-field-outlined-hover-label-text-color: var(--app-text);
+  --mat-form-field-outlined-hover-label-text-color: var(--app-ink);
   --mat-form-field-outlined-focus-label-text-color: var(--app-forest-light);
-  --mat-form-field-outlined-disabled-label-text-color: rgba(234, 231, 224, 0.38);
+  --mat-form-field-outlined-disabled-label-text-color: rgba(
+    234,
+    231,
+    224,
+    0.38
+  );
   --mat-form-field-outlined-input-text-color: var(--app-text);
   --mat-form-field-outlined-outline-color: var(--app-stroke-strong);
-  --mat-form-field-outlined-hover-outline-color: rgba(234, 231, 224, 0.35);
+  --mat-form-field-outlined-hover-outline-color: var(--app-stroke-strong);
   --mat-form-field-outlined-focus-outline-color: var(--app-forest-light);
   --mat-select-enabled-trigger-text-color: var(--app-text);
-  --mat-select-enabled-arrow-color: var(--app-text-muted);
+  --mat-select-enabled-arrow-color: #ffffff;
   --mat-select-disabled-trigger-text-color: rgba(234, 231, 224, 0.38);
   --mat-select-placeholder-text-color: var(--app-text-muted);
   --mdc-outlined-text-field-label-text-color: var(--app-ink);
 
   .mat-mdc-text-field-wrapper {
-    background-color: color-mix(in srgb, var(--app-surface-strong) 55%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--app-surface-strong) 55%,
+      transparent
+    );
     border-radius: var(--app-radius-xs);
   }
 
@@ -488,9 +697,125 @@
     fill: currentColor !important;
   }
 
-  .mat-mdc-select-arrow {
-    color: var(--app-text-muted) !important;
+  .mat-mdc-select-arrow,
+  .mat-mdc-select-arrow svg {
+    color: #ffffff !important;
+    fill: #ffffff !important;
   }
+}
+
+/* Hover stable pour les selects des jauges (dark). */
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-notched-outline__leading,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-notched-outline__notch,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-notched-outline__trailing {
+  border-color: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-floating-label,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select
+  .mdc-text-field--outlined:not(.mdc-text-field--focused):hover
+  .mdc-floating-label--float-above {
+  color: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mat-mdc-select-arrow,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mat-mdc-select-arrow
+  svg,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mat-mdc-select-arrow,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mat-mdc-select-arrow
+  svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-notched-outline__leading,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-notched-outline__notch,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-notched-outline__trailing {
+  border-color: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-floating-label,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mdc-floating-label--float-above,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field.mat-focused
+  .mat-mdc-floating-label {
+  color: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-notched-outline__leading,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-notched-outline__notch,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-notched-outline__trailing {
+  border-color: #ffffff !important;
+}
+
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-floating-label,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mdc-floating-label--float-above,
+:host-context(body.dark-theme)
+  ::ng-deep
+  .gauge-card__select.mat-mdc-form-field:hover
+  .mat-mdc-floating-label {
+  color: #ffffff !important;
 }
 
 .gauge-card__canvas-host {
@@ -548,10 +873,12 @@
     grid-template-columns: 1fr;
   }
   .panel--radar {
+    height: auto;
     min-height: 0;
   }
   .panel--radar .radar-host {
     height: 360px;
+    min-height: 360px;
   }
 }
 

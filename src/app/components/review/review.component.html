@@ -54,7 +54,7 @@
                   [class.active]="i === selectedQuestionIndex"
                   (click)="selectQuestion(i)"
                 >
-                  <span class="question-index">Q{{ i + 1 }}</span>
+                  <span class="question-index">Q{{ question.qNum }}</span>
                   <span class="question-text">{{ question.label }}</span>
                   <span
                     class="evaluation-count-badge"
@@ -103,22 +103,35 @@
             ></textarea>
 
             <div class="answer-actions">
-              <div class="question-audio">
-                <div class="audio-toolbar">
+              <div class="answer-actions__slot answer-actions__slot--audio">
+                <div class="audio-toolbar" [attr.aria-label]="'review.audioToolbarAria' | translate">
                   <button
                     mat-icon-button
                     class="btn-record"
                     (click)="startRecording()"
                     [disabled]="isRecording"
+                    [attr.aria-label]="'review.recordAudio' | translate"
                   >
                     <mat-icon>mic</mat-icon>
                   </button>
 
-                  <button mat-icon-button color="warn" (click)="stopRecording()" [disabled]="!isRecording">
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="stopRecording()"
+                    [disabled]="!isRecording"
+                    [attr.aria-label]="'review.stopAudio' | translate"
+                  >
                     <mat-icon>stop</mat-icon>
                   </button>
 
-                  <button mat-icon-button class="btn-play" (click)="playAudio()" [disabled]="!id_audio">
+                  <button
+                    mat-icon-button
+                    class="btn-play"
+                    (click)="playAudio()"
+                    [disabled]="!id_audio"
+                    [attr.aria-label]="'review.playAudio' | translate"
+                  >
                     <mat-icon>play_arrow</mat-icon>
                   </button>
 
@@ -129,14 +142,29 @@
               </div>
 
               <button
-                class="evaluate-button"
-                mat-raised-button
-                color="primary"
+                mat-stroked-button
+                type="button"
+                class="answer-actions__btn drawing-button"
+                (click)="openDrawingDialog()"
+                [attr.aria-label]="'review.openDrawing' | translate"
+              >
+                <mat-icon>draw</mat-icon>
+                <span class="answer-actions__btn-label">{{
+                  selectedQuestion.hasDessin
+                    ? ('review.editDrawing' | translate)
+                    : ('review.openDrawing' | translate)
+                }}</span>
+              </button>
+
+              <button
+                class="answer-actions__btn evaluate-button"
+                mat-stroked-button
                 type="button"
                 (click)="submitEvaluation()"
                 [disabled]="evaluating || !userAnswer.trim()"
               >
-                {{ 'review.evaluate' | translate }}
+                <mat-icon>psychology</mat-icon>
+                <span class="answer-actions__btn-label">{{ 'review.evaluate' | translate }}</span>
               </button>
             </div>
             @if (evaluateError) {

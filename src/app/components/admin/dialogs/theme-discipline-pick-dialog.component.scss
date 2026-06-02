@@ -1,0 +1,50 @@
+.theme-discipline-pick {
+  min-width: min(100%, 320px);
+  max-width: 480px;
+}
+
+.theme-discipline-pick__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.theme-discipline-pick__intro {
+  margin: 0 0 1rem;
+  line-height: 1.45;
+}
+
+.theme-discipline-pick__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.theme-discipline-pick__item {
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.theme-discipline-pick__label {
+  font-weight: 500;
+}
+
+.theme-discipline-pick__desc {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
+.theme-discipline-pick__error,
+.theme-discipline-pick__empty {
+  margin: 0;
+}
+
+.theme-discipline-pick__hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--mat-form-field-error-text-color, #b3261e);
+}

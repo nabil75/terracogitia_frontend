@@ -1,4 +1,4 @@
-@use '../../../styles/themes/mixins' as *;
+@use "../../../styles/themes/mixins" as *;
 
 .admin-themes-page {
   width: 100%;
@@ -422,88 +422,6 @@
   font-size: 0.88rem;
   color: var(--app-text-muted);
   line-height: 1.35;
-}
-
-.subtheme-row__actions {
-  display: flex;
-  flex-shrink: 0;
-  gap: 0.45rem;
-  align-items: center;
-}
-
-/* Icônes seules : contour type « stroked », fond transparent (clair / sombre). */
-.subtheme-row__actions .subtheme-row__btn-icon.mat-mdc-button-base {
-  min-width: 2.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  border-radius: var(--app-radius-xs);
-  --mdc-outlined-button-outline-width: 1.5px;
-  --mdc-outlined-button-outline-color: var(--app-stroke-strong);
-  background-color: transparent !important;
-  color: var(--app-text-muted) !important;
-}
-
-.subtheme-row__actions .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):hover {
-  background-color: rgba(45, 90, 61, 0.08) !important;
-  color: var(--app-text) !important;
-  --mdc-outlined-button-outline-color: var(--app-brand-from);
-}
-
-.subtheme-row__actions .subtheme-row__btn-icon .mdc-button__label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.subtheme-row__actions .subtheme-row__btn-icon mat-icon {
-  margin: 0;
-  font-size: 1.15rem;
-  width: 1.15rem;
-  height: 1.15rem;
-}
-
-.subtheme-row__actions .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]) {
-  --mdc-outlined-button-outline-color: rgba(156, 91, 61, 0.45);
-  color: var(--app-terracotta) !important;
-}
-
-.subtheme-row__actions .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):hover {
-  --mdc-outlined-button-outline-color: var(--app-terracotta);
-  background-color: rgba(156, 91, 61, 0.1) !important;
-  color: var(--app-terracotta) !important;
-}
-
-:host-context(body.dark-theme) .subtheme-row__actions .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]) {
-  background-color: transparent !important;
-  --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.4);
-  color: var(--app-text) !important;
-}
-
-:host-context(body.dark-theme) .subtheme-row__actions .subtheme-row__btn-icon.mat-mdc-button-base:not([disabled]):hover {
-  background-color: rgba(15, 17, 23, 0.42) !important;
-  color: var(--app-text) !important;
-  --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.65);
-}
-
-:host-context(body.dark-theme)
-  .subtheme-row__actions
-  .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]) {
-  --mdc-outlined-button-outline-color: rgba(232, 200, 195, 0.5);
-  color: var(--app-text) !important;
-}
-
-:host-context(body.dark-theme)
-  .subtheme-row__actions
-  .subtheme-row__btn-icon--danger.mat-mdc-button-base:not([disabled]):hover {
-  --mdc-outlined-button-outline-color: rgba(240, 220, 215, 0.75);
-  background-color: rgba(232, 200, 195, 0.12) !important;
-  color: var(--app-text) !important;
-}
-
-:host-context(body.dark-theme) .subtheme-row__actions .subtheme-row__btn-icon mat-icon {
-  color: var(--app-text);
 }
 
 @media (max-width: 600px) {

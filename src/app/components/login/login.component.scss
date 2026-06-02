@@ -1,4 +1,4 @@
-@use '../../styles/themes/mixins' as *;
+@use "../../styles/themes/mixins" as *;
 
 .login-container {
   min-height: 100vh;
@@ -48,8 +48,12 @@
   margin-bottom: 1.5rem;
 }
 
-.accent-clair { color: var(--app-logo-word-clair); }
-.accent-fonce { color: var(--app-logo-word-fonce); }
+.accent-clair {
+  color: var(--app-logo-word-clair);
+}
+.accent-fonce {
+  color: var(--app-logo-word-fonce);
+}
 
 .login-brand-text h1 {
   margin: 0;
@@ -74,7 +78,9 @@
   gap: 0.5rem;
 }
 
-.full-width { width: 100%; }
+.full-width {
+  width: 100%;
+}
 
 .field-error {
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);

@@ -1,4 +1,4 @@
-@use '../../styles/themes/mixins' as *;
+@use "../../styles/themes/mixins" as *;
 
 .admin-page {
   min-height: 100vh;
@@ -67,7 +67,10 @@
   border-top-width: 3px;
 }
 
-.admin-tabs ::ng-deep .mat-mdc-tab-link.mdc-tab--active .mdc-tab-indicator__content--underline {
+.admin-tabs
+  ::ng-deep
+  .mat-mdc-tab-link.mdc-tab--active
+  .mdc-tab-indicator__content--underline {
   border-top-color: var(--app-logo-word-fonce) !important;
 }
 
@@ -78,7 +81,10 @@
   color: var(--app-text) !important;
 }
 
-.admin-tabs ::ng-deep .mat-mdc-tab-link:not(.mdc-tab--active) .mdc-tab__text-label {
+.admin-tabs
+  ::ng-deep
+  .mat-mdc-tab-link:not(.mdc-tab--active)
+  .mdc-tab__text-label {
   opacity: 0.72;
 }
 
@@ -87,8 +93,14 @@
   font-weight: 600;
 }
 
-.admin-tabs ::ng-deep .mat-mdc-tab-link.mdc-tab--active:hover .mdc-tab__text-label,
-.admin-tabs ::ng-deep .mat-mdc-tab-link.mdc-tab--active:focus .mdc-tab__text-label {
+.admin-tabs
+  ::ng-deep
+  .mat-mdc-tab-link.mdc-tab--active:hover
+  .mdc-tab__text-label,
+.admin-tabs
+  ::ng-deep
+  .mat-mdc-tab-link.mdc-tab--active:focus
+  .mdc-tab__text-label {
   color: var(--app-text) !important;
 }
 

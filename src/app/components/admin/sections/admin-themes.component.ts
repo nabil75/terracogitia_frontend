@@ -5,6 +5,7 @@ import {
   Component,
   HostListener,
   OnInit,
+  OnDestroy,
   computed,
   effect,
   inject,
@@ -21,7 +22,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { finalize } from 'rxjs';
+import { filter, finalize, of } from 'rxjs';
 
 import {
   ApiService,
@@ -30,6 +31,7 @@ import {
   ThemeAdminDto
 } from '../../../api/api.service';
 import { ThemeEditDialogComponent } from '../dialogs/theme-edit-dialog.component';
+import { ThemeDisciplinePickDialogComponent } from '../dialogs/theme-discipline-pick-dialog.component';
 import { SubThemeEditDialogComponent } from '../dialogs/subtheme-edit-dialog.component';
 import {
   ConfirmDeleteDialogComponent,
@@ -38,6 +40,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SpinnerComponent } from "../../../shared/spinner/spinner.component";
 import { DisciplineService } from '../../../shared/services/discipline.service';
+import { InactiveThemeVisibilityService } from '../../../shared/services/inactive-theme-visibility.service';
 
 function httpErrorMessage(err: unknown, translate: TranslateService): string {
   if (err instanceof HttpErrorResponse) {
@@ -82,13 +85,14 @@ function httpErrorMessage(err: unknown, translate: TranslateService): string {
   templateUrl: './admin-themes.component.html',
   styleUrl: './admin-themes.component.scss'
 })
-export class AdminThemesComponent implements OnInit {
+export class AdminThemesComponent implements OnInit, OnDestroy {
   private readonly api = inject(ApiService);
   private readonly dialog = inject(MatDialog);
   private readonly snack = inject(MatSnackBar);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translate = inject(TranslateService);
   private readonly disciplineService = inject(DisciplineService);
+  readonly inactiveThemeVisibility = inject(InactiveThemeVisibilityService);
 
   /** Thème choisi pour la génération bulk parcours + questions (id en string, aligné sur `mat-option`). */
   bulkAiSelectedThemeId: string | null = null;
@@ -145,6 +149,10 @@ export class AdminThemesComponent implements OnInit {
     this.refresh();
   }
 
+  ngOnDestroy(): void {
+    this.inactiveThemeVisibility.setInactiveThemesCount(0);
+  }
+
   /** Recharge la liste des thèmes. */
   refresh(): void {
     this.loading = true;
@@ -157,12 +165,14 @@ export class AdminThemesComponent implements OnInit {
           this.taglineTruncated = {};
           const list = Array.isArray(data) ? data : [];
           this.themes = list;
+          this.updateInactiveThemesCount();
           this.pruneBulkAiSelection(list);
         },
         error: (err) => {
           this.loadError = httpErrorMessage(err, this.translate);
           this.themes = [];
           this.bulkAiSelectedThemeId = null;
+          this.inactiveThemeVisibility.setInactiveThemesCount(0);
           this.expandedThemeKeys.clear();
           this.lastOpenedThemeKey = null;
           this.expansionRevision.update((n) => n + 1);
@@ -189,6 +199,19 @@ export class AdminThemesComponent implements OnInit {
 
   subThemesOf(theme: ThemeAdminDto): SubThemeAdminDto[] {
     return theme.subThemes ?? [];
+  }
+
+  visibleThemes(): ThemeAdminDto[] {
+    if (this.inactiveThemeVisibility.showInactiveThemes()) return this.themes;
+    return this.themes.filter((theme) => this.subThemesOf(theme).length > 0);
+  }
+
+  private updateInactiveThemesCount(): void {
+    const count = this.themes.reduce(
+      (acc, theme) => acc + (this.subThemesOf(theme).length === 0 ? 1 : 0),
+      0
+    );
+    this.inactiveThemeVisibility.setInactiveThemesCount(count);
   }
 
   onThemePanelOpened(theme: ThemeAdminDto): void {
@@ -234,27 +257,44 @@ export class AdminThemesComponent implements OnInit {
   }
 
   openCreateTheme() {
-    const ref = this.dialog.open(ThemeEditDialogComponent, {
-      data: { mode: 'create' as const }
-    });
-    ref.afterClosed().subscribe((payload) => {
-      if (!payload) return;
-      this.saving = true;
-      this.api
-        .createTheme(payload)
-        .pipe(finalize(() => (this.saving = false)))
-        .subscribe({
-          next: () => {
-            this.snack.open(this.translate.instant('adminThemes.snackThemeCreated'), this.translate.instant('common.ok'), {
-              duration: 3500
-            });
-            this.refresh();
-          },
-          error: (err) =>
-            this.snack.open(httpErrorMessage(err, this.translate), this.translate.instant('common.close'), {
-              duration: 6000
+    const disciplineId$ =
+      this.disciplineService.selectedDisciplineId() != null
+        ? of(this.disciplineService.selectedDisciplineId()!)
+        : this.dialog
+            .open(ThemeDisciplinePickDialogComponent, {
+              width: '440px',
+              maxWidth: '92vw',
+              panelClass: 'app-theme-discipline-pick-dialog'
             })
-        });
+            .afterClosed()
+            .pipe(filter((id): id is number => typeof id === 'number'));
+
+    disciplineId$.subscribe((idDiscipline) => {
+      const ref = this.dialog.open(ThemeEditDialogComponent, {
+        data: { mode: 'create' as const }
+      });
+      ref.afterClosed().subscribe((payload) => {
+        if (!payload) return;
+        this.saving = true;
+        this.api
+          .createTheme({
+            ...payload,
+            id_discipline: idDiscipline
+          })
+          .pipe(finalize(() => (this.saving = false)))
+          .subscribe({
+            next: () => {
+              this.snack.open(this.translate.instant('adminThemes.snackThemeCreated'), this.translate.instant('common.ok'), {
+                duration: 3500
+              });
+              this.refresh();
+            },
+            error: (err) =>
+              this.snack.open(httpErrorMessage(err, this.translate), this.translate.instant('common.close'), {
+                duration: 6000
+              })
+          });
+      });
     });
   }
 
@@ -389,10 +429,15 @@ export class AdminThemesComponent implements OnInit {
       return;
     }
     const description = (theme.description ?? '').trim();
+    const existing_domaines = this.subThemesOf(theme).map((sub) => ({
+      label: (sub.label ?? '').trim(),
+      ...(sub.description?.trim() ? { description: sub.description.trim() } : {})
+    })).filter((d) => d.label.length > 0);
     const payload: GenerateParcoursQuestionsFromThemePayload = {
       id_theme: theme.id,
       label,
-      ...(description.length > 0 ? { description } : {})
+      ...(description.length > 0 ? { description } : {}),
+      ...(existing_domaines.length > 0 ? { existing_domaines } : {})
     };
 
     this.isGenerating = true;

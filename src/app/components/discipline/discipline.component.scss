@@ -1,0 +1,452 @@
+@use "../../styles/themes/mixins" as *;
+
+.discipline-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+  box-sizing: border-box;
+  @include app-mesh-background;
+  @include page-with-transverse-rail-padding;
+}
+
+.discipline-page .app-page-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.discipline-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.discipline-page__title-block h1 {
+  margin: 0;
+  font-family: var(--app-font-display);
+  font-size: clamp(1.55rem, 2.8vw, 2rem);
+  font-weight: 700;
+  color: var(--app-brand-ink);
+  letter-spacing: -0.02em;
+}
+
+.discipline-page__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.15fr);
+  gap: 1.25rem;
+  align-items: start;
+  min-height: 0;
+}
+
+@media (max-width: 960px) {
+  .discipline-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.discipline-page__list-panel,
+.discipline-page__detail-panel {
+  @include app-glass-panel;
+  padding: 1rem 1.1rem 1.15rem;
+  min-height: min(70vh, 720px);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: visible;
+}
+
+.discipline-page__panel-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--app-font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--app-brand-ink);
+}
+
+.discipline-page__intro {
+  margin: 0 0 0.65rem;
+  color: var(--app-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.discipline-page__state {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 0;
+  color: var(--app-text);
+}
+
+.discipline-page__error {
+  margin: 0;
+  color: var(--app-danger, #c0392b);
+  font-weight: 600;
+}
+
+.discipline-page__muted {
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.discipline-page__detail-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.65rem 0.2rem 0.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discipline-page__field {
+  width: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* Libellés outline : éviter la troncature (conteneur scroll + notch Material). */
+:host ::ng-deep .discipline-page__detail-scroll .discipline-page__field .mdc-floating-label,
+:host ::ng-deep .discipline-page__detail-scroll .discipline-dialog-add-form__field .mdc-floating-label {
+  max-width: none;
+}
+
+:host ::ng-deep .discipline-page__detail-scroll .discipline-page__field .mat-mdc-text-field-wrapper,
+:host ::ng-deep .discipline-page__detail-scroll .discipline-dialog-add-form__field .mat-mdc-text-field-wrapper {
+  overflow: visible;
+}
+
+:host ::ng-deep .discipline-page__detail-scroll .discipline-page__field .mat-mdc-form-field-subscript-wrapper {
+  overflow: visible;
+}
+
+/* Champs outline : lisibilité en dark-theme (surcharge azure-blue / encapsulation). */
+:host-context(body.dark-theme) ::ng-deep .discipline-page__field.mat-mdc-form-field,
+:host-context(body.dark-theme) ::ng-deep .discipline-dialog-add-form__field.mat-mdc-form-field {
+  --mat-form-field-outlined-input-text-color: #ffffff;
+  --mat-form-field-outlined-label-text-color: rgba(255, 255, 255, 0.78);
+  --mat-form-field-outlined-focus-label-text-color: #ffffff;
+  --mat-form-field-outlined-hover-label-text-color: #ffffff;
+
+  input,
+  textarea {
+    color: #ffffff !important;
+    caret-color: var(--app-forest-light);
+  }
+
+  .mdc-floating-label,
+  .mat-mdc-floating-label {
+    color: rgba(255, 255, 255, 0.78) !important;
+  }
+
+  &.mat-focused .mdc-floating-label,
+  &.mat-focused .mat-mdc-floating-label,
+  &.mat-form-field-should-float .mdc-floating-label {
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-select-value,
+  .mat-mdc-select-value-text {
+    color: #ffffff !important;
+  }
+}
+
+.discipline-page__section-title {
+  margin: 0.85rem 0 0.4rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--app-brand-ink);
+  font-family: var(--app-font-display);
+}
+
+.discipline-page__readonly-block {
+  margin: 0.25rem 0 0.5rem;
+}
+
+.discipline-page__readonly-list {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: var(--app-text);
+  font-size: 0.9rem;
+  line-height: 1.45;
+
+  li + li {
+    margin-top: 0.35rem;
+  }
+}
+
+.discipline-page__notions-list li {
+  list-style: disc;
+}
+
+.discipline-page__notion-desc {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.84rem;
+  color: var(--app-text-muted);
+  font-weight: 400;
+}
+
+.discipline-page__meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.83rem;
+  color: var(--app-text-muted);
+}
+
+.discipline-page__hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  color: var(--app-text-muted);
+  font-style: italic;
+}
+
+.discipline-page__detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--app-stroke);
+}
+
+:host ::ng-deep .discipline-page__detail-actions .mat-mdc-button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+}
+
+:host ::ng-deep .discipline-page__detail-actions .mat-mdc-button-base .mdc-button__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  line-height: 1.2;
+}
+
+:host ::ng-deep .discipline-page__detail-actions .mat-mdc-button-base mat-icon {
+  margin: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* --- Liste (styles hérités du dialogue) ----------------------------------- */
+.discipline-dialog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow-y: auto;
+  max-height: min(42vh, 420px);
+  flex: 0 1 auto;
+  box-sizing: border-box;
+  padding: 0.55rem 0.65rem;
+  border: 1.5px solid color-mix(in srgb, var(--app-stroke-strong) 72%, transparent);
+  border-radius: var(--app-radius-sm, 8px);
+  background: color-mix(in srgb, var(--app-surface-strong) 35%, transparent);
+}
+
+.discipline-dialog-item {
+  display: block;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--app-radius-sm, 8px);
+  transition: background-color 0.15s ease;
+}
+
+.discipline-dialog-item:hover {
+  background: var(--app-surface-strong, rgba(45, 90, 61, 0.08));
+}
+
+.discipline-dialog-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.discipline-dialog-item-row .discipline-dialog-item {
+  flex: 1 1 auto;
+}
+
+.discipline-dialog-item-row .subtheme-row__actions {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.discipline-delete-btn-wrap {
+  display: inline-flex;
+  vertical-align: top;
+}
+
+.discipline-delete-btn-wrap--blocked {
+  cursor: not-allowed;
+}
+
+.discipline-dialog-item__label {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.discipline-dialog-item__desc {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: var(--app-text-muted);
+  line-height: 1.35;
+}
+
+.discipline-dialog-empty {
+  margin: 0;
+  font-style: italic;
+  color: var(--app-text-muted);
+}
+
+.discipline-dialog-add-toggle.mat-mdc-button-base {
+  align-self: flex-start;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1.15rem;
+  padding: 0 0.25rem;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  font-weight: 600;
+  border: none;
+  border-radius: 0;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  color: var(--app-forest) !important;
+  --mdc-text-button-label-text-color: var(--app-forest);
+}
+
+:host ::ng-deep .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]) {
+  background-color: transparent !important;
+
+  .mdc-button__label,
+  .discipline-dialog-add-toggle__label,
+  mat-icon {
+    color: inherit !important;
+  }
+}
+
+:host ::ng-deep .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):hover,
+:host ::ng-deep .discipline-dialog-add-toggle.mat-mdc-button-base:not([disabled]):focus-visible {
+  background-color: transparent !important;
+}
+
+:host-context(body.dark-theme) ::ng-deep .discipline-dialog-add-toggle.mat-mdc-button-base {
+  color: #ffffff !important;
+  --mdc-text-button-label-text-color: #ffffff;
+}
+
+.discipline-dialog-add-toggle:hover .discipline-dialog-add-toggle__label,
+.discipline-dialog-add-toggle:focus-visible .discipline-dialog-add-toggle__label {
+  text-decoration: underline;
+}
+
+.discipline-dialog-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 0.9rem 0.5rem;
+  margin-top: 0.5rem;
+  border: 1px solid var(--app-stroke);
+  border-radius: var(--app-radius-sm, 8px);
+  background: var(--app-surface);
+  overflow: visible;
+}
+
+.discipline-dialog-add-form__title {
+  margin: 0 0 0.25rem;
+  font-family: var(--app-font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.discipline-dialog-add-form__lead {
+  margin: 0 0 0.65rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--app-text-muted);
+}
+
+.discipline-dialog-add-form__propose-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.discipline-dialog-add-form__proposal-title {
+  margin: 0.5rem 0 0.35rem;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: var(--app-text);
+}
+
+.discipline-dialog-add-form__proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.discipline-dialog-add-form__validated {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.84rem;
+  color: var(--app-forest);
+
+  mat-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+:host-context(body.dark-theme) .discipline-dialog-add-form__validated {
+  color: var(--app-forest-light);
+}
+
+.discipline-dialog-add-form__field {
+  width: 100%;
+  display: block;
+}
+
+.discipline-dialog-add-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.discipline-dialog-add-form__error {
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--app-radius-xs, 6px);
+  background: rgba(239, 155, 155, 0.12);
+  border: 1px solid rgba(239, 155, 155, 0.45);
+  color: #b91c1c;
+  font-size: 0.85rem;
+}
+
+.discipline-dialog-add-form__spinner {
+  margin-right: 0.5rem;
+  display: inline-flex !important;
+  vertical-align: middle;
+}

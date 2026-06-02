@@ -1,66 +1,349 @@
 <app-transverse-rail />
 
 <div class="discover-page">
+    @if (isGenerating) {
+    <app-spinner [message_spinner]="'adminThemes.isGenerating' | translate"></app-spinner>
+  }
   <div class="app-page-inner">
     <header class="discover-header">
       <h1>{{ 'discover.title' | translate }}</h1>
       <p class="discover-header__intro">{{ 'discover.intro' | translate }}</p>
     </header>
 
-    <div class="discover-body">
-    @if (loadingThemes) {
-      <div class="discover-state discover-state--center discover-state--body-fill">
-        <mat-progress-spinner diameter="40" mode="indeterminate" />
-        <span>{{ 'discover.loadingThemes' | translate }}</span>
+    <section
+      class="discover-map-panel"
+      [class.discover-map-panel--body-collapsed]="!mindMapPanelBodyVisible"
+      aria-labelledby="discover-map-title"
+    >
+      <div class="discover-map-panel__head">
+        <div class="discover-map-panel__titles">
+          <div class="discover-map-panel__title-row">
+            <h2 id="discover-map-title">
+              @if (mindMapDisciplineLabelTrimmed(); as d) {
+                {{ 'discover.mentalMapTitle' | translate: { discipline: d } }}
+              } @else {
+                {{ 'discover.mentalMapTitleNoSelection' | translate }}
+              }
+            </h2>
+            <button
+              mat-icon-button
+              type="button"
+              class="discover-map-panel__hint-toggle"
+              [attr.aria-expanded]="mindMapZoomHintVisible"
+              aria-controls="discover-map-zoom-hint"
+              [attr.aria-label]="'discover.mapZoomHintToggleAria' | translate"
+              (click)="toggleMindMapZoomHint()"
+            >
+              <mat-icon aria-hidden="true">help_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="discover-map-panel__search-wrap">
+          @if (mapThemes.length > 0 && !loadingMap) {
+            <div class="discover-map-panel__search" role="search">
+              <input
+                id="discover-map-search-input"
+                type="search"
+                class="discover-map-panel__search-input"
+                autocomplete="off"
+                spellcheck="false"
+                [placeholder]="'discover.mapSearchPlaceholder' | translate"
+                [attr.aria-label]="'discover.mapSearchAriaLabel' | translate"
+                [attr.aria-busy]="mindMapSearchIndexing"
+                [ngModel]="mindMapSearchQuery"
+                (ngModelChange)="onMindMapSearchQueryChange($event)"
+              />
+              @if (mindMapSearchIndexing) {
+                <mat-progress-spinner
+                  class="discover-map-panel__search-spinner"
+                  diameter="20"
+                  mode="indeterminate"
+                />
+              } @else {
+                <mat-icon class="discover-map-panel__search-icon" aria-hidden="true">search</mat-icon>
+              }
+            </div>
+          }
+        </div>
+        <div class="discover-map-panel__actions">
+          @if (mapThemes.length > 0) {
+            <p class="discover-map-panel__meta">
+              {{
+                'discover.mentalMapMeta'
+                  | translate
+                    : {
+                        themeCount: mapThemes.length,
+                        pathCount: totalMapSubThemes()
+                      }
+              }}
+            </p>
+            <button
+              mat-stroked-button
+              type="button"
+              color="primary"
+              class="discover-map-reset-btn"
+              (click)="resetMindMapView()"
+            >
+              <mat-icon aria-hidden="true">center_focus_strong</mat-icon>
+              <span>{{ 'discover.mapResetView' | translate }}</span>
+            </button>
+          }
+          <button
+            mat-icon-button
+            type="button"
+            class="discover-map-panel__map-toggle"
+            [attr.aria-expanded]="mindMapPanelBodyVisible"
+            [attr.aria-controls]="mindMapPanelBodyVisible ? 'discover-map-panel-body' : null"
+            [attr.aria-label]="'discover.mapTogglePanelAria' | translate"
+            (click)="toggleMindMapPanelBody()"
+          >
+            @if (mindMapPanelBodyVisible) {
+              <mat-icon aria-hidden="true">expand_less</mat-icon>
+            } @else {
+              <mat-icon aria-hidden="true">expand_more</mat-icon>
+            }
+          </button>
+        </div>
       </div>
-    } @else if (loadThemesError) {
-      <p class="discover-error">{{ loadThemesError }}</p>
-    } @else {
-      <div class="discover-layout">
-        <section class="discover-panel discover-panel--themes" aria-label="Thèmes et parcours">
-          <h2 class="discover-panel__title">{{ 'discover.panelThemes' | translate }}</h2>
-          <div class="themes-grid discover-themes">
-            @for (theme of themes; track theme.id) {
-              <mat-card
-                class="theme-card"
-                [class.theme-card--expanded]="expandedThemeId === theme.id"
-                (click)="toggleTheme(theme.id)"
-              >
-                <div class="theme-ribbon"></div>
-                <mat-card-header>
-                  <mat-card-title>{{ theme.label }}</mat-card-title>
-                  <mat-card-subtitle>{{ theme.tagline }}</mat-card-subtitle>
-                  <span class="theme-header-spacer"></span>
-                  <mat-icon class="theme-chevron">
-                    {{ expandedThemeId === theme.id ? 'expand_less' : 'expand_more' }}
-                  </mat-icon>
-                </mat-card-header>
-                @if (expandedThemeId === theme.id) {
-                  <div class="subthemes-list">
-                    @for (sub of theme.subThemes ?? []; track sub.id) {
-                      <div
-                        class="subtheme-item"
-                        [class.subtheme-item--selected]="isSubSelected(sub)"
-                        (click)="$event.stopPropagation(); selectSubTheme(theme, sub)"
-                        role="button"
-                        tabindex="0"
-                      >
-                        <div class="subtheme-text">
-                          <h4>{{ sub.label }}</h4>
-                          <p>{{ sub.description }}</p>
-                        </div>
-                        @if (isSubSelected(sub)) {
-                          <mat-icon class="subtheme-check" aria-hidden="true">check_circle</mat-icon>
+
+      <p
+        id="discover-map-zoom-hint"
+        class="discover-map-panel__hint"
+        role="region"
+        [hidden]="!mindMapZoomHintVisible || !mindMapPanelBodyVisible"
+      >
+        {{ 'discover.mapZoomHint' | translate }}
+      </p>
+
+      @if (mindMapPanelBodyVisible) {
+        <div id="discover-map-panel-body" class="discover-map-panel__body">
+          @if (loadingMap) {
+            <div class="discover-state discover-state--compact">
+              <mat-progress-spinner diameter="24" mode="indeterminate" />
+              <span>{{ 'discover.loadingThemes' | translate }}</span>
+            </div>
+          } @else if (loadMapError) {
+            <p class="discover-error">{{ loadMapError }}</p>
+          } @else if (mapThemes.length === 0) {
+            <p class="discover-muted">{{ 'discover.mapEmpty' | translate }}</p>
+          } @else {
+            <div
+              #mindMapHost
+              class="discover-mindmap-host"
+              tabindex="0"
+              role="application"
+              [attr.aria-label]="'discover.mapAria' | translate"
+              [class.discover-mindmap-host--sized]="mindMapHostHeightPx != null"
+              [style.height.px]="mindMapHostHeightPx"
+            ></div>
+          }
+        </div>
+        @if (showMindMapResizeHandle) {
+          <div
+            class="discover-map-divider"
+            [class.active]="isResizingMindMap"
+            cdkDrag
+            cdkDragLockAxis="y"
+            (cdkDragStarted)="onMindMapResizeStart()"
+            (cdkDragMoved)="onMindMapResizeMoved($event)"
+            (cdkDragEnded)="onMindMapResizeEnded($event)"
+            role="separator"
+            aria-orientation="horizontal"
+            [attr.aria-label]="'discover.mapResizeAria' | translate"
+          ></div>
+        }
+      }
+    </section>
+
+    <section
+      class="discover-timeline-panel"
+      [class.discover-timeline-panel--body-collapsed]="!timelinePanelBodyVisible"
+      aria-labelledby="discover-timeline-title"
+    >
+      <div class="discover-timeline-panel__head">
+        <div class="discover-timeline-panel__titles">
+          <h2 id="discover-timeline-title">
+            {{ 'discover.timelinePanelTitle' | translate }}
+          </h2>
+          @if (selectedSubThemeId) {
+            <p class="discover-breadcrumb discover-timeline-panel__crumb">
+              <span>{{ selectedThemeLabel }}</span>
+              <span class="discover-breadcrumb__sep">/</span>
+              <span>{{ selectedSubThemeLabel }}</span>
+            </p>
+          }
+        </div>
+        <div class="discover-timeline-panel__actions">
+          @if (selectedSubThemeId && questions.length > 0) {
+            @if (timelineFromCache && learningOrderTimelineSteps.length > 0) {
+              <span class="discover-timeline-panel__cache-badge" role="status">
+                {{ 'discover.timelineFromCache' | translate }}
+              </span>
+            }
+            <button
+              mat-stroked-button
+              type="button"
+              color="primary"
+              class="discover-timeline-panel__regenerate"
+              [disabled]="learningOrderLoading || learningOrderRegenerating"
+              (click)="regenerateLearningTimeline()"
+            >
+              @if (learningOrderRegenerating) {
+                <mat-progress-spinner diameter="18" mode="indeterminate" />
+              } @else {
+                <mat-icon aria-hidden="true">refresh</mat-icon>
+              }
+              <span>{{ 'discover.timelineRegenerate' | translate }}</span>
+            </button>
+          }
+          <button
+            mat-icon-button
+            type="button"
+            class="discover-timeline-panel__toggle"
+            [attr.aria-expanded]="timelinePanelBodyVisible"
+            [attr.aria-controls]="timelinePanelBodyVisible ? 'discover-timeline-panel-body' : null"
+            [attr.aria-label]="'discover.timelineToggleAria' | translate"
+            (click)="toggleTimelinePanelBody()"
+          >
+            @if (timelinePanelBodyVisible) {
+              <mat-icon aria-hidden="true">expand_less</mat-icon>
+            } @else {
+              <mat-icon aria-hidden="true">expand_more</mat-icon>
+            }
+          </button>
+        </div>
+      </div>
+
+      @if (timelinePanelBodyVisible) {
+        <div id="discover-timeline-panel-body" class="discover-timeline-panel__body">
+          @if (!selectedSubThemeId) {
+            <p class="discover-muted">{{ 'discover.timelinePickPath' | translate }}</p>
+          } @else if (loadingQuestions) {
+            <div class="discover-state discover-state--compact">
+              <mat-progress-spinner diameter="24" mode="indeterminate" />
+              <span>{{ 'discover.loadingQuestions' | translate }}</span>
+            </div>
+          } @else if (loadQuestionsError) {
+            <p class="discover-error">{{ loadQuestionsError }}</p>
+          } @else if (questions.length === 0) {
+            <p class="discover-muted">{{ 'discover.noQuestions' | translate }}</p>
+          } @else if (learningOrderLoading) {
+            <div class="discover-state discover-state--compact">
+              <mat-progress-spinner diameter="32" mode="indeterminate" />
+              <span>{{ 'discover.learningOrderLoading' | translate }}</span>
+            </div>
+          } @else if (learningOrderError) {
+            <p class="discover-error">{{ learningOrderError }}</p>
+          } @else if (learningOrderTimelineSteps.length === 0) {
+            <p class="discover-muted">{{ 'discover.timelineEmpty' | translate }}</p>
+          } @else {
+            @if (learningOrderSequencePartial && !learningOrderStructureEmpty) {
+              <p class="discover-timeline-panel__hint">
+                {{ 'discover.learningOrderSequencePartialHint' | translate }}
+              </p>
+            }
+            @if (learningOrderStructureEmpty) {
+              <p class="discover-muted discover-timeline-panel__note">
+                {{ 'discover.mapSequenceNoDeps' | translate }}
+              </p>
+            } @else if (learningOrderHasSuggestion && learningOrderMatchesApiOrder) {
+              <p class="discover-timeline-panel__note discover-timeline-panel__note--match">
+                {{ 'discover.timelineMatchesApiOrder' | translate }}
+              </p>
+            } @else if (learningOrderShowsSuggestedPath) {
+              <p class="discover-timeline-panel__note discover-timeline-panel__note--suggested">
+                {{ 'discover.timelineSuggestedOrder' | translate }}
+              </p>
+            }
+            <div class="discover-timeline-stack">
+              <div
+                #learningTimelineHost
+                class="discover-timeline-host"
+                tabindex="0"
+                role="application"
+                [attr.aria-label]="'discover.learningOrderSequenceAria' | translate"
+              ></div>
+              @if (timelineHoverPreview; as preview) {
+                <div
+                  class="discover-timeline-hover"
+                  role="region"
+                  [attr.aria-label]="'discover.timelinePrereqHoverTitle' | translate"
+                  (mouseenter)="onTimelineHoverBandEnter(preview.step.id)"
+                  (mouseleave)="onTimelineHoverBandLeave()"
+                >
+                  <p class="discover-timeline-hover__title">
+                    {{ 'discover.timelinePrereqHoverTitle' | translate }}
+                    <strong>{{ preview.step.qNum > 0 ? ('Q' + preview.step.qNum) : '?' }}</strong>
+                  </p>
+                  <ul class="discover-timeline-hover__list">
+                    @for (line of preview.lines; track line) {
+                      <li>{{ line }}</li>
+                    }
+                  </ul>
+                  @if (getTimelinePrereqs(preview.step.id).length > 0) {
+                    <button
+                      type="button"
+                      class="discover-timeline-hover__cta"
+                      (click)="openTimelinePrereqDetail(preview.step.id)"
+                    >
+                      {{ 'discover.timelinePrereqOpenDetail' | translate }}
+                    </button>
+                  }
+                </div>
+              }
+              @if (timelineDetailStep; as detail) {
+                <aside
+                  class="discover-timeline-detail"
+                  aria-labelledby="discover-timeline-detail-title"
+                >
+                  <div class="discover-timeline-detail__head">
+                    <h3 id="discover-timeline-detail-title" class="discover-timeline-detail__title">
+                      {{
+                        'discover.timelinePrereqDetailTitle'
+                          | translate: { q: detail.qNum > 0 ? ('Q' + detail.qNum) : '?' }
+                      }}
+                    </h3>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      class="discover-timeline-detail__close"
+                      [attr.aria-label]="'discover.timelinePrereqClose' | translate"
+                      (click)="closeTimelinePrereqDetail()"
+                    >
+                      <mat-icon aria-hidden="true">close</mat-icon>
+                    </button>
+                  </div>
+                  <p class="discover-timeline-detail__question">{{ detail.label }}</p>
+                  <div class="discover-timeline-detail__scroll">
+                    @for (p of getTimelinePrereqs(detail.id); track p.label) {
+                      <article class="discover-timeline-detail__block">
+                        <h4 class="discover-timeline-detail__prereq">
+                          {{ displayPrereqLabel(p.label) }}
+                        </h4>
+                        @if (p.justification) {
+                          <p class="discover-timeline-detail__justification">{{ p.justification }}</p>
                         }
-                      </div>
+                      </article>
                     }
                   </div>
-                }
-              </mat-card>
-            }
-          </div>
-        </section>
+                  <p class="discover-timeline-detail__foot">
+                    {{ 'discover.timelinePrereqDetailHint' | translate }}
+                  </p>
+                </aside>
+              }
+            </div>
+          }
+        </div>
+      }
+    </section>
 
+    <div class="discover-body">
+      <div
+        #discoverLayout
+        class="discover-layout"
+        [style.--p1]="divider1Percent"
+        [style.--p2]="divider2Percent"
+      >
         <section class="discover-panel discover-panel--questions" aria-label="Questions du parcours">
           @if (!selectedSubThemeId) {
             <div class="discover-placeholder discover-placeholder--questions-fill">
@@ -87,15 +370,75 @@
               } @else if (questions.length === 0) {
                 <p class="discover-muted discover-muted--grow">{{ 'discover.noQuestions' | translate }}</p>
               } @else {
-                <h2 class="discover-panel__title discover-questions-heading">{{ 'discover.questionsTitle' | translate }}</h2>
+                <div class="discover-questions-heading-row">
+                  <h2 class="discover-panel__title discover-questions-heading">
+                    {{ 'discover.questionsTitle' | translate }}
+                  </h2>
+                  @if (questionGroupLegendItems().length > 0) {
+                    <div
+                      class="discover-questions-group-legend"
+                      role="group"
+                      [attr.aria-label]="'discover.questionGroupLegendAria' | translate"
+                    >
+                      @for (leg of questionGroupLegendItems(); track leg.groupe) {
+                        <span
+                          class="discover-questions-group-legend__dot-wrap"
+                          [matTooltip]="leg.tooltip"
+                          matTooltipShowDelay="200"
+                          matTooltipPosition="above"
+                          [attr.aria-label]="leg.tooltip"
+                          tabindex="0"
+                        >
+                          <span [class]="leg.dotClass" aria-hidden="true"></span>
+                        </span>
+                      }
+                    </div>
+                  }
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="discover-questions-group-btn"
+                    [class.discover-questions-group-btn--group-active]="
+                      hasQuestionsGrouping() && questionsListDisplayMode === 'group'
+                    "
+                    [class.discover-questions-group-btn--sequence-active]="
+                      hasQuestionsGrouping() && questionsListDisplayMode === 'sequence'
+                    "
+                    [disabled]="loadingQuestions || regroupementQuestionsBusy || questions.length === 0"
+                    [matTooltip]="groupQuestionsButtonTooltip()"
+                    [attr.aria-label]="groupQuestionsButtonAria()"
+                    (click)="triggerQuestionRegroupement()"
+                  >
+                    <mat-icon aria-hidden="true">account_tree</mat-icon>
+                  </button>
+                </div>
                 <ul class="discover-questions">
-                  @for (q of questions; track q.id) {
+                  @for (q of questions; track q.id; let i = $index) {
                     <li
                       class="discover-q-row"
                       [class.discover-q-row--active]="selectedQuestionId === q.id"
                     >
                       <button type="button" class="discover-q" (click)="selectQuestion(q.id)">
-                        <span class="discover-q__label">{{ q.label }}</span>
+                        @if (questionGroupDotClass(q); as dotCls) {
+                          <span
+                            class="discover-q__group-dot-wrap"
+                            [matTooltip]="questionGroupDotTooltip(q)"
+                            matTooltipShowDelay="200"
+                            matTooltipPosition="above"
+                          >
+                            <span [class]="dotCls" aria-hidden="true"></span>
+                          </span>
+                        }
+                        <span class="discover-q__index">Q{{ q.qNum }}</span>
+                        <span class="discover-q__label">
+                          @for (seg of mindMapQuestionLabelSegments(q.label); track $index) {
+                            @if (seg.hit) {
+                              <mark class="discover-q__search-hit">{{ seg.text }}</mark>
+                            } @else {
+                              {{ seg.text }}
+                            }
+                          }
+                        </span>
                       </button>
                       @if (selectedQuestionId === q.id) {
                         <button
@@ -121,51 +464,284 @@
           }
         </section>
 
-        <section class="discover-panel discover-panel--answer" aria-labelledby="discover-answer-heading">
-          <h2 id="discover-answer-heading" class="discover-panel__title">
-            {{ 'discover.proposedAnswerTitle' | translate }}
-          </h2>
+        <div
+          class="discover-divider"
+          [class.active]="isResizingPanels"
+          cdkDrag
+          cdkDragLockAxis="x"
+          (cdkDragStarted)="onDividerDragStart()"
+          (cdkDragMoved)="onFirstDividerDragMoved($event)"
+          (cdkDragEnded)="onDividerDragEnded($event)"
+          role="separator"
+          [attr.aria-label]="'discover.dividerQuestionsCurrent' | translate"
+          aria-orientation="vertical"
+        ></div>
 
+        <section
+          class="discover-panel discover-panel--current"
+          aria-labelledby="discover-current-heading"
+        >
           @if (!selectedSubThemeId) {
-            <div class="discover-placeholder discover-placeholder--compact">
-              <mat-icon aria-hidden="true">touch_app</mat-icon>
-              <p>{{ 'discover.pickPath' | translate }}</p>
-            </div>
-          } @else if (loadingQuestions) {
-            <div class="discover-state discover-state--compact">
-              <mat-progress-spinner diameter="28" mode="indeterminate" />
-              <span>{{ 'discover.loadingQuestions' | translate }}</span>
-            </div>
-          } @else if (loadQuestionsError) {
-            <p class="discover-muted">{{ 'discover.loadQuestionsError' | translate }}</p>
-          } @else if (questions.length === 0) {
-            <p class="discover-muted">{{ 'discover.noQuestions' | translate }}</p>
+            <p class="discover-muted">{{ 'discover.pickPath' | translate }}</p>
           } @else if (!selectedQuestionId) {
-            <p class="discover-muted">{{ 'discover.proposedAnswerPickQuestion' | translate }}</p>
-          } @else if (isGenerating) {
-            <div class="discover-state discover-state--compact discover-state--answer-generating">
-              <mat-progress-spinner diameter="28" mode="indeterminate" />
-              <span>{{ 'discover.propositionGenerating' | translate }}</span>
-            </div>
-          } @else if (!hasAnswerColumnContent()) {
-            <p class="discover-muted">{{ 'discover.proposedAnswerEmpty' | translate }}</p>
+            <p class="discover-muted">{{ 'discover.workspacePickQuestion' | translate }}</p>
           } @else {
-            <div class="discover-answer-stack">
-              @if (answerColumnBody().length > 0) {
-                <div class="discover-answer-body">{{ answerColumnBody() }}</div>
-              }
-              @if (discoveredKeyPoints.length > 0) {
-                <ul class="discover-answer-keypoints">
-                  @for (pt of discoveredKeyPoints; track $index) {
-                    <li>{{ pt }}</li>
+            <section class="discover-current-inner" aria-labelledby="discover-current-heading">
+                <div class="discover-workspace__current-head">
+                  <h2 id="discover-current-heading" class="discover-panel__title">
+                    {{ 'discover.currentPropositionTitle' | translate }}
+                  </h2>
+                  @if (hasDraft) {
+                    <span class="discover-workspace__draft-badge">{{ 'discover.draftBadge' | translate }}</span>
+                  } @else if (currentSavedEntry && !hasDraft) {
+                    <span class="discover-workspace__current-badge">{{
+                      'discover.currentBadge' | translate
+                    }}</span>
                   }
-                </ul>
-              }
+                  <div class="discover-workspace__current-actions">
+                    @if (hasDraft) {
+                      <button
+                        mat-stroked-button
+                        type="button"
+                        class="discover-workspace__cancel-btn"
+                        (click)="cancelDraft()"
+                        [disabled]="savingSavedProposition"
+                      >
+                        {{ 'discover.cancelDraft' | translate }}
+                      </button>
+                      <button
+                        mat-stroked-button
+                        type="button"
+                        color="primary"
+                        class="discover-save-btn"
+                        (click)="saveDraftProposition()"
+                        [disabled]="!canSaveDraft"
+                      >
+                        <mat-icon aria-hidden="true">bookmark_add</mat-icon>
+                        <span>{{ 'discover.saveCurrentProposition' | translate }}</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                @if (isGenerating) {
+                  <div class="discover-state discover-state--compact">
+                    <mat-progress-spinner diameter="28" mode="indeterminate" />
+                    <span>{{ 'discover.propositionGenerating' | translate }}</span>
+                  </div>
+                } @else if (!hasMainDisplayContent()) {
+                  <p class="discover-muted">{{ 'discover.proposedAnswerEmpty' | translate }}</p>
+                } @else {
+                  <div class="discover-answer-stack" (contextmenu)="onDiscoverWikiContextMenu($event)">
+                    @if (mainStructuredSections.length > 0) {
+                      @for (row of mainStructuredSections; track row.titleKey) {
+                        <section class="discover-answer-section">
+                          <h3 class="discover-answer-section__title">{{ row.titleKey | translate }}</h3>
+                          @if (row.kind === 'simple') {
+                            <app-discover-answer-body [text]="row.text" [imageLinks]="row.imageLinks" />
+                          } @else {
+                            <div class="discover-answer-subsections" role="group">
+                              @for (sub of row.subsections; track subIx; let subIx = $index) {
+                                <div
+                                  class="discover-answer-subsection"
+                                  [class.discover-answer-subsection--untitled]="sub.omitTitle"
+                                >
+                                  @if (!sub.omitTitle) {
+                                    <h4 class="discover-answer-subsection__title">{{ sub.title }}</h4>
+                                  }
+                                  <app-discover-answer-body [text]="sub.text" />
+                                </div>
+                              }
+                            </div>
+                            @if (row.imageLinks.length > 0) {
+                              <app-discover-answer-body [text]="''" [imageLinks]="row.imageLinks" />
+                            }
+                          }
+                        </section>
+                      }
+                    } @else {
+                      @if (mainPlainBody().length > 0) {
+                        <div class="discover-answer-body">{{ mainPlainBody() }}</div>
+                      }
+                      @if (mainKeyPoints().length > 0) {
+                        <ul class="discover-answer-keypoints">
+                          @for (pt of mainKeyPoints(); track $index) {
+                            <li>{{ pt }}</li>
+                          }
+                        </ul>
+                      }
+                    }
+                  </div>
+                }
+            </section>
+          }
+        </section>
+
+        <div
+          class="discover-divider"
+          [class.active]="isResizingPanels"
+          cdkDrag
+          cdkDragLockAxis="x"
+          (cdkDragStarted)="onDividerDragStart()"
+          (cdkDragMoved)="onSecondDividerDragMoved($event)"
+          (cdkDragEnded)="onDividerDragEnded($event)"
+          role="separator"
+          [attr.aria-label]="'discover.dividerCurrentSide' | translate"
+          aria-orientation="vertical"
+        ></div>
+
+        <section class="discover-panel discover-panel--side" aria-label="Notes et historique">
+          @if (!selectedSubThemeId) {
+            <p class="discover-muted">{{ 'discover.pickPath' | translate }}</p>
+          } @else if (!selectedQuestionId) {
+            <p class="discover-muted">{{ 'discover.workspacePickQuestion' | translate }}</p>
+          } @else {
+            <div class="discover-side-panel">
+              <section class="discover-side-panel__notes" aria-labelledby="discover-notes-heading">
+                <div class="discover-side-panel__notes-head">
+                  <h2 id="discover-notes-heading" class="discover-panel__title">
+                    {{ 'discover.personalNotesTitle' | translate }}
+                  </h2>
+                  @if (savingPersonalNotes) {
+                    <span class="discover-side-panel__saving-hint">{{
+                      'discover.notesSaving' | translate
+                    }}</span>
+                  }
+                </div>
+                @if (loadingSavedPropositions) {
+                  <div class="discover-state discover-state--compact">
+                    <mat-progress-spinner diameter="22" mode="indeterminate" />
+                  </div>
+                } @else {
+                  <mat-form-field appearance="outline" class="discover-side-panel__notes-field">
+                    <textarea
+                      matInput
+                      rows="4"
+                      name="personalNotes"
+                      [(ngModel)]="personalNotes"
+                      (ngModelChange)="onPersonalNotesInput()"
+                      [placeholder]="'discover.personalNotesPlaceholder' | translate"
+                    ></textarea>
+                  </mat-form-field>
+                  @if (personalNotesError) {
+                    <p class="discover-error">{{ personalNotesError }}</p>
+                  }
+                }
+              </section>
+
+              <section
+                class="discover-side-panel__history"
+                aria-labelledby="discover-history-heading"
+              >
+                <h2 id="discover-history-heading" class="discover-panel__title">
+                  {{ 'discover.historyTitle' | translate }}
+                </h2>
+                @if (loadingSavedPropositions) {
+                  <div class="discover-state discover-state--compact">
+                    <mat-progress-spinner diameter="22" mode="indeterminate" />
+                    <span>{{ 'discover.savedLoading' | translate }}</span>
+                  </div>
+                } @else if (savedPropositionsError) {
+                  <p class="discover-error">{{ savedPropositionsError }}</p>
+                } @else if (currentQuestionSavedPropositions.length === 0) {
+                  <p class="discover-muted">{{ 'discover.historyEmpty' | translate }}</p>
+                } @else {
+                  <ul class="discover-history-list">
+                    @for (entry of currentQuestionSavedPropositions; track entry.id) {
+                      <li
+                        class="discover-history-row"
+                        [class.discover-history-row--current]="isHistoryEntryCurrent(entry)"
+                      >
+                        <div class="discover-history-row__meta">
+                          <span class="discover-history-row__date">{{
+                            formatSavedPropositionDate(entry)
+                          }}</span>
+                          @if (isHistoryEntryCurrent(entry)) {
+                            <span class="discover-history-row__badge">{{
+                              'discover.currentBadge' | translate
+                            }}</span>
+                          }
+                        </div>
+                        <div class="discover-history-row__actions">
+                          @if (!isHistoryEntryCurrent(entry)) {
+                            <button
+                              mat-stroked-button
+                              type="button"
+                              class="discover-history-row__set-current"
+                              (click)="setCurrentSavedProposition(entry, $event)"
+                              [disabled]="settingCurrentPropositionId === entry.id"
+                            >
+                              {{ 'discover.setAsCurrent' | translate }}
+                            </button>
+                          }
+                          <button
+                            mat-icon-button
+                            type="button"
+                            class="discover-saved-delete-btn"
+                            [attr.aria-label]="'common.delete' | translate"
+                            [matTooltip]="'common.delete' | translate"
+                            matTooltipPosition="above"
+                            (click)="deleteSavedProposition(entry, $event)"
+                            [disabled]="deletingSavedPropositionId === entry.id || !entry.dbId"
+                          >
+                            <mat-icon aria-hidden="true">delete</mat-icon>
+                          </button>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              </section>
             </div>
           }
         </section>
       </div>
-    }
     </div>
   </div>
+
+  @if (wikiContextMenuOpen) {
+    <div
+      class="discover-wiki-context-backdrop"
+      role="presentation"
+      (click)="closeWikiContextMenu()"
+      (contextmenu)="$event.preventDefault(); closeWikiContextMenu()"
+    ></div>
+    <div
+      class="discover-wiki-context-menu"
+      role="menu"
+      [attr.aria-label]="'discover.wikiContextMenuAria' | translate"
+      [style.left.px]="wikiContextMenuX"
+      [style.top.px]="wikiContextMenuY"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="discover-wiki-context-menu__item"
+        role="menuitem"
+        (click)="openWikipediaFromContextMenu()"
+      >
+        {{ 'discover.wikiContextPageWikipedia' | translate }}
+      </button>
+      <button
+        type="button"
+        class="discover-wiki-context-menu__item"
+        role="menuitem"
+        (click)="openGoogleFromContextMenu()"
+      >
+        {{ 'discover.wikiContextPageGoogle' | translate }}
+      </button>
+      <button
+        type="button"
+        class="discover-wiki-context-menu__item discover-wiki-context-menu__item--disabled"
+        role="menuitem"
+        disabled
+        [attr.aria-disabled]="true"
+        [matTooltip]="'discover.wikiContextPageOtherHint' | translate"
+        matTooltipPosition="right"
+        matTooltipShowDelay="200"
+      >
+        {{ 'discover.wikiContextPageOther' | translate }}
+      </button>
+    </div>
+  }
 </div>

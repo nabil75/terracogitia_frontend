@@ -1,4 +1,4 @@
-@use '../../styles/themes/mixins' as *;
+@use "../../styles/themes/mixins" as *;
 
 .home-container {
   min-height: 100vh;
@@ -64,6 +64,19 @@
     border-color 0.22s ease;
 }
 
+.theme-card.theme-card--inactive {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.theme-card.theme-card--inactive:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--app-stroke);
+}
+
 .theme-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--app-shadow-hover);
@@ -122,7 +135,33 @@
   line-height: 28px;
   font-size: 24px;
   color: var(--app-text-muted);
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
+}
+
+.theme-card.theme-card--inactive .theme-chevron {
+  opacity: 0.2;
+}
+
+.theme-inactive-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--app-text-muted);
+  border: 1px solid var(--app-stroke);
+  background: rgba(107, 99, 90, 0.08);
+}
+
+.theme-inactive-pill mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
 }
 
 .theme-card:hover .theme-chevron {
@@ -222,12 +261,16 @@
 }
 
 /* Variante « Découvrir » : teinte ocre comme accent (analogue au --danger admin) */
-.subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]) {
+.subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not(
+    [disabled]
+  ) {
   --mdc-outlined-button-outline-color: rgba(166, 124, 50, 0.5);
   color: var(--app-ochre) !important;
 }
 
-.subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]):hover {
+.subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not(
+    [disabled]
+  ):hover {
   --mdc-outlined-button-outline-color: var(--app-ochre);
   background-color: rgba(166, 124, 50, 0.12) !important;
   color: var(--app-ochre) !important;
@@ -239,33 +282,41 @@
   color: var(--app-forest) !important;
 }
 
-.subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not([disabled]):hover {
+.subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not(
+    [disabled]
+  ):hover {
   --mdc-outlined-button-outline-color: var(--app-forest);
   background-color: rgba(45, 90, 61, 0.1) !important;
   color: var(--app-forest) !important;
 }
 
 /* Thème sombre : reprise stricte du comportement admin */
-:host-context(body.dark-theme) .subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled]) {
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled]) {
   background-color: transparent !important;
   --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.4);
   color: var(--app-text) !important;
 }
 
-:host-context(body.dark-theme) .subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled]):hover {
+:host-context(body.dark-theme)
+  .subtheme-actions__btn-icon.mat-mdc-button-base:not([disabled]):hover {
   background-color: rgba(15, 17, 23, 0.42) !important;
   color: var(--app-text) !important;
   --mdc-outlined-button-outline-color: rgba(234, 231, 224, 0.65);
 }
 
 :host-context(body.dark-theme)
-  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]) {
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not(
+    [disabled]
+  ) {
   --mdc-outlined-button-outline-color: rgba(191, 164, 106, 0.5);
   color: var(--app-text) !important;
 }
 
 :host-context(body.dark-theme)
-  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]):hover {
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not(
+    [disabled]
+  ):hover {
   --mdc-outlined-button-outline-color: rgba(214, 188, 130, 0.75);
   background-color: rgba(191, 164, 106, 0.15) !important;
   color: var(--app-text) !important;
@@ -290,16 +341,22 @@
 }
 
 :host-context(body.dark-theme)
-  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled])
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not(
+    [disabled]
+  )
   mat-icon {
   color: var(--app-ochre) !important;
 }
 
 :host-context(body.dark-theme)
-  .subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not([disabled]):hover
+  .subtheme-actions__btn-icon.review-button.mat-mdc-button-base:not(
+    [disabled]
+  ):hover
   mat-icon,
 :host-context(body.dark-theme)
-  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not([disabled]):hover
+  .subtheme-actions__btn-icon.discover-button.mat-mdc-button-base:not(
+    [disabled]
+  ):hover
   mat-icon {
   color: var(--app-text) !important;
 }
@@ -316,4 +373,3 @@
     align-items: flex-start;
   }
 }
-

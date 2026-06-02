@@ -50,7 +50,7 @@
         </mat-card>
       } @else {
         <mat-accordion class="theme-admin-accordion" multi>
-          @for (theme of themes; track theme.id) {
+          @for (theme of visibleThemes(); track theme.id) {
             <mat-expansion-panel
               class="theme-admin-panel"
               (opened)="onThemePanelOpened(theme)"

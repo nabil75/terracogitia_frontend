@@ -1,0 +1,231 @@
+@use "../../../styles/themes/mixins" as *;
+
+.resume-container {
+  min-height: 100vh;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  @include app-mesh-background;
+  @include page-with-transverse-rail-padding;
+}
+
+.resume-container .app-page-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.resume-header {
+  text-align: center;
+}
+
+.accent-clair {
+  color: var(--app-logo-word-clair);
+}
+
+.accent-fonce {
+  color: var(--app-logo-word-fonce);
+}
+
+.resume-header h1 {
+  margin: 0;
+  font-family: var(--app-font-display);
+  font-size: clamp(2.1rem, 4.8vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.resume-header p {
+  margin-top: 0.75rem;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  color: var(--app-text-muted);
+  font-weight: 500;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.resume-panel {
+  @include app-glass-panel;
+  border-radius: var(--app-radius);
+  padding: 1.5rem 1.25rem;
+  color: var(--app-text);
+}
+
+.resume-panel__title {
+  margin: 0 0 0.35rem;
+  font-family: var(--app-font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.resume-panel__intro {
+  margin: 0 0 1.25rem;
+  color: var(--app-text-muted);
+  font-size: 0.95rem;
+}
+
+.resume-panel__loading,
+.resume-panel__error,
+.resume-panel__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 8rem;
+  color: var(--app-text-muted);
+}
+
+.resume-panel__error {
+  flex-direction: column;
+}
+
+.resume-tree {
+  background: transparent;
+  color: var(--app-text);
+}
+
+.resume-tree-node {
+  display: block;
+  color: var(--app-text);
+}
+
+.resume-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0.15rem 0;
+  color: var(--app-text);
+
+  .mat-mdc-icon-button {
+    color: var(--app-text);
+    --mdc-icon-button-icon-color: currentColor;
+  }
+}
+
+.resume-tree-row--leaf {
+  padding-left: 0.25rem;
+}
+
+.resume-tree-row__spacer {
+  flex: 0 0 var(--resume-tree-toggle-size, 2.5rem);
+}
+
+.resume-tree-row__toggle.mat-mdc-icon-button {
+  flex-shrink: 0;
+  width: var(--resume-tree-toggle-size, 2.5rem);
+  height: var(--resume-tree-toggle-size, 2.5rem);
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--app-stroke);
+  background: var(--app-highlight-row);
+
+  .mat-icon,
+  .resume-tree-toggle-icon {
+    width: var(--resume-tree-toggle-icon-size, 1.25rem);
+    height: var(--resume-tree-toggle-icon-size, 1.25rem);
+    font-size: var(--resume-tree-toggle-icon-size, 1.25rem);
+  }
+}
+
+.resume-tree-row__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--resume-tree-icon-wrap-size, 2rem);
+  height: var(--resume-tree-icon-wrap-size, 2rem);
+  border-radius: 50%;
+  border: 1px solid var(--app-stroke);
+  background: var(--app-highlight-row);
+}
+
+.resume-tree-row__icon {
+  flex-shrink: 0;
+  width: var(--resume-tree-icon-size, 1.15rem);
+  height: var(--resume-tree-icon-size, 1.15rem);
+  font-size: var(--resume-tree-icon-size, 1.15rem);
+  color: var(--app-text-muted);
+}
+
+// Profondeur 0 (discipline) → 4 (proposition / évaluation) : cercles et carets plus petits
+$resume-tree-depths: (
+  0: (toggle: 2.5rem, toggle-icon: 1.35rem, wrap: 2.15rem, icon: 1.2rem),
+  1: (toggle: 2.2rem, toggle-icon: 1.2rem, wrap: 1.9rem, icon: 1.05rem),
+  2: (toggle: 1.95rem, toggle-icon: 1.05rem, wrap: 1.65rem, icon: 0.92rem),
+  3: (toggle: 1.75rem, toggle-icon: 0.95rem, wrap: 1.45rem, icon: 0.82rem),
+  4: (toggle: 1.55rem, toggle-icon: 0.85rem, wrap: 1.25rem, icon: 0.72rem),
+);
+
+@each $depth, $sizes in $resume-tree-depths {
+  .resume-tree-row--depth-#{$depth} {
+    --resume-tree-toggle-size: #{map-get($sizes, toggle)};
+    --resume-tree-toggle-icon-size: #{map-get($sizes, toggle-icon)};
+    --resume-tree-icon-wrap-size: #{map-get($sizes, wrap)};
+    --resume-tree-icon-size: #{map-get($sizes, icon)};
+  }
+}
+
+.resume-tree-row--discipline .resume-tree-row__icon {
+  color: var(--app-accent, #1565c0);
+}
+
+.resume-tree-row--proposition .resume-tree-row__icon,
+.resume-tree-row--evaluation .resume-tree-row__icon {
+  color: var(--app-text-muted);
+  opacity: 0.85;
+}
+
+.resume-tree-row__label {
+  flex: 1 1 auto;
+  line-height: 1.45;
+  word-break: break-word;
+  color: var(--app-text);
+}
+
+.resume-tree-row--question .resume-tree-row__label {
+  font-weight: 500;
+}
+
+.resume-tree-row--inactive {
+  opacity: 0.72;
+}
+
+.resume-tree-row__inactive-pill {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--app-text-muted);
+  border: 1px solid var(--app-stroke);
+  background: var(--app-highlight-row);
+}
+
+.resume-tree-row__date {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+  white-space: nowrap;
+}
+
+.resume-tree-children {
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--app-stroke);
+  margin-left: 1.25rem;
+}
+
+.resume-tree-children--hidden {
+  display: none;
+}
+
+.resume-tree-toggle-icon {
+  transition: transform 0.15s ease;
+}

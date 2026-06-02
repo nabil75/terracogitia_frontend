@@ -1,0 +1,123 @@
+<app-transverse-rail />
+
+<div class="resume-container">
+  <div class="app-page-inner">
+    <div class="resume-header">
+      <img
+        [src]="themeService.logoSrc()"
+        width="100"
+        height="130"
+        [attr.alt]="'common.logoAlt' | translate"
+      />
+      <h1 class="accent-clair">
+        terra-cogit<span class="accent-fonce"><em>ia</em></span>
+      </h1>
+      <p>{{ 'home.tagline' | translate }}</p>
+    </div>
+
+    <section class="resume-panel" [attr.aria-label]="'resume.ariaTree' | translate">
+      <h2 class="resume-panel__title">{{ 'resume.title' | translate }}</h2>
+      <p class="resume-panel__intro">{{ 'resume.intro' | translate }}</p>
+
+      @if (loading) {
+        <div class="resume-panel__loading">
+          <mat-spinner diameter="40" />
+          <span>{{ 'resume.loading' | translate }}</span>
+        </div>
+      } @else if (loadError) {
+        <div class="resume-panel__error">
+          <p>{{ 'resume.loadError' | translate }}</p>
+          <button mat-stroked-button type="button" (click)="retryLoad()">
+            {{ 'common.retry' | translate }}
+          </button>
+        </div>
+      } @else if (!treeData.length) {
+        <p class="resume-panel__empty">{{ 'resume.empty' | translate }}</p>
+      } @else {
+        <mat-tree
+          #tree
+          [dataSource]="treeData"
+          [childrenAccessor]="childrenAccessor"
+          class="resume-tree"
+        >
+          <mat-nested-tree-node *matTreeNodeDef="let node" class="resume-tree-node">
+            <div
+              [class]="'resume-tree-row resume-tree-row--leaf resume-tree-row--' + node.type + ' resume-tree-row--depth-' + node.depth"
+              [class.resume-tree-row--inactive]="!!node.inactive"
+            >
+              <span class="resume-tree-row__spacer"></span>
+              <span class="resume-tree-row__icon-wrap" aria-hidden="true">
+                <mat-icon class="resume-tree-row__icon">
+                  {{ iconForType(node.type) }}
+                </mat-icon>
+              </span>
+              <span class="resume-tree-row__label">
+                @if (node.type === 'proposition') {
+                  {{ 'resume.proposition' | translate: { id: node.refId } }}
+                } @else if (node.type === 'evaluation') {
+                  {{ 'resume.evaluation' | translate: { id: node.refId } }}
+                } @else {
+                  {{ node.name }}
+                }
+              </span>
+              @if (node.dateCreation) {
+                <span class="resume-tree-row__date">
+                  {{ formatDateCreation(node.dateCreation) }}
+                </span>
+              }
+              @if (node.inactive) {
+                <span class="resume-tree-row__inactive-pill">
+                  {{ 'resume.themeInactive' | translate }}
+                </span>
+              }
+            </div>
+          </mat-nested-tree-node>
+
+          <mat-nested-tree-node
+            *matTreeNodeDef="let node; when: hasChild"
+            matTreeNodeToggle
+            [cdkTreeNodeTypeaheadLabel]="node.name"
+            class="resume-tree-node"
+          >
+            <div
+              [class]="'resume-tree-row resume-tree-row--' + node.type + ' resume-tree-row--depth-' + node.depth"
+              [class.resume-tree-row--inactive]="!!node.inactive"
+            >
+              <button
+                mat-icon-button
+                type="button"
+                class="resume-tree-row__toggle"
+                matTreeNodeToggle
+                [attr.aria-label]="'resume.toggleNode' | translate"
+              >
+                <mat-icon class="resume-tree-toggle-icon">
+                  {{
+                    tree?.isExpanded(node) ? 'expand_more' : 'chevron_right'
+                  }}
+                </mat-icon>
+              </button>
+              <span class="resume-tree-row__icon-wrap" aria-hidden="true">
+                <mat-icon class="resume-tree-row__icon">
+                  {{ iconForType(node.type) }}
+                </mat-icon>
+              </span>
+              <span class="resume-tree-row__label">{{ node.name }}</span>
+              @if (node.inactive) {
+                <span class="resume-tree-row__inactive-pill">
+                  {{ 'resume.themeInactive' | translate }}
+                </span>
+              }
+            </div>
+            <div
+              class="resume-tree-children"
+              role="group"
+              [class.resume-tree-children--hidden]="!tree?.isExpanded(node)"
+            >
+              <ng-container matTreeNodeOutlet />
+            </div>
+          </mat-nested-tree-node>
+        </mat-tree>
+      }
+    </section>
+  </div>
+</div>
