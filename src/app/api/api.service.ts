@@ -1,5 +1,13 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { AppLang, LanguageService } from '../shared/services/language.service';
+import {
+  humanizeAdvancedEvaluationOverview,
+  humanizeDisciplineDetail,
+  humanizeKnowledgeOverview,
+  humanizeThemesPayload
+} from '../shared/utils/label-display.util';
 
 export type DisciplineNiveauEstime = 'debutant' | 'intermediaire' | 'avance';
 
@@ -81,11 +89,13 @@ export interface DisciplineUpsertPayload {
   prerequis?: string[];
   niveau_estime?: DisciplineNiveauEstime | null;
   projection?: string;
+  lang?: AppLang;
 }
 
 /** Souhait utilisateur pour proposer intitulé + description (création discipline). */
 export interface DisciplineProposeFromWishPayload {
   wish: string;
+  lang?: AppLang;
 }
 
 export interface DisciplineProposeFromWishResult {
@@ -130,6 +140,118 @@ export interface SubThemeStats {
   avg_clarte: number | null;
   min_note: number | null;
   max_note: number | null;
+}
+
+/** GET /advanced-evaluation/overview — croisement pyramide + effort découverte. */
+export interface AdvancedEvaluationPyramidLevel {
+  niveau_pyramide: string;
+  evaluation_count: number;
+  avg_note: number | null;
+  avg_pertinence: number | null;
+  avg_precision: number | null;
+  avg_clarte: number | null;
+}
+
+export interface AdvancedEvaluationSubthemeSession {
+  id_session: number;
+  id_theme?: number | null;
+  id_subtheme?: number | null;
+  theme_label?: string | null;
+  subtheme_label?: string | null;
+  entered_at?: string | null;
+  exited_at?: string | null;
+  duration_seconds?: number | null;
+  source?: string | null;
+}
+
+export interface AdvancedEvaluationDiscoverEffort {
+  subtheme_sessions: AdvancedEvaluationSubthemeSession[];
+  subthemes_explored_count: number;
+  total_duration_seconds: number;
+  propositions_requested: number;
+  propositions_saved: number;
+  propositions_discarded: number;
+  exercises_in_propositions: number;
+}
+
+export interface AdvancedEvaluationCognitiveOperation {
+  operation: string;
+  family: string;
+  propositions_requested: number;
+  propositions_saved: number;
+  propositions_discarded: number;
+  exercises_in_propositions: number;
+  first_activity_at?: string | null;
+  available_in_discipline: boolean;
+}
+
+export interface AdvancedEvaluationDiscoverySequenceStep {
+  rank: number;
+  operation: string;
+  family: string;
+  first_at?: string | null;
+}
+
+export interface AdvancedEvaluationPyramidOperationMatrix {
+  niveau_pyramide: string;
+  discover_requested_by_operation: Record<string, number>;
+  available_operations: string[];
+}
+
+export interface AdvancedEvaluationCognitiveProfileSummary {
+  dominant_family?: string | null;
+  observation_before_comprehension?: boolean | null;
+  comprehension_explored: boolean;
+  observation_explored: boolean;
+  operations_available_count: number;
+  operations_explored_count: number;
+}
+
+export interface AdvancedEvaluationCognitiveDiscovery {
+  operations: AdvancedEvaluationCognitiveOperation[];
+  discovery_sequence: AdvancedEvaluationDiscoverySequenceStep[];
+  unexplored_operations: string[];
+  pyramid_operation_matrix: AdvancedEvaluationPyramidOperationMatrix[];
+  profile_summary: AdvancedEvaluationCognitiveProfileSummary;
+}
+
+export interface AdvancedEvaluationOverview {
+  pyramid: AdvancedEvaluationPyramidLevel[];
+  acquis: string[];
+  points_a_travailler: string[];
+  conseils_pedagogiques: string[];
+  discover_effort: AdvancedEvaluationDiscoverEffort;
+  cognitive_discovery?: AdvancedEvaluationCognitiveDiscovery;
+  evaluation_total: number;
+}
+
+export interface AdvancedEvaluationInsights {
+  transformations_mentales?: string;
+  acquis?: string[];
+  points_a_travailler?: string[];
+  effort_decouverte?: string;
+  conduite_decouverte?: string;
+  recommandations?: string[];
+  commentaire_global?: string;
+}
+
+export interface SubthemeSessionStartPayload {
+  id_theme?: number | null;
+  id_subtheme: number;
+  source?: string;
+}
+
+export interface DiscoverActivityPayload {
+  id_theme?: number | null;
+  id_subtheme?: number | null;
+  id_question?: number | null;
+  event_type:
+    | 'proposition_requested'
+    | 'proposition_saved'
+    | 'proposition_discarded'
+    | 'exercise_in_proposition';
+  id_proposition?: number | null;
+  meta?: Record<string, unknown> | null;
 }
 
 /** Réponse standard d'un appel d'authentification réussi. */
@@ -215,6 +337,7 @@ export interface OrdreLogiqueQuestionInputDto {
 export interface OrdreLogiqueQuestionsPayload {
   id_subtheme: string;
   questions: OrdreLogiqueQuestionInputDto[];
+  lang?: AppLang;
 }
 
 /**
@@ -327,6 +450,7 @@ export interface GenerateParcoursQuestionsFromThemePayload {
   description?: string;
   /** Parcours déjà présents sur le thème (complément au chargement côté API). */
   existing_domaines?: ExistingDomainePayload[];
+  lang?: AppLang;
 }
 
 /** Réponse `GET/PUT/DELETE /questions/:id/dessin`. */
@@ -345,6 +469,7 @@ export interface QuestionDessinResponse {
  */
 export interface RegroupementQuestionsParcoursPayload {
   id_subtheme: string;
+  lang?: AppLang;
 }
 
 /** Une famille dans la réponse JSON du modèle (persistée en base par le backend). */
@@ -363,11 +488,25 @@ export interface RegroupementQuestionsParcoursResponse {
 })
 
 export class ApiService {
-
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
+  private readonly language = inject(LanguageService);
 
   baseurl = "http://localhost:8002";
   httpHeaders_json = new HttpHeaders({'Content-Type':'application/json'});
+
+  /** Langue UI courante — transmise aux endpoints de génération IA. */
+  private currentLang(): AppLang {
+    return this.language.getCurrentLang();
+  }
+
+  private withLangBody<T extends object>(body: T): T & { lang: AppLang } {
+    return { ...body, lang: this.currentLang() };
+  }
+
+  private withLangParams(params?: HttpParams): HttpParams {
+    let p = params ?? new HttpParams();
+    return p.set('lang', this.currentLang());
+  }
 
   /**
    * Construit `?id_discipline=<id>` quand un id de discipline est fourni.
@@ -382,21 +521,22 @@ export class ApiService {
   }
 
   getAllThemes(idDiscipline?: number | null) {
-    return this.http.get(`${this.baseurl}/themes/all_themes`, {
-      headers: this.httpHeaders_json,
-      params: this.themesParams(idDiscipline)
-    });
+    return this.http
+      .get(`${this.baseurl}/themes/all_themes`, {
+        headers: this.httpHeaders_json,
+        params: this.themesParams(idDiscipline)
+      })
+      .pipe(map((raw) => humanizeThemesPayload(raw)));
   }
 
   /** Liste typée (même endpoint que getAllThemes). */
   getAllThemesAdmin(idDiscipline?: number | null) {
-    return this.http.get<ThemeAdminDto[]>(
-      `${this.baseurl}/themes/all_themes`,
-      {
+    return this.http
+      .get<ThemeAdminDto[]>(`${this.baseurl}/themes/all_themes`, {
         headers: this.httpHeaders_json,
         params: this.themesParams(idDiscipline)
-      }
-    );
+      })
+      .pipe(map((raw) => humanizeThemesPayload(raw) as ThemeAdminDto[]));
   }
 
   /** Liste des disciplines (niveau au-dessus du thème). */
@@ -409,10 +549,12 @@ export class ApiService {
 
   /** Arborescence complète des savoirs (page Résumé). */
   getKnowledgeOverview() {
-    return this.http.get<KnowledgeOverviewDisciplineDto[]>(
-      `${this.baseurl}/disciplines/knowledge_overview`,
-      { headers: this.httpHeaders_json }
-    );
+    return this.http
+      .get<KnowledgeOverviewDisciplineDto[]>(
+        `${this.baseurl}/disciplines/knowledge_overview`,
+        { headers: this.httpHeaders_json }
+      )
+      .pipe(map((data) => humanizeKnowledgeOverview(data)));
   }
 
   /**
@@ -423,7 +565,7 @@ export class ApiService {
   createDiscipline(payload: DisciplineUpsertPayload) {
     return this.http.post<DisciplineDto>(
       `${this.baseurl}/disciplines/create_discipline`,
-      payload,
+      this.withLangBody(payload),
       { headers: this.httpHeaders_json }
     );
   }
@@ -446,10 +588,12 @@ export class ApiService {
 
   /** Fiche discipline (thèmes, compétences, prérequis). */
   getDisciplineDetail(disciplineId: number) {
-    return this.http.get<DisciplineDetailDto>(
-      `${this.baseurl}/disciplines/${disciplineId}/detail`,
-      { headers: this.httpHeaders_json }
-    );
+    return this.http
+      .get<DisciplineDetailDto>(
+        `${this.baseurl}/disciplines/${disciplineId}/detail`,
+        { headers: this.httpHeaders_json }
+      )
+      .pipe(map((detail) => humanizeDisciplineDetail(detail)));
   }
 
   /**
@@ -459,7 +603,7 @@ export class ApiService {
   proposeDisciplineFromWish(payload: DisciplineProposeFromWishPayload) {
     return this.http.post<DisciplineProposeFromWishResult>(
       `${this.baseurl}/disciplines/propose_from_wish`,
-      payload,
+      this.withLangBody(payload),
       { headers: this.httpHeaders_json }
     );
   }
@@ -526,7 +670,7 @@ export class ApiService {
   generateParcoursAndQuestionsFromTheme(payload: GenerateParcoursQuestionsFromThemePayload) {
     return this.http.post<unknown>(
       `${this.baseurl}/themes/generate-parcours-and-questions`,
-      payload,
+      this.withLangBody(payload),
       { headers: this.httpHeaders_json }
     );
   }
@@ -565,7 +709,7 @@ export class ApiService {
   regroupementQuestionsParcours(payload: RegroupementQuestionsParcoursPayload) {
     return this.http.post<RegroupementQuestionsParcoursResponse>(
       `${this.baseurl}/themes/regroupement_questions_parcours`,
-      payload,
+      this.withLangBody(payload),
       { headers: this.httpHeaders_json }
     );
   }
@@ -573,7 +717,7 @@ export class ApiService {
   evaluateResponse(subtheme: string, question: string, response: string){
     return this.http.post(
       this.baseurl+"/evaluations/evaluate_response",
-      { subtheme, question, response },
+      this.withLangBody({ subtheme, question, response }),
       {headers: this.httpHeaders_json, responseType: 'text'}
     );
   }
@@ -605,6 +749,60 @@ export class ApiService {
   getStatsBySubTheme() {
     return this.http.get<SubThemeStats[]>(
       `${this.baseurl}/evaluations/stats_by_subtheme`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  /** Vue d'ensemble évaluation avancée (pyramide + effort découverte). */
+  getAdvancedEvaluationOverview(idDiscipline?: number | null) {
+    let params = new HttpParams();
+    if (idDiscipline != null) {
+      params = params.set('id_discipline', String(idDiscipline));
+    }
+    return this.http
+      .get<AdvancedEvaluationOverview>(
+        `${this.baseurl}/advanced-evaluation/overview`,
+        { headers: this.httpHeaders_json, params }
+      )
+      .pipe(map((overview) => humanizeAdvancedEvaluationOverview(overview)));
+  }
+
+  /** Synthèse IA à partir de l'overview évaluation avancée. */
+  postAdvancedEvaluationInsights(idDiscipline?: number | null) {
+    return this.http
+      .post<{ overview: AdvancedEvaluationOverview; insights: AdvancedEvaluationInsights }>(
+        `${this.baseurl}/advanced-evaluation/insights`,
+        this.withLangBody({ id_discipline: idDiscipline ?? null }),
+        { headers: this.httpHeaders_json }
+      )
+      .pipe(
+        map((res) => ({
+          ...res,
+          overview: humanizeAdvancedEvaluationOverview(res.overview)
+        }))
+      );
+  }
+
+  startSubthemeSession(payload: SubthemeSessionStartPayload) {
+    return this.http.post<{ id_session: number }>(
+      `${this.baseurl}/advanced-evaluation/subtheme-session/start`,
+      payload,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  endSubthemeSession(idSession: number) {
+    return this.http.post(
+      `${this.baseurl}/advanced-evaluation/subtheme-session/end`,
+      { id_session: idSession },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  logDiscoverActivity(payload: DiscoverActivityPayload) {
+    return this.http.post(
+      `${this.baseurl}/advanced-evaluation/discover-activity`,
+      payload,
       { headers: this.httpHeaders_json }
     );
   }
@@ -652,7 +850,7 @@ export class ApiService {
     const s = encodeURIComponent(subthemeLabel ?? '');
     return this.http.get<unknown>(
       `${this.baseurl}/discovering/get_proposition_for_question/${q}/${s}`,
-      { headers: this.httpHeaders_json }
+      { headers: this.httpHeaders_json, params: this.withLangParams() }
     );
   }
 
@@ -720,7 +918,7 @@ export class ApiService {
     }
     return this.http.post<OrdreLogiqueQuestionsResponseEnriched>(
       `${this.baseurl}/discovering/ordre_logique_questions`,
-      payload,
+      this.withLangBody(payload),
       { headers: this.httpHeaders_json, params }
     );
   }

@@ -1,0 +1,327 @@
+<app-transverse-rail />
+
+<div class="advanced-eval-page">
+  <div class="app-page-inner">
+    <header class="advanced-eval-header">
+      <div>
+        <h1>{{ 'advancedEvaluation.title' | translate }}</h1>
+        <p>{{ 'advancedEvaluation.subtitle' | translate }}</p>
+      </div>
+      <div class="advanced-eval-header__actions">
+        <button mat-stroked-button type="button" (click)="reload()">
+          <mat-icon>refresh</mat-icon>
+          {{ 'common.retry' | translate }}
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          [disabled]="loading || insightsLoading || !overview"
+          (click)="generateInsights()"
+        >
+          @if (insightsLoading) {
+            <mat-spinner diameter="20" />
+          } @else {
+            <mat-icon>auto_awesome</mat-icon>
+          }
+          {{ 'advancedEvaluation.generateInsights' | translate }}
+        </button>
+      </div>
+    </header>
+
+    @if (loading) {
+      <div class="advanced-eval-loading">
+        <mat-spinner diameter="36" />
+        <span>{{ 'advancedEvaluation.loading' | translate }}</span>
+      </div>
+    } @else if (loadError) {
+      <mat-card class="advanced-eval-error">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ loadError | translate }}</p>
+      </mat-card>
+    } @else if (overview) {
+      <section class="kpi-grid">
+        <mat-card class="kpi-card">
+          <span class="kpi-card__label">{{ 'advancedEvaluation.kpiEvaluations' | translate }}</span>
+          <span class="kpi-card__value">{{ overview.evaluation_total }}</span>
+        </mat-card>
+        <mat-card class="kpi-card">
+          <span class="kpi-card__label">{{ 'advancedEvaluation.kpiSubthemesExplored' | translate }}</span>
+          <span class="kpi-card__value">{{ overview.discover_effort.subthemes_explored_count }}</span>
+        </mat-card>
+        <mat-card class="kpi-card">
+          <span class="kpi-card__label">{{ 'advancedEvaluation.kpiDiscoverTime' | translate }}</span>
+          <span class="kpi-card__value">{{
+            formatDuration(overview.discover_effort.total_duration_seconds)
+          }}</span>
+        </mat-card>
+        <mat-card class="kpi-card">
+          <span class="kpi-card__label">{{ 'advancedEvaluation.kpiPropositionsSaved' | translate }}</span>
+          <span class="kpi-card__value">{{ overview.discover_effort.propositions_saved }}</span>
+        </mat-card>
+      </section>
+
+      <div class="advanced-eval-grid">
+        <mat-card class="panel panel--chart">
+          <h2>{{ 'advancedEvaluation.pyramidTitle' | translate }}</h2>
+          <p class="panel__intro">{{ 'advancedEvaluation.pyramidIntro' | translate }}</p>
+          <div class="chart-wrap">
+            <canvas #pyramidChartCanvas></canvas>
+          </div>
+          <ul class="pyramid-legend">
+            @for (level of overview.pyramid; track level.niveau_pyramide) {
+              <li>
+                <strong>{{ pyramidLabel(level.niveau_pyramide) | translate }}</strong>
+                — {{ level.evaluation_count }}
+                {{ 'advancedEvaluation.evaluationsShort' | translate }}
+                @if (level.avg_note != null) {
+                  · {{ 'advancedEvaluation.avgNote' | translate }}: {{ level.avg_note }}/100
+                }
+              </li>
+            }
+          </ul>
+        </mat-card>
+
+        <mat-card class="panel">
+          <h2>{{ 'advancedEvaluation.acquisTitle' | translate }}</h2>
+          @if (overview.acquis.length) {
+            <ul class="bullet-list bullet-list--success">
+              @for (item of overview.acquis; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="panel__empty">{{ 'advancedEvaluation.noAcquis' | translate }}</p>
+          }
+
+          <h2 class="panel__subtitle">{{ 'advancedEvaluation.gapsTitle' | translate }}</h2>
+          @if (overview.points_a_travailler.length) {
+            <ul class="bullet-list bullet-list--warn">
+              @for (item of overview.points_a_travailler; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="panel__empty">{{ 'advancedEvaluation.noGaps' | translate }}</p>
+          }
+        </mat-card>
+
+        <mat-card class="panel panel--wide">
+          <h2>{{ 'advancedEvaluation.discoverTitle' | translate }}</h2>
+          <div class="discover-stats">
+            <div>
+              <span class="discover-stats__label">{{
+                'advancedEvaluation.propositionsRequested' | translate
+              }}</span>
+              <span class="discover-stats__value">{{
+                overview.discover_effort.propositions_requested
+              }}</span>
+            </div>
+            <div>
+              <span class="discover-stats__label">{{
+                'advancedEvaluation.propositionsSaved' | translate
+              }}</span>
+              <span class="discover-stats__value">{{
+                overview.discover_effort.propositions_saved
+              }}</span>
+            </div>
+            <div>
+              <span class="discover-stats__label">{{
+                'advancedEvaluation.propositionsDiscarded' | translate
+              }}</span>
+              <span class="discover-stats__value">{{
+                overview.discover_effort.propositions_discarded
+              }}</span>
+            </div>
+            <div>
+              <span class="discover-stats__label">{{
+                'advancedEvaluation.exercisesInPropositions' | translate
+              }}</span>
+              <span class="discover-stats__value">{{
+                overview.discover_effort.exercises_in_propositions
+              }}</span>
+            </div>
+          </div>
+
+          @if (overview.discover_effort.subtheme_sessions.length) {
+            <div class="sessions-table-wrap">
+              <table class="sessions-table">
+                <thead>
+                  <tr>
+                    <th>{{ 'advancedEvaluation.sessionSubtheme' | translate }}</th>
+                    <th>{{ 'advancedEvaluation.sessionEntered' | translate }}</th>
+                    <th>{{ 'advancedEvaluation.sessionExited' | translate }}</th>
+                    <th>{{ 'advancedEvaluation.sessionDuration' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (s of overview.discover_effort.subtheme_sessions; track s.id_session) {
+                    <tr>
+                      <td>
+                        {{ s.subtheme_label || ('#' + s.id_subtheme) }}
+                        @if (s.theme_label) {
+                          <small>{{ s.theme_label }}</small>
+                        }
+                      </td>
+                      <td>{{ formatDate(s.entered_at) }}</td>
+                      <td>{{ formatDate(s.exited_at) }}</td>
+                      <td>{{ formatDuration(s.duration_seconds) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p class="panel__empty">{{ 'advancedEvaluation.noSessions' | translate }}</p>
+          }
+        </mat-card>
+
+        @if (overview.cognitive_discovery) {
+          <mat-card class="panel panel--wide panel--cognitive">
+            <h2>{{ 'advancedEvaluation.cognitiveTitle' | translate }}</h2>
+            <p class="panel__intro">{{ 'advancedEvaluation.cognitiveIntro' | translate }}</p>
+
+            @if (profileSequenceHint(); as hintKey) {
+              <p class="cognitive-profile-hint">{{ hintKey | translate }}</p>
+            }
+
+            @if (overview.cognitive_discovery.profile_summary.dominant_family) {
+              <p class="cognitive-profile-meta">
+                {{ 'advancedEvaluation.dominantFamily' | translate }} :
+                <strong>{{
+                  familyLabel(overview.cognitive_discovery.profile_summary.dominant_family!)
+                }}</strong>
+                ·
+                {{
+                  'advancedEvaluation.operationsExploredRatio' | translate : {
+                    explored: overview.cognitive_discovery.profile_summary.operations_explored_count,
+                    available: overview.cognitive_discovery.profile_summary.operations_available_count
+                  }
+                }}
+              </p>
+            }
+
+            @if (cognitiveOperationsWithActivity().length) {
+              <div class="chart-wrap chart-wrap--cognitive">
+                <canvas #cognitiveChartCanvas></canvas>
+              </div>
+
+              <div class="sessions-table-wrap">
+                <table class="sessions-table cognitive-table">
+                  <thead>
+                    <tr>
+                      <th>{{ 'advancedEvaluation.colOperation' | translate }}</th>
+                      <th>{{ 'advancedEvaluation.colFamily' | translate }}</th>
+                      <th>{{ 'advancedEvaluation.propositionsRequested' | translate }}</th>
+                      <th>{{ 'advancedEvaluation.propositionsSaved' | translate }}</th>
+                      <th>{{ 'advancedEvaluation.propositionsDiscarded' | translate }}</th>
+                      <th>{{ 'advancedEvaluation.exercisesInPropositions' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (op of cognitiveOperationsWithActivity(); track op.operation) {
+                      <tr>
+                        <td>{{ operationLabel(op.operation) }}</td>
+                        <td>{{ familyLabel(op.family) }}</td>
+                        <td>{{ op.propositions_requested }}</td>
+                        <td>{{ op.propositions_saved }}</td>
+                        <td>{{ op.propositions_discarded }}</td>
+                        <td>{{ op.exercises_in_propositions }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="panel__empty">{{ 'advancedEvaluation.noCognitiveActivity' | translate }}</p>
+            }
+
+            @if (overview.cognitive_discovery.discovery_sequence.length) {
+              <h3>{{ 'advancedEvaluation.sequenceTitle' | translate }}</h3>
+              <ol class="sequence-list">
+                @for (step of overview.cognitive_discovery.discovery_sequence; track step.rank) {
+                  <li>
+                    <span class="sequence-list__operation">{{ operationLabel(step.operation) }}</span>
+                    <span class="sequence-list__family">({{ familyLabel(step.family) }})</span>
+                    @if (step.first_at) {
+                      <span class="sequence-list__date"> — {{ formatDate(step.first_at) }}</span>
+                    }
+                  </li>
+                }
+              </ol>
+            }
+
+            @if (overview.cognitive_discovery.unexplored_operations.length) {
+              <h3>{{ 'advancedEvaluation.unexploredTitle' | translate }}</h3>
+              <div class="tag-list">
+                @for (op of overview.cognitive_discovery.unexplored_operations; track op) {
+                  <span class="tag tag--muted">{{ operationLabel(op) }}</span>
+                }
+              </div>
+            }
+
+            @if (overview.cognitive_discovery.pyramid_operation_matrix.length) {
+              <h3>{{ 'advancedEvaluation.matrixTitle' | translate }}</h3>
+              <div class="matrix-list">
+                @for (row of overview.cognitive_discovery.pyramid_operation_matrix; track row.niveau_pyramide) {
+                  <div class="matrix-row">
+                    <span class="matrix-row__pyramid">{{
+                      pyramidLabel(row.niveau_pyramide) | translate
+                    }}</span>
+                    @if (row.available_operations.length) {
+                      <span class="matrix-row__label">{{
+                        'advancedEvaluation.matrixAvailable' | translate
+                      }}</span>
+                      @for (op of row.available_operations; track op) {
+                        <span class="tag">{{ operationLabel(op) }}</span>
+                      }
+                    }
+                    @if (objectKeys(row.discover_requested_by_operation).length) {
+                      <span class="matrix-row__label">{{
+                        'advancedEvaluation.matrixRequested' | translate
+                      }}</span>
+                      @for (entry of objectEntries(row.discover_requested_by_operation); track entry[0]) {
+                        <span class="tag tag--active"
+                          >{{ operationLabel(entry[0]) }} ({{ entry[1] }})</span
+                        >
+                      }
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </mat-card>
+        }
+
+        @if (insights) {
+          <mat-card class="panel panel--wide panel--insights">
+            <h2>{{ 'advancedEvaluation.insightsTitle' | translate }}</h2>
+            @if (insights.commentaire_global) {
+              <p class="insights-lead">{{ insights.commentaire_global }}</p>
+            }
+            @if (insights.transformations_mentales) {
+              <h3>{{ 'advancedEvaluation.insightsTransformations' | translate }}</h3>
+              <p>{{ insights.transformations_mentales }}</p>
+            }
+            @if (insights.effort_decouverte) {
+              <h3>{{ 'advancedEvaluation.insightsDiscover' | translate }}</h3>
+              <p>{{ insights.effort_decouverte }}</p>
+            }
+            @if (insights.conduite_decouverte) {
+              <h3>{{ 'advancedEvaluation.insightsCognitiveConduct' | translate }}</h3>
+              <p>{{ insights.conduite_decouverte }}</p>
+            }
+            @if (insights.recommandations?.length) {
+              <h3>{{ 'advancedEvaluation.insightsRecommendations' | translate }}</h3>
+              <ul class="bullet-list">
+                @for (r of insights.recommandations; track r) {
+                  <li>{{ r }}</li>
+                }
+              </ul>
+            }
+          </mat-card>
+        }
+      </div>
+    }
+  </div>
+</div>
