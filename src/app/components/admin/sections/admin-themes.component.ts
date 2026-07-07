@@ -97,6 +97,11 @@ export class AdminThemesComponent implements OnInit, OnDestroy {
   /** Thème choisi pour la génération bulk parcours + questions (id en string, aligné sur `mat-option`). */
   bulkAiSelectedThemeId: string | null = null;
 
+  /** Surbrillance du panneau IA pendant un glisser-déposer de thème. */
+  bulkAiDropActive = false;
+
+  private static readonly THEME_DRAG_MIME = 'application/x-terra-theme-id';
+
   /** Sous-titre tronqué (ellipsis) : clé = id thème → infobulle activée. */
   protected taglineTruncated: Record<string, boolean> = {};
 
@@ -195,6 +200,72 @@ export class AdminThemesComponent implements OnInit, OnDestroy {
   bulkAiSelectedTheme(): ThemeAdminDto | null {
     if (this.bulkAiSelectedThemeId == null) return null;
     return this.themes.find((t) => String(t.id) === this.bulkAiSelectedThemeId) ?? null;
+  }
+
+  onThemeDragStart(event: DragEvent, theme: ThemeAdminDto): void {
+    const id = String(theme.id);
+    const dt = event.dataTransfer;
+    if (!dt) return;
+    dt.setData(AdminThemesComponent.THEME_DRAG_MIME, id);
+    dt.setData('text/plain', id);
+    dt.effectAllowed = 'copy';
+  }
+
+  onThemeDragEnd(): void {
+    this.bulkAiDropActive = false;
+  }
+
+  onBulkAiDragEnter(event: DragEvent): void {
+    if (!this.isThemeDragEvent(event)) return;
+    event.preventDefault();
+    this.bulkAiDropActive = true;
+  }
+
+  onBulkAiDragOver(event: DragEvent): void {
+    if (!this.isThemeDragEvent(event)) return;
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+    this.bulkAiDropActive = true;
+  }
+
+  onBulkAiDragLeave(event: DragEvent): void {
+    const current = event.currentTarget as HTMLElement | null;
+    const related = event.relatedTarget as Node | null;
+    if (current && related && current.contains(related)) return;
+    this.bulkAiDropActive = false;
+  }
+
+  onBulkAiDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.bulkAiDropActive = false;
+    const id =
+      event.dataTransfer?.getData(AdminThemesComponent.THEME_DRAG_MIME) ||
+      event.dataTransfer?.getData('text/plain');
+    if (!id) return;
+    const theme = this.themes.find((t) => String(t.id) === id);
+    if (!theme) return;
+    this.selectBulkAiTheme(theme);
+  }
+
+  private isThemeDragEvent(event: DragEvent): boolean {
+    const types = event.dataTransfer?.types;
+    if (!types) return false;
+    return Array.from(types).includes(AdminThemesComponent.THEME_DRAG_MIME);
+  }
+
+  private selectBulkAiTheme(theme: ThemeAdminDto): void {
+    this.bulkAiSelectedThemeId = String(theme.id);
+    const label = (theme.label ?? '').trim();
+    if (label) {
+      this.snack.open(
+        this.translate.instant('adminThemes.snackBulkAiThemeSelected', { label }),
+        this.translate.instant('common.ok'),
+        { duration: 2500 }
+      );
+    }
+    this.cdr.markForCheck();
   }
 
   subThemesOf(theme: ThemeAdminDto): SubThemeAdminDto[] {

@@ -412,6 +412,8 @@ export interface SubThemeAdminDto {
   id: string | number;
   label: string;
   description?: string;
+  /** Famille de la grille pyramide (ex. « Entités », « Causalité »), renseignée par la génération IA. */
+  famille?: string | null;
 }
 
 export interface ThemeUpsertPayload {

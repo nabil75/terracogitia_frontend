@@ -58,7 +58,20 @@
             >
               <mat-expansion-panel-header class="theme-admin-panel__header">
                 <mat-panel-title class="theme-accordion-header">
-                  <span class="theme-accordion-title">{{ theme.label }}</span>
+                  <div class="theme-accordion-header__top">
+                    <button
+                      type="button"
+                      class="theme-drag-handle"
+                      draggable="true"
+                      (dragstart)="onThemeDragStart($event, theme)"
+                      (dragend)="onThemeDragEnd()"
+                      (click)="$event.stopPropagation()"
+                      [attr.aria-label]="'adminThemes.ariaDragThemeToAi' | translate"
+                    >
+                      <mat-icon>drag_indicator</mat-icon>
+                    </button>
+                    <span class="theme-accordion-title">{{ theme.label }}</span>
+                  </div>
                   @if (theme.tagline) {
                     <span
                       class="theme-accordion-subtitle"
@@ -125,6 +138,12 @@
                         <li class="subtheme-row">
                           <div class="subtheme-row__text">
                             <strong>{{ sub.label }}</strong>
+                            @if (sub.famille) {
+                              <span class="sub-famille">
+                                <mat-icon class="sub-famille__icon" aria-hidden="true">category</mat-icon>
+                                {{ 'adminThemes.familleLabel' | translate }} : {{ sub.famille }}
+                              </span>
+                            }
                             @if (sub.description) {
                               <span class="sub-desc">{{ sub.description }}</span>
                             }
@@ -166,7 +185,12 @@
 
     <div
       class="admin-section admin-section--ai"
+      [class.admin-section--ai-drop-target]="bulkAiDropActive"
       [attr.aria-label]="'adminThemes.aiSectionAria' | translate"
+      (dragenter)="onBulkAiDragEnter($event)"
+      (dragover)="onBulkAiDragOver($event)"
+      (dragleave)="onBulkAiDragLeave($event)"
+      (drop)="onBulkAiDrop($event)"
     >
       <div class="admin-section__head admin-section__head--ai-stacked">
         <h2 class="ai-page-title">{{ 'adminThemes.aiPageTitle' | translate }}</h2>
@@ -176,7 +200,10 @@
       </div>
 
       <div class="ai-panels">
-        <section class="ai-panel" aria-labelledby="ai-bulk-heading">
+        <section
+          class="ai-panel"
+          aria-labelledby="ai-bulk-heading"
+        >
           <div class="ai-panel__head">
             <div class="ai-panel__title-row">
               <mat-icon class="ai-panel__icon" aria-hidden="true">topic</mat-icon>
