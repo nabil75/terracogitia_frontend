@@ -335,9 +335,9 @@ body.dark-theme {
   }
 
   /**
-   * Dialogue « Dessin — réponse à la question » (panelClass: app-question-drawing-dialog)
+   * Dialogue de dessin graphique (panelClass: app-drawing-dialog)
    */
-  .cdk-overlay-container .app-question-drawing-dialog {
+  .cdk-overlay-container .app-drawing-dialog {
     --mdc-dialog-container-color: var(--app-surface-strong);
     --mat-dialog-container-color: var(--app-surface-strong);
     --mdc-dialog-subhead-color: var(--app-text);
@@ -346,29 +346,29 @@ body.dark-theme {
     --mat-dialog-supporting-text-color: var(--app-text);
   }
 
-  .cdk-overlay-container .app-question-drawing-dialog .mat-mdc-dialog-surface,
-  .cdk-overlay-container .app-question-drawing-dialog .mdc-dialog__surface {
+  .cdk-overlay-container .app-drawing-dialog .mat-mdc-dialog-surface,
+  .cdk-overlay-container .app-drawing-dialog .mdc-dialog__surface {
     background-color: var(--app-surface-strong) !important;
     border: 1px solid var(--app-stroke-strong);
     color: var(--app-text);
   }
 
-  .cdk-overlay-container .app-question-drawing-dialog .mat-mdc-dialog-title,
-  .cdk-overlay-container .app-question-drawing-dialog .mdc-dialog__title {
+  .cdk-overlay-container .app-drawing-dialog .mat-mdc-dialog-title,
+  .cdk-overlay-container .app-drawing-dialog .mdc-dialog__title {
     color: var(--app-text) !important;
   }
 
-  .cdk-overlay-container .app-question-drawing-dialog .mat-mdc-dialog-content {
+  .cdk-overlay-container .app-drawing-dialog .mat-mdc-dialog-content {
     color: var(--app-text);
   }
 
-  .cdk-overlay-container .app-question-drawing-dialog .mat-mdc-dialog-actions {
+  .cdk-overlay-container .app-drawing-dialog .mat-mdc-dialog-actions {
     background-color: var(--app-surface-strong);
     border-top: 1px solid var(--app-stroke-strong);
   }
 
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled) {
     --mdc-text-button-label-text-color: var(--app-button-fg);
@@ -379,7 +379,7 @@ body.dark-theme {
   }
 
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-button-base:not([disabled]):not(.mat-mdc-button-disabled)
     .mdc-button__label {
@@ -387,7 +387,7 @@ body.dark-theme {
   }
 
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-outlined-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled) {
     --mdc-outlined-button-outline-color: rgba(239, 154, 154, 0.65);
@@ -396,7 +396,7 @@ body.dark-theme {
   }
 
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-outlined-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled)
     .mdc-button__label {
@@ -404,11 +404,11 @@ body.dark-theme {
   }
 
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-outlined-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled):hover,
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-outlined-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled):focus-visible {
     --mdc-outlined-button-outline-color: rgba(239, 154, 154, 0.85);
@@ -417,12 +417,12 @@ body.dark-theme {
   }
 
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-outlined-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled):hover
     .mdc-button__label,
   .cdk-overlay-container
-    .app-question-drawing-dialog
+    .app-drawing-dialog
     .mat-mdc-dialog-actions
     .mat-mdc-outlined-button.mat-warn:not([disabled]):not(.mat-mdc-button-disabled):focus-visible
     .mdc-button__label {
@@ -748,9 +748,9 @@ body.dark-theme .resume-container {
 }
 
 /**
- * Dialogue « Dessin — réponse à la question » (panelClass: app-question-drawing-dialog)
+ * Dialogue « Dessin — réponse à la question » (panelClass: app-drawing-dialog)
  */
-.cdk-overlay-container .app-question-drawing-dialog {
+.cdk-overlay-container .app-drawing-dialog {
   .mat-mdc-dialog-container,
   .mat-mdc-dialog-surface,
   .mdc-dialog__surface {
@@ -775,7 +775,7 @@ body.dark-theme .resume-container {
   }
 }
 
-.cdk-overlay-container .app-question-drawing-dialog--maximized {
+.cdk-overlay-container .app-drawing-dialog--maximized {
   .mat-mdc-dialog-container,
   .mat-mdc-dialog-surface,
   .mdc-dialog__surface {

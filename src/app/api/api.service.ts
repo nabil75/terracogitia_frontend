@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { AppLang, LanguageService } from '../shared/services/language.service';
 import {
-  humanizeAdvancedEvaluationOverview,
   humanizeDisciplineDetail,
   humanizeKnowledgeOverview,
   humanizeThemesPayload
@@ -26,16 +25,10 @@ export interface KnowledgeOverviewPropositionDto {
   date_creation?: string | null;
 }
 
-export interface KnowledgeOverviewEvaluationDto {
-  id_evaluation: number;
-  date_creation?: string | null;
-}
-
 export interface KnowledgeOverviewQuestionDto {
   id_question: number;
   label: string;
   propositions: KnowledgeOverviewPropositionDto[];
-  evaluations: KnowledgeOverviewEvaluationDto[];
 }
 
 export interface KnowledgeOverviewSubThemeDto {
@@ -69,6 +62,19 @@ export interface DisciplineThemeSummaryDto {
 export interface DisciplineLinkedLabelDto {
   id: number;
   label: string;
+}
+
+/** Réponse `GET/PUT/DELETE /questions/:id_objet/dessin`. */
+export interface ObjectDessinResponse {
+  id_objet: number;
+  dessin?: Record<string, unknown> | null;
+  has_dessin: boolean;
+}
+
+/** Réponse `POST /themes/get_transcribe_audio`. */
+export interface AudioTranscriptionResponse {
+  id: string;
+  text: string;
 }
 
 /** GET /disciplines/:id/detail — fiche complète pour la page Discipline. */
@@ -107,158 +113,18 @@ export interface DisciplineProposeFromWishResult {
   projection?: string | null;
 }
 
-/** Ligne renvoyée par GET /evaluations/by_question/:id (aligné sur le backend). */
-export interface EvaluationRecord {
-  id: number;
-  id_theme: number;
-  id_subtheme: number;
-  id_question: number;
-  reponse: string;
-  pertinence: string;
-  pertinence_note: number | null;
-  precision: string;
-  precision_note: number | null;
-  clarte: string;
-  clarte_note: number | null;
-  /** Tableau ou chaîne (JSON ou lignes) selon la source. */
-  synthese_points_forts: string[] | string | null;
-  synthese_points_faibles: string[] | string | null;
-  synthese_conseils_pedagogiques: string[] | string | null;
-  note: number | null;
-  /** Renseigné par le serveur / la base à la lecture (pas envoyé à l’enregistrement). */
-  date_creation?: string;
-}
-
-/** Agrégat par parcours renvoyé par GET /evaluations/stats_by_subtheme. */
-export interface SubThemeStats {
-  id_theme: number;
-  id_subtheme: number;
-  evaluation_count: number;
-  avg_note: number | null;
-  avg_pertinence: number | null;
-  avg_precision: number | null;
-  avg_clarte: number | null;
-  min_note: number | null;
-  max_note: number | null;
-}
-
-/** GET /advanced-evaluation/overview — croisement pyramide + effort découverte. */
-export interface AdvancedEvaluationPyramidLevel {
-  niveau_pyramide: string;
-  evaluation_count: number;
-  avg_note: number | null;
-  avg_pertinence: number | null;
-  avg_precision: number | null;
-  avg_clarte: number | null;
-}
-
-export interface AdvancedEvaluationSubthemeSession {
-  id_session: number;
-  id_theme?: number | null;
-  id_subtheme?: number | null;
-  theme_label?: string | null;
-  subtheme_label?: string | null;
-  entered_at?: string | null;
-  exited_at?: string | null;
-  duration_seconds?: number | null;
-  source?: string | null;
-}
-
-export interface AdvancedEvaluationDiscoverEffort {
-  subtheme_sessions: AdvancedEvaluationSubthemeSession[];
-  subthemes_explored_count: number;
-  total_duration_seconds: number;
-  propositions_requested: number;
-  propositions_saved: number;
-  propositions_discarded: number;
-  exercises_in_propositions: number;
-}
-
-export interface AdvancedEvaluationCognitiveOperation {
-  operation: string;
-  family: string;
-  propositions_requested: number;
-  propositions_saved: number;
-  propositions_discarded: number;
-  exercises_in_propositions: number;
-  first_activity_at?: string | null;
-  available_in_discipline: boolean;
-}
-
-export interface AdvancedEvaluationDiscoverySequenceStep {
-  rank: number;
-  operation: string;
-  family: string;
-  first_at?: string | null;
-}
-
-export interface AdvancedEvaluationPyramidOperationMatrix {
-  niveau_pyramide: string;
-  discover_requested_by_operation: Record<string, number>;
-  available_operations: string[];
-}
-
-export interface AdvancedEvaluationCognitiveProfileSummary {
-  dominant_family?: string | null;
-  observation_before_comprehension?: boolean | null;
-  comprehension_explored: boolean;
-  observation_explored: boolean;
-  operations_available_count: number;
-  operations_explored_count: number;
-}
-
-export interface AdvancedEvaluationCognitiveDiscovery {
-  operations: AdvancedEvaluationCognitiveOperation[];
-  discovery_sequence: AdvancedEvaluationDiscoverySequenceStep[];
-  unexplored_operations: string[];
-  pyramid_operation_matrix: AdvancedEvaluationPyramidOperationMatrix[];
-  profile_summary: AdvancedEvaluationCognitiveProfileSummary;
-}
-
-export interface AdvancedEvaluationOverview {
-  pyramid: AdvancedEvaluationPyramidLevel[];
-  acquis: string[];
-  points_a_travailler: string[];
-  conseils_pedagogiques: string[];
-  discover_effort: AdvancedEvaluationDiscoverEffort;
-  cognitive_discovery?: AdvancedEvaluationCognitiveDiscovery;
-  evaluation_total: number;
-}
-
-export interface AdvancedEvaluationInsights {
-  transformations_mentales?: string;
-  acquis?: string[];
-  points_a_travailler?: string[];
-  effort_decouverte?: string;
-  conduite_decouverte?: string;
-  recommandations?: string[];
-  commentaire_global?: string;
-}
-
-export interface SubthemeSessionStartPayload {
-  id_theme?: number | null;
-  id_subtheme: number;
-  source?: string;
-}
-
-export interface DiscoverActivityPayload {
-  id_theme?: number | null;
-  id_subtheme?: number | null;
-  id_question?: number | null;
-  event_type:
-    | 'proposition_requested'
-    | 'proposition_saved'
-    | 'proposition_discarded'
-    | 'exercise_in_proposition';
-  id_proposition?: number | null;
-  meta?: Record<string, unknown> | null;
-}
-
 /** Réponse standard d'un appel d'authentification réussi. */
 export interface AuthResponse {
   ok: boolean;
   id?: number;
   email: string;
+}
+
+/** GET /auth/session — utilisateur courant si une session (cookie) est active. */
+export interface SessionUser {
+  id: number;
+  email: string;
+  auth_provider: string;
 }
 
 /** Codes d'erreur renvoyés par le backend (champ `detail.code`). */
@@ -270,23 +136,6 @@ export type AuthErrorCode =
 export interface AuthErrorDetail {
   code: AuthErrorCode;
   message: string;
-}
-
-export interface StoreEvaluationPayload {
-  id_theme: number;
-  id_subtheme: number;
-  id_question: number;
-  reponse: string;
-  pertinence: string;
-  pertinence_note: number | null;
-  precision: string;
-  precision_note: number | null;
-  clarte: string;
-  clarte_note: number | null;
-  synthese_points_forts: string[];
-  synthese_points_faibles: string[];
-  synthese_conseils_pedagogiques: string[];
-  note: number | null;
 }
 
 /** Ligne renvoyée par GET /discovering/get_saved_propositions_by_question/:id_question. */
@@ -453,13 +302,6 @@ export interface GenerateParcoursQuestionsFromThemePayload {
   /** Parcours déjà présents sur le thème (complément au chargement côté API). */
   existing_domaines?: ExistingDomainePayload[];
   lang?: AppLang;
-}
-
-/** Réponse `GET/PUT/DELETE /questions/:id/dessin`. */
-export interface QuestionDessinResponse {
-  id_question: number;
-  dessin?: Record<string, unknown> | null;
-  has_dessin: boolean;
 }
 
 /**
@@ -681,28 +523,6 @@ export class ApiService {
     return this.http.get(this.baseurl+"/themes/getQuestionsBySubTheme/"+idSubTheme, {headers: this.httpHeaders_json});
   }
 
-  getQuestionDessin(idQuestion: string | number) {
-    return this.http.get<QuestionDessinResponse>(
-      `${this.baseurl}/questions/${idQuestion}/dessin`,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  saveQuestionDessin(idQuestion: string | number, dessin: Record<string, unknown>) {
-    return this.http.put<QuestionDessinResponse>(
-      `${this.baseurl}/questions/${idQuestion}/dessin`,
-      { dessin },
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  deleteQuestionDessin(idQuestion: string | number) {
-    return this.http.delete<QuestionDessinResponse>(
-      `${this.baseurl}/questions/${idQuestion}/dessin`,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
   /**
    * Regroupe les questions d’un parcours (`id_subtheme`) en `nombre_familles` familles homogènes via Mistral,
    * puis enregistre l’indice de famille dans la colonne `groupe` de chaque question.
@@ -712,107 +532,6 @@ export class ApiService {
     return this.http.post<RegroupementQuestionsParcoursResponse>(
       `${this.baseurl}/themes/regroupement_questions_parcours`,
       this.withLangBody(payload),
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  evaluateResponse(subtheme: string, question: string, response: string){
-    return this.http.post(
-      this.baseurl+"/evaluations/evaluate_response",
-      this.withLangBody({ subtheme, question, response }),
-      {headers: this.httpHeaders_json, responseType: 'text'}
-    );
-  }
-
-  storeEvaluation(payload: StoreEvaluationPayload) {
-    return this.http.post(
-      this.baseurl + '/evaluations/store_evaluation',
-      payload,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  getEvaluationsByQuestion(idQuestion: number) {
-    return this.http.get<EvaluationRecord[]>(
-      `${this.baseurl}/evaluations/get_evaluations_by_question/${idQuestion}`,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  /** Toutes les évaluations pour le tableau de bord (le tri affiché utilise `date_creation` côté UI). */
-  getAllEvaluations() {
-    return this.http.get<EvaluationRecord[]>(
-      `${this.baseurl}/evaluations/all`,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  /** Agrégats par parcours pour le tableau de bord. */
-  getStatsBySubTheme() {
-    return this.http.get<SubThemeStats[]>(
-      `${this.baseurl}/evaluations/stats_by_subtheme`,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  /** Vue d'ensemble évaluation avancée (pyramide + effort découverte). */
-  getAdvancedEvaluationOverview(idDiscipline?: number | null) {
-    let params = new HttpParams();
-    if (idDiscipline != null) {
-      params = params.set('id_discipline', String(idDiscipline));
-    }
-    return this.http
-      .get<AdvancedEvaluationOverview>(
-        `${this.baseurl}/advanced-evaluation/overview`,
-        { headers: this.httpHeaders_json, params }
-      )
-      .pipe(map((overview) => humanizeAdvancedEvaluationOverview(overview)));
-  }
-
-  /** Synthèse IA à partir de l'overview évaluation avancée. */
-  postAdvancedEvaluationInsights(idDiscipline?: number | null) {
-    return this.http
-      .post<{ overview: AdvancedEvaluationOverview; insights: AdvancedEvaluationInsights }>(
-        `${this.baseurl}/advanced-evaluation/insights`,
-        this.withLangBody({ id_discipline: idDiscipline ?? null }),
-        { headers: this.httpHeaders_json }
-      )
-      .pipe(
-        map((res) => ({
-          ...res,
-          overview: humanizeAdvancedEvaluationOverview(res.overview)
-        }))
-      );
-  }
-
-  startSubthemeSession(payload: SubthemeSessionStartPayload) {
-    return this.http.post<{ id_session: number }>(
-      `${this.baseurl}/advanced-evaluation/subtheme-session/start`,
-      payload,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  endSubthemeSession(idSession: number) {
-    return this.http.post(
-      `${this.baseurl}/advanced-evaluation/subtheme-session/end`,
-      { id_session: idSession },
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  logDiscoverActivity(payload: DiscoverActivityPayload) {
-    return this.http.post(
-      `${this.baseurl}/advanced-evaluation/discover-activity`,
-      payload,
-      { headers: this.httpHeaders_json }
-    );
-  }
-
-  /** Détail d'une évaluation par id (clé primaire en base). */
-  getEvaluationById(idEvaluation: number) {
-    return this.http.get<EvaluationRecord>(
-      `${this.baseurl}/evaluations/${idEvaluation}`,
       { headers: this.httpHeaders_json }
     );
   }
@@ -831,6 +550,18 @@ export class ApiService {
   }
 
   /**
+   * Crée un compte utilisateur (email + mot de passe ≥ 6 caractères).
+   * Renvoie une erreur `email_already_exists` si l'email est déjà utilisé.
+   */
+  register(email: string, password: string) {
+    return this.http.post<AuthResponse>(
+      this.baseurl + '/auth/register',
+      { email, password },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  /**
    * Réinitialise le mot de passe d'un compte existant.
    * Renvoie une erreur `email_not_found` si l'email n'existe pas en base.
    */
@@ -839,6 +570,33 @@ export class ApiService {
       this.baseurl + '/auth/reset_password',
       { email, new_password: newPassword },
       { headers: this.httpHeaders_json }
+    );
+  }
+
+  /**
+   * URL backend d'entrée du flux OAuth Microsoft. Utilisée en redirection
+   * pleine page (le flux OAuth ne peut pas passer par un XHR).
+   */
+  microsoftLoginUrl(): string {
+    return this.baseurl + '/auth/microsoft/login';
+  }
+
+  /**
+   * Lit la session applicative établie après une connexion Microsoft.
+   * `withCredentials` est requis pour transmettre le cookie de session httpOnly.
+   */
+  getSession() {
+    return this.http.get<SessionUser>(this.baseurl + '/auth/session', {
+      withCredentials: true
+    });
+  }
+
+  /** Invalide la session applicative (efface le cookie httpOnly). */
+  logout() {
+    return this.http.post<{ ok: boolean }>(
+      this.baseurl + '/auth/logout',
+      {},
+      { withCredentials: true }
     );
   }
 
@@ -923,5 +681,42 @@ export class ApiService {
       this.withLangBody(payload),
       { headers: this.httpHeaders_json, params }
     );
+  }
+
+  getObjectDessin(idObjet: string | number) {
+    return this.http.get<ObjectDessinResponse>(
+      `${this.baseurl}/questions/${idObjet}/dessin`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  saveObjectDessin(idObjet: string | number, dessin: Record<string, unknown>) {
+    return this.http.put<ObjectDessinResponse>(
+      `${this.baseurl}/questions/${idObjet}/dessin`,
+      { dessin },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  deleteObjectDessin(idObjet: string | number) {
+    return this.http.delete<ObjectDessinResponse>(
+      `${this.baseurl}/questions/${idObjet}/dessin`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  transcribeAudio(audioBlob: Blob, filename = 'reponse.webm') {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, filename);
+    return this.http.post<AudioTranscriptionResponse>(
+      `${this.baseurl}/themes/get_transcribe_audio`,
+      formData
+    );
+  }
+
+  getAudioFile(idAudio: string) {
+    return this.http.get(`${this.baseurl}/themes/get_audio_file/${idAudio}`, {
+      responseType: 'blob',
+    });
   }
 }

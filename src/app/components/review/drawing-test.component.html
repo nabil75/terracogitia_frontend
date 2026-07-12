@@ -1,0 +1,113 @@
+<main class="drawing-test">
+  <mat-card class="drawing-test__card">
+    <mat-card-header>
+      <mat-card-title>Test — dialogue de dessin</mat-card-title>
+      <mat-card-subtitle>
+        Page provisoire pour tester <code>drawing-dialog</code> (Fabric.js).
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="drawing-test__form">
+      <mat-form-field appearance="outline" class="drawing-test__field">
+        <mat-label>ID objet (base)</mat-label>
+        <input matInput type="text" [(ngModel)]="idObjet" name="idObjet" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="drawing-test__field">
+        <mat-label>Libellé affiché</mat-label>
+        <input matInput type="text" [(ngModel)]="objectLabel" name="objectLabel" />
+      </mat-form-field>
+
+      <p class="drawing-test__hint">
+        Utilisez un <strong>id_objet</strong> existant. Le dessin est chargé / enregistré via
+        <code>GET/PUT/DELETE /questions/:id_objet/dessin</code>.
+      </p>
+
+      @if (lastDrawingResult !== null) {
+        <p class="drawing-test__result">
+          Dernier résultat (dialogue) :
+          @switch (lastDrawingResult) {
+            @case ('saved') { enregistré }
+            @case ('deleted') { supprimé }
+            @case ('cancelled') { annulé }
+          }
+        </p>
+      }
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-flat-button color="primary" type="button" (click)="openDrawingDialog()">
+        Ouvrir le dialogue de dessin
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card class="drawing-test__card drawing-test__card--wide">
+    <mat-card-header>
+      <mat-card-title>Test — éditeur de dessin intégré</mat-card-title>
+      <mat-card-subtitle>
+        Page provisoire pour tester <code>app-drawing-editor</code> embarqué.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="drawing-test__embedded-editor">
+      <app-drawing-editor
+        [idObjet]="idObjet"
+        [objectLabel]="objectLabel"
+        (saved)="onEmbeddedDrawingSaved()"
+        (deleted)="onEmbeddedDrawingDeleted()"
+        (cancelled)="onEmbeddedDrawingCancelled()"
+      ></app-drawing-editor>
+
+      @if (lastEmbeddedDrawingResult !== null) {
+        <p class="drawing-test__result">
+          Dernier résultat (intégré) :
+          @switch (lastEmbeddedDrawingResult) {
+            @case ('saved') { enregistré }
+            @case ('deleted') { supprimé }
+            @case ('cancelled') { annulé }
+          }
+        </p>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="drawing-test__card">
+    <mat-card-header>
+      <mat-card-title>Test — barre audio</mat-card-title>
+      <mat-card-subtitle>
+        Page provisoire pour tester <code>app-audio-recording-toolbar</code>.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="drawing-test__form">
+      <app-audio-recording-toolbar
+        [(transcription)]="transcription"
+        [(audioId)]="audioId"
+      ></app-audio-recording-toolbar>
+
+      <mat-form-field appearance="outline" class="drawing-test__field">
+        <mat-label>Transcription</mat-label>
+        <textarea
+          matInput
+          rows="4"
+          [(ngModel)]="transcription"
+          name="transcription"
+          placeholder="Le texte transcrit s'affichera ici…"
+        ></textarea>
+      </mat-form-field>
+
+      @if (audioId) {
+        <p class="drawing-test__result">
+          Fichier audio enregistré : <code>{{ audioId }}.webm</code>
+        </p>
+      }
+
+      <p class="drawing-test__hint">
+        L'audio est stocké localement dans
+        <code>C:\Users\LG\Documents\data_terracogitia\data\audio</code>
+        via <code>POST /themes/get_transcribe_audio</code>.
+      </p>
+    </mat-card-content>
+  </mat-card>
+</main>

@@ -1,0 +1,45 @@
+.drawing-test {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.drawing-test__card {
+  width: min(100%, 32rem);
+}
+
+.drawing-test__card--wide {
+  width: min(100%, 72rem);
+}
+
+.drawing-test__embedded-editor {
+  margin-top: 0.5rem;
+  --drawing-editor-min-height: min(70vh, 40rem);
+}
+
+.drawing-test__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.drawing-test__field {
+  width: 100%;
+}
+
+.drawing-test__hint,
+.drawing-test__result {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--app-text-muted, rgba(0, 0, 0, 0.65));
+}
+
+.drawing-test__result {
+  color: var(--app-text, inherit);
+}

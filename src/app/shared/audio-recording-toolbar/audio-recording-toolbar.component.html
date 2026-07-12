@@ -1,0 +1,48 @@
+<div
+  class="audio-recording-toolbar"
+  [class.audio-recording-toolbar--disabled]="disabled"
+  [attr.aria-label]="'audioRecording.toolbarAria' | translate"
+>
+  <button
+    mat-icon-button
+    type="button"
+    class="audio-recording-toolbar__record"
+    (click)="startRecording()"
+    [disabled]="disabled || isRecording || isLoading"
+    [attr.aria-label]="'audioRecording.record' | translate"
+  >
+    <mat-icon>mic</mat-icon>
+  </button>
+
+  <button
+    mat-icon-button
+    type="button"
+    color="warn"
+    (click)="stopRecording()"
+    [disabled]="disabled || !isRecording"
+    [attr.aria-label]="'audioRecording.stop' | translate"
+  >
+    <mat-icon>stop</mat-icon>
+  </button>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="audio-recording-toolbar__play"
+    (click)="playAudio()"
+    [disabled]="disabled || !audioId || isLoading"
+    [attr.aria-label]="'audioRecording.play' | translate"
+  >
+    <mat-icon>play_arrow</mat-icon>
+  </button>
+
+  @if (isLoading) {
+    <mat-spinner diameter="22" class="audio-recording-toolbar__spinner"></mat-spinner>
+  }
+
+  @if (isRecording) {
+    <span class="audio-recording-toolbar__indicator">
+      {{ 'audioRecording.recording' | translate }}
+    </span>
+  }
+</div>

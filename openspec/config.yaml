@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  Produit : Terra Cogitia — plateforme éducative bilingue (FR/EN) qui génère du
+  contenu pédagogique avec le LLM Mistral, structuré par la « pyramide des savoirs »
+  (6 niveaux : faits_observables, lois_relations, schemes_operatoires,
+  principes_generateurs, structures_abstraites, metacadres_theoriques).
+
+  Ce dépôt = FRONTEND.
+  Tech stack : Angular (standalone components, signals), Angular Material, ngx-translate
+  (FR/EN), Chart.js et D3 (visualisations), Fabric.js (dessin), API REST vers le backend
+  FastAPI (base URL http://localhost:8002).
+
+  Conventions :
+  - Aucune protection de route (pas de guard) ; `/login` existe mais ne persiste ni
+    token ni session, et n'est pas lié depuis la barre de navigation.
+  - La langue UI (FR/EN) est stockée dans localStorage['lang'] et transmise aux endpoints
+    IA du backend (dans le body via withLangBody, ou en query via withLangParams).
+  - Filtre de discipline global partagé via DisciplineService (localStorage).
+  - Les libellés snake_case renvoyés par l'API sont « humanisés » via label-display.util.
+
+  Les specs de ce dossier décrivent le comportement observable EXISTANT (référence),
+  pas un plan d'implémentation.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours

@@ -41,11 +41,11 @@ export class TransverseRailComponent {
   showInactiveThemesButton(): boolean {
     if (!this.inactiveThemeVisibility.hasInactiveThemes()) return false;
     const url = this.router.url;
-    return url === '/' || url.startsWith('/dashboard') || url.startsWith('/admin');
+    return url === '/home' || url.startsWith('/admin');
   }
 
   inactiveThemesTooltipKey(): string {
-    const onHome = this.router.url === '/';
+    const onHome = this.router.url === '/home' || this.router.url === '/';
     if (this.inactiveThemeVisibility.showInactiveThemes()) {
       return onHome
         ? 'transverseRail.tooltipInactiveHomeHide'

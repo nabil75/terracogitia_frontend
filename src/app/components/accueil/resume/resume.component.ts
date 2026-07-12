@@ -19,8 +19,7 @@ export type ResumeNodeType =
   | 'theme'
   | 'subtheme'
   | 'question'
-  | 'proposition'
-  | 'evaluation';
+  | 'proposition';
 
 export interface ResumeTreeNode {
   name: string;
@@ -81,8 +80,6 @@ export class ResumeComponent implements OnInit {
         return 'quiz';
       case 'proposition':
         return 'lightbulb';
-      case 'evaluation':
-        return 'rate_review';
       default:
         return 'circle';
     }
@@ -160,22 +157,13 @@ export class ResumeComponent implements OnInit {
     depth: number
   ): ResumeTreeNode {
     const leafDepth = depth + 1;
-    const leaves: ResumeTreeNode[] = [
-      ...question.propositions.map((prop) => ({
-        name: `#${prop.id_proposition}`,
-        type: 'proposition' as const,
-        depth: leafDepth,
-        refId: prop.id_proposition,
-        dateCreation: prop.date_creation,
-      })),
-      ...question.evaluations.map((ev) => ({
-        name: `#${ev.id_evaluation}`,
-        type: 'evaluation' as const,
-        depth: leafDepth,
-        refId: ev.id_evaluation,
-        dateCreation: ev.date_creation,
-      })),
-    ];
+    const leaves: ResumeTreeNode[] = question.propositions.map((prop) => ({
+      name: `#${prop.id_proposition}`,
+      type: 'proposition' as const,
+      depth: leafDepth,
+      refId: prop.id_proposition,
+      dateCreation: prop.date_creation,
+    }));
     return {
       name: question.label,
       type: 'question',

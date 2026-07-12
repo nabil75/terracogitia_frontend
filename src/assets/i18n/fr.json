@@ -406,6 +406,7 @@
   },
   "login": {
     "subtitleLogin": "Connectez-vous pour accéder à vos parcours.",
+    "subtitleRegister": "Créez votre compte pour accéder à vos parcours.",
     "subtitleReset": "Choisissez un nouveau mot de passe.",
     "emailRequired": "L'email est obligatoire.",
     "emailInvalid": "Adresse email invalide.",
@@ -413,13 +414,21 @@
     "passwordToggleShow": "Afficher le mot de passe",
     "passwordToggleHide": "Masquer le mot de passe",
     "forgotPassword": "Mot de passe oublié ?",
+    "createAccount": "Créer un compte",
     "submitLogin": "Se connecter",
+    "loginSuccess": "Connexion réussie, redirection en cours…",
+    "submitRegister": "Créer le compte",
+    "registerSuccess": "Compte créé. Vous pouvez à présent vous connecter.",
+    "resetSuccess": "Mot de passe mis à jour. Vous pouvez à présent vous reconnecter.",
     "newPasswordRequired": "Le nouveau mot de passe est obligatoire.",
     "newPasswordMin": "6 caractères minimum.",
     "confirmRequired": "Veuillez confirmer le mot de passe.",
     "confirmMismatch": "Les mots de passe ne correspondent pas.",
     "backToLogin": "Retour à la connexion",
-    "submitReset": "Réinitialiser"
+    "submitReset": "Réinitialiser",
+    "orSeparator": "ou",
+    "microsoftSignIn": "Se connecter avec Microsoft",
+    "oauthError": "La connexion Microsoft a échoué. Veuillez réessayer."
   },
   "review": {
     "spinnerEvaluating": "L'évaluation est en cours",
@@ -462,8 +471,15 @@
     "stopAudio": "Arrêter l'enregistrement",
     "playAudio": "Écouter l'enregistrement"
   },
-  "questionDrawing": {
-    "title": "Dessin — réponse à la question",
+  "audioRecording": {
+    "toolbarAria": "Enregistrement et lecture audio",
+    "record": "Démarrer l'enregistrement",
+    "stop": "Arrêter l'enregistrement",
+    "play": "Écouter l'enregistrement",
+    "recording": "Enregistrement en cours …"
+  },
+  "drawing": {
+    "title": "Dessin graphique",
     "toolbarAria": "Outils de dessin (glisser-déposer sur le canevas)",
     "toolbarSecondaryAria": "Outils secondaires",
     "toolRect": "Rectangle",

@@ -1,0 +1,191 @@
+<div class="drawing-editor">
+  @if (objectLabel) {
+    <p class="object-label">{{ objectLabel }}</p>
+  }
+
+  @if (loadError) {
+    <p class="error-text">{{ loadError }}</p>
+  } @else {
+    <div class="drawing-editor-content">
+      <div class="drawing-layout">
+        <aside class="drawing-toolbar" [attr.aria-label]="'drawing.toolbarAria' | translate">
+          <div class="drawing-toolbar__primary">
+            @for (tool of primaryTools; track tool.kind) {
+              <button
+                type="button"
+                class="tool-btn"
+                draggable="true"
+                (dragstart)="onToolDragStart($event, tool.kind)"
+                [matTooltip]="tool.labelKey | translate"
+              >
+                <mat-icon>{{ tool.icon }}</mat-icon>
+                <span class="tool-btn__label">{{ tool.labelKey | translate }}</span>
+              </button>
+            }
+            <button
+              type="button"
+              class="tool-btn"
+              [class.tool-btn--active]="polyArrowModeActive"
+              (click)="togglePolyArrowMode()"
+              [matTooltip]="'drawing.toolPolyArrow' | translate"
+            >
+              <mat-icon>alt_route</mat-icon>
+              <span class="tool-btn__label">{{ 'drawing.toolPolyArrow' | translate }}</span>
+            </button>
+
+            <div
+              class="toolbar-font-size"
+              [class.toolbar-font-size--disabled]="!labelFontSizeSliderEnabled"
+              [matTooltip]="'drawing.labelFontSizeHint' | translate"
+            >
+              <div class="toolbar-font-size__header">
+                <mat-icon>format_size</mat-icon>
+                <span class="toolbar-font-size__title">{{
+                  'drawing.labelFontSize' | translate
+                }}</span>
+              </div>
+              <input
+                type="range"
+                class="toolbar-font-size__slider"
+                [min]="labelFontSizeMin"
+                [max]="labelFontSizeMax"
+                [step]="labelFontSizeStep"
+                [value]="labelFontSize"
+                [disabled]="!labelFontSizeSliderEnabled"
+                (input)="onLabelFontSizeInput($event)"
+                [attr.aria-label]="'drawing.labelFontSizeAria' | translate"
+              />
+              <span class="toolbar-font-size__value">
+                @if (!labelFontSizeSliderEnabled) {
+                  {{ 'drawing.labelFontSizeSelectHint' | translate }}
+                } @else if (labelFontSizeMixed) {
+                  {{ 'drawing.labelFontSizeMixed' | translate }}
+                } @else {
+                  {{ labelFontSize }} px
+                }
+              </span>
+              @if (labelFontSizeSelectionCount > 1) {
+                <span class="toolbar-font-size__count">
+                  {{
+                    'drawing.labelFontSizeSelectionCount'
+                      | translate: { count: labelFontSizeSelectionCount }
+                  }}
+                </span>
+              }
+            </div>
+
+            <div class="toolbar-zoom" [matTooltip]="'drawing.zoomHint' | translate">
+              <div class="toolbar-zoom__header">
+                <mat-icon>zoom_in</mat-icon>
+                <span class="toolbar-zoom__title">{{ 'drawing.zoom' | translate }}</span>
+              </div>
+              <div class="toolbar-zoom__controls">
+                <button
+                  type="button"
+                  class="toolbar-zoom__btn"
+                  (click)="zoomOut()"
+                  [disabled]="loading"
+                  [attr.aria-label]="'drawing.zoomOut' | translate"
+                >
+                  <mat-icon>remove</mat-icon>
+                </button>
+                <span class="toolbar-zoom__value">{{ canvasZoomPercent }}%</span>
+                <button
+                  type="button"
+                  class="toolbar-zoom__btn"
+                  (click)="zoomIn()"
+                  [disabled]="loading"
+                  [attr.aria-label]="'drawing.zoomIn' | translate"
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+              <button
+                type="button"
+                class="toolbar-zoom__reset"
+                (click)="resetCanvasZoom()"
+                [disabled]="loading || canvasZoomPercent === 100"
+              >
+                {{ 'drawing.zoomReset' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="drawing-toolbar__secondary"
+            [attr.aria-label]="'drawing.toolbarSecondaryAria' | translate"
+          >
+            @for (tool of secondaryTools; track tool.kind) {
+              <button
+                type="button"
+                class="tool-btn tool-btn--secondary"
+                draggable="true"
+                (dragstart)="onToolDragStart($event, tool.kind)"
+                [matTooltip]="tool.labelKey | translate"
+              >
+                <mat-icon>{{ tool.icon }}</mat-icon>
+                <span class="tool-btn__label">{{ tool.labelKey | translate }}</span>
+              </button>
+            }
+            <button
+              type="button"
+              class="tool-btn tool-btn--secondary tool-btn--secondary-danger"
+              (click)="deleteSelected()"
+              [matTooltip]="'drawing.deleteSelection' | translate"
+            >
+              <mat-icon>delete_outline</mat-icon>
+              <span class="tool-btn__label">{{ 'drawing.deleteSelection' | translate }}</span>
+            </button>
+          </div>
+        </aside>
+
+        <div
+          #canvasWrap
+          class="canvas-wrap"
+          tabindex="0"
+          (click)="focusCanvas()"
+          (dragover)="onCanvasDragOver($event)"
+          (drop)="onCanvasDrop($event)"
+        >
+          @if (loading) {
+            <div class="canvas-loading">
+              <mat-spinner diameter="36"></mat-spinner>
+            </div>
+          }
+          <div #canvasHost class="canvas-host"></div>
+        </div>
+      </div>
+      <p class="hint">{{ 'drawing.hint' | translate }}</p>
+    </div>
+  }
+
+  @if (saveError) {
+    <p class="error-text">{{ saveError }}</p>
+  }
+
+  <div class="drawing-editor-actions">
+    @if (hasDessin) {
+      <button
+        mat-stroked-button
+        color="warn"
+        type="button"
+        (click)="deleteDessin()"
+        [disabled]="saving || deleting || loading"
+      >
+        {{ 'drawing.deleteDrawing' | translate }}
+      </button>
+    }
+    <button mat-button type="button" (click)="cancel()" [disabled]="saving || deleting">
+      {{ 'common.cancel' | translate }}
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="save()"
+      [disabled]="saving || deleting || loading || !!loadError"
+    >
+      {{ 'drawing.save' | translate }}
+    </button>
+  </div>
+</div>

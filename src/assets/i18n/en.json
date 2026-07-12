@@ -406,6 +406,7 @@
   },
   "login": {
     "subtitleLogin": "Sign in to access your learning paths.",
+    "subtitleRegister": "Create your account to access your learning paths.",
     "subtitleReset": "Choose a new password.",
     "emailRequired": "Email is required.",
     "emailInvalid": "Invalid email address.",
@@ -413,13 +414,21 @@
     "passwordToggleShow": "Show password",
     "passwordToggleHide": "Hide password",
     "forgotPassword": "Forgot password?",
+    "createAccount": "Create an account",
     "submitLogin": "Sign in",
+    "loginSuccess": "Sign-in successful, redirecting…",
+    "submitRegister": "Create account",
+    "registerSuccess": "Account created. You can now sign in.",
+    "resetSuccess": "Password updated. You can now sign in.",
     "newPasswordRequired": "New password is required.",
     "newPasswordMin": "At least 6 characters.",
     "confirmRequired": "Please confirm the password.",
     "confirmMismatch": "Passwords do not match.",
     "backToLogin": "Back to sign in",
-    "submitReset": "Reset"
+    "submitReset": "Reset",
+    "orSeparator": "or",
+    "microsoftSignIn": "Sign in with Microsoft",
+    "oauthError": "Microsoft sign-in failed. Please try again."
   },
   "review": {
     "spinnerEvaluating": "Evaluation in progress",
@@ -462,8 +471,15 @@
     "stopAudio": "Stop recording",
     "playAudio": "Play recording"
   },
-  "questionDrawing": {
-    "title": "Drawing — answer to the question",
+  "audioRecording": {
+    "toolbarAria": "Record and play audio",
+    "record": "Start recording",
+    "stop": "Stop recording",
+    "play": "Play recording",
+    "recording": "Recording in progress…"
+  },
+  "drawing": {
+    "title": "Drawing",
     "toolbarAria": "Drawing tools (drag and drop onto the canvas)",
     "toolbarSecondaryAria": "Secondary tools",
     "toolRect": "Rectangle",

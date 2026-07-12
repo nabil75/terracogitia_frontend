@@ -1,0 +1,45 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.drawing-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-right: 0.35rem;
+}
+
+.drawing-dialog-header__title {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+}
+
+.drawing-dialog-header__maximize {
+  flex-shrink: 0;
+}
+
+.drawing-dialog-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  overflow: visible;
+  padding-top: 0;
+}
+
+.drawing-dialog-content app-drawing-editor {
+  flex: 1 1 auto;
+  min-height: 0;
+  --drawing-editor-min-height: min(60vh, 32rem);
+}
+
+.drawing-dialog-content app-drawing-editor ::ng-deep .drawing-editor-actions {
+  padding-bottom: 0.25rem;
+}

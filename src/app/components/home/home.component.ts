@@ -126,17 +126,6 @@ export class HomeComponent implements OnDestroy {
     }
   }
 
-  reviewSubTheme(theme: any, subTheme: any) {
-    this.router.navigate(['/review'], {
-      queryParams: {
-        theme: theme.id,
-        subTheme: subTheme.id,
-        themeLabel: theme.label,
-        subThemeLabel: subTheme.label
-      }
-    });
-  }
-
   discoverSubTheme(theme: any, subTheme: any) {
     this.router.navigate(['/discover'], {
       queryParams: {

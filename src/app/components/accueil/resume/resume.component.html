@@ -54,8 +54,6 @@
               <span class="resume-tree-row__label">
                 @if (node.type === 'proposition') {
                   {{ 'resume.proposition' | translate: { id: node.refId } }}
-                } @else if (node.type === 'evaluation') {
-                  {{ 'resume.evaluation' | translate: { id: node.refId } }}
                 } @else {
                   {{ node.name }}
                 }

@@ -1,7 +1,7 @@
 <aside class="transverse-rail" [attr.aria-label]="'transverseRail.ariaRail' | translate">
   <div class="transverse-rail__track">
     <a
-      routerLink="/"
+      routerLink="/home"
       routerLinkActive="transverse-rail__sticker--active"
       [routerLinkActiveOptions]="{ exact: true }"
       class="transverse-rail__sticker"
@@ -94,65 +94,6 @@
           stroke-linejoin="round"
           fill="currentColor"
           fill-opacity="0.12"
-        />
-      </svg>
-    </a>
-    <a
-      routerLink="/dashboard"
-      routerLinkActive="transverse-rail__sticker--active"
-      class="transverse-rail__sticker"
-      [matTooltip]="'transverseRail.tooltipDashboard' | translate"
-      matTooltipClass="app-transverse-rail-tooltip"
-      matTooltipPosition="right"
-      matTooltipShowDelay="150"
-      [attr.aria-label]="'transverseRail.ariaDashboard' | translate"
-    >
-      <svg
-        class="transverse-rail__icon"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 48 48"
-        fill="none"
-        aria-hidden="true"
-        width="48"
-        height="48"
-      >
-        <rect x="6" y="26" width="10" height="14" rx="1.5" fill="currentColor" fill-opacity="1" />
-        <rect x="19" y="16" width="10" height="24" rx="1.5" fill="currentColor" fill-opacity="0.82" />
-        <rect x="32" y="8" width="10" height="32" rx="1.5" fill="currentColor" fill-opacity="1" />
-      </svg>
-    </a>
-    <a
-      routerLink="/evaluation-avancee"
-      routerLinkActive="transverse-rail__sticker--active"
-      class="transverse-rail__sticker"
-      [matTooltip]="'transverseRail.tooltipAdvancedEvaluation' | translate"
-      matTooltipClass="app-transverse-rail-tooltip"
-      matTooltipPosition="right"
-      matTooltipShowDelay="150"
-      [attr.aria-label]="'transverseRail.ariaAdvancedEvaluation' | translate"
-    >
-      <svg
-        class="transverse-rail__icon"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 48 48"
-        fill="none"
-        aria-hidden="true"
-        width="48"
-        height="48"
-      >
-        <path
-          d="M8 36V12l16-6 16 6v24l-16 6-16-6Z"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linejoin="round"
-          fill="currentColor"
-          fill-opacity="0.1"
-        />
-        <path
-          d="M24 6v30M8 12l16 6 16-6M8 24l16 6 16-6"
-          stroke="currentColor"
-          stroke-width="1.75"
-          stroke-linejoin="round"
         />
       </svg>
     </a>

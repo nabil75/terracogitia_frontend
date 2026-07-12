@@ -1,0 +1,31 @@
+<div class="drawing-dialog-header">
+  <h2 mat-dialog-title class="drawing-dialog-header__title">
+    {{ 'drawing.title' | translate }}
+  </h2>
+  <button
+    mat-icon-button
+    type="button"
+    class="drawing-dialog-header__maximize"
+    (click)="toggleDialogMaximized()"
+    [matTooltip]="
+      (dialogMaximized ? 'drawing.restoreDialogSize' : 'drawing.maximizeDialog')
+        | translate
+    "
+    [attr.aria-label]="
+      (dialogMaximized ? 'drawing.restoreDialogSize' : 'drawing.maximizeDialog')
+        | translate
+    "
+  >
+    <mat-icon>{{ dialogMaximized ? 'fullscreen_exit' : 'fullscreen' }}</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="drawing-dialog-content">
+  <app-drawing-editor
+    [idObjet]="data.idObjet"
+    [objectLabel]="data.objectLabel"
+    (saved)="onSaved()"
+    (deleted)="onDeleted()"
+    (cancelled)="onCancelled()"
+  ></app-drawing-editor>
+</mat-dialog-content>

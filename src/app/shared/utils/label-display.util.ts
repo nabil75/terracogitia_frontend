@@ -111,29 +111,3 @@ export function humanizeDisciplineDetail<T extends {
     }))
   };
 }
-
-/** Sessions parcours de l'évaluation avancée. */
-export function humanizeAdvancedEvaluationOverview<T extends {
-  discover_effort: {
-    subtheme_sessions: Array<{
-      theme_label?: string | null;
-      subtheme_label?: string | null;
-    }>;
-  };
-}>(overview: T): T {
-  return {
-    ...overview,
-    discover_effort: {
-      ...overview.discover_effort,
-      subtheme_sessions: overview.discover_effort.subtheme_sessions.map((session) => ({
-        ...session,
-        theme_label: session.theme_label
-          ? humanizeSnakeLabel(session.theme_label)
-          : session.theme_label,
-        subtheme_label: session.subtheme_label
-          ? humanizeSnakeLabel(session.subtheme_label)
-          : session.subtheme_label
-      }))
-    }
-  };
-}

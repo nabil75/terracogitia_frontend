@@ -55,28 +55,16 @@
                   <p>{{ sub.description }}</p>
                 </div>
                 <div class="subtheme-actions" (click)="$event.stopPropagation()">
-                  <div class="subtheme-actions__pair">
-                    <button
-                      mat-stroked-button
-                      type="button"
-                      class="subtheme-actions__btn-icon review-button"
-                      [matTooltip]="'home.review' | translate"
-                      [attr.aria-label]="'home.review' | translate"
-                      (click)="reviewSubTheme(theme, sub)"
-                    >
-                      <mat-icon>rate_review</mat-icon>
-                    </button>
-                    <button
-                      mat-stroked-button
-                      type="button"
-                      class="subtheme-actions__btn-icon discover-button"
-                      [matTooltip]="'home.discover' | translate"
-                      [attr.aria-label]="'home.discover' | translate"
-                      (click)="discoverSubTheme(theme, sub)"
-                    >
-                      <mat-icon>lightbulb</mat-icon>
-                    </button>
-                  </div>
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="subtheme-actions__btn-icon discover-button"
+                    [matTooltip]="'home.discover' | translate"
+                    [attr.aria-label]="'home.discover' | translate"
+                    (click)="discoverSubTheme(theme, sub)"
+                  >
+                    <mat-icon>lightbulb</mat-icon>
+                  </button>
                 </div>
               </div>
             }

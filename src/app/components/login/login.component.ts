@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,9 +22,9 @@ import {
 } from '../../api/api.service';
 import { TransverseRailComponent } from '../../shared/transverse-rail/transverse-rail.component';
 import { ThemeService } from '../../shared/services/theme.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-type ViewMode = 'login' | 'reset';
+type ViewMode = 'login' | 'register' | 'reset';
 
 @Component({
   selector: 'app-login',
@@ -44,16 +44,19 @@ type ViewMode = 'login' | 'reset';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private apiService = inject(ApiService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private translate = inject(TranslateService);
   readonly themeService = inject(ThemeService);
 
   mode: ViewMode = 'login';
   loading = false;
   hidePassword = true;
   hideNewPassword = true;
+  hideRegisterPassword = true;
 
   /** Message d'erreur global (sous le formulaire). */
   errorMessage: string | null = null;
@@ -72,6 +75,37 @@ export class LoginComponent {
     newPassword: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', [Validators.required]]
   });
+
+  registerForm: FormGroup = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', [Validators.required]]
+  });
+
+  ngOnInit(): void {
+    // Retour d'un flux OAuth Microsoft en échec : ?auth_error=<raison>.
+    const authError = this.route.snapshot.queryParamMap.get('auth_error');
+    if (authError) {
+      this.errorField = null;
+      this.errorMessage = this.translate.instant('login.oauthError');
+    }
+  }
+
+  /** Redirige (pleine page) vers le point d'entrée OAuth Microsoft du backend. */
+  loginWithMicrosoft(): void {
+    window.location.href = this.apiService.microsoftLoginUrl();
+  }
+
+  subtitleKey(): string {
+    switch (this.mode) {
+      case 'register':
+        return 'login.subtitleRegister';
+      case 'reset':
+        return 'login.subtitleReset';
+      default:
+        return 'login.subtitleLogin';
+    }
+  }
 
   switchMode(next: ViewMode): void {
     this.mode = next;
@@ -92,8 +126,8 @@ export class LoginComponent {
     this.apiService.login(email!, password!).subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage = 'Connexion réussie, redirection en cours…';
-        this.router.navigate(['/']);
+        this.successMessage = this.translate.instant('login.loginSuccess');
+        void this.router.navigate(['/home']);
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
@@ -118,9 +152,36 @@ export class LoginComponent {
     this.apiService.resetPassword(email, newPassword!).subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage =
-          'Mot de passe mis à jour. Vous pouvez à présent vous reconnecter.';
+        this.successMessage = this.translate.instant('login.resetSuccess');
         this.resetForm.reset();
+        this.loginForm.patchValue({ email });
+        this.mode = 'login';
+      },
+      error: (err: HttpErrorResponse) => {
+        this.loading = false;
+        this.handleAuthError(err);
+      }
+    });
+  }
+
+  submitRegister(): void {
+    const { password, confirmPassword } = this.registerForm.value;
+    if (password !== confirmPassword) {
+      this.registerForm.get('confirmPassword')?.setErrors({ mismatch: true });
+    }
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+    this.clearFeedback();
+    this.loading = true;
+
+    const email = this.registerForm.value.email!;
+    this.apiService.register(email, password!).subscribe({
+      next: () => {
+        this.loading = false;
+        this.successMessage = this.translate.instant('login.registerSuccess');
+        this.registerForm.reset();
         this.loginForm.patchValue({ email });
         this.mode = 'login';
       },

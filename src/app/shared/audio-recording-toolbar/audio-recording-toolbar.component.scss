@@ -1,0 +1,68 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.audio-recording-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  min-height: var(--audio-toolbar-height, 2.75rem);
+  height: var(--audio-toolbar-height, auto);
+  padding: 0 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: var(--app-radius-sm, 6px);
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.audio-recording-toolbar--disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.audio-recording-toolbar__record,
+.audio-recording-toolbar__play {
+  color: var(--app-text, inherit);
+}
+
+.audio-recording-toolbar__play {
+  color: #15803d;
+}
+
+.audio-recording-toolbar button.mat-mdc-icon-button {
+  width: 44px;
+  height: 44px;
+}
+
+.audio-recording-toolbar button .mat-icon {
+  font-size: 24px;
+}
+
+.audio-recording-toolbar__spinner {
+  flex-shrink: 0;
+}
+
+.audio-recording-toolbar__indicator {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  color: #b91c1c;
+  pointer-events: none;
+}
+
+:host-context(body.dark-theme) .audio-recording-toolbar {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+:host-context(body.dark-theme) .audio-recording-toolbar__play {
+  color: #7fc99a;
+}
+
+:host-context(body.dark-theme) .audio-recording-toolbar__indicator {
+  color: #ef9b9b;
+}

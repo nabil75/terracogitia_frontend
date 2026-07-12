@@ -36,7 +36,6 @@ import * as d3 from 'd3';
 
 import {
   ApiService,
-  DiscoverActivityPayload,
   ThemeAdminDto,
   SavedDiscoverPropositionRecord,
   StoreSavedDiscoverPropositionPayload,
@@ -349,10 +348,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   private mindMapLastNodes: MindMapNode[] = [];
   private mindMapLastLinks: MindMapLink[] = [];
 
-  /** Session parcours pour l'évaluation avancée (entrée / sortie / durée). */
-  private activeSubthemeSessionId: number | null = null;
-  private trackedSubthemeId: string | null = null;
-
   selectedThemeId = '';
   selectedThemeLabel = '';
   selectedSubThemeId = '';
@@ -455,7 +450,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.endActiveSubthemeSession();
     this.flushPersonalNotesSave();
     this.querySub?.unsubscribe();
     this.langSub?.unsubscribe();
@@ -639,7 +633,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   discover(): void {
     if (!this.selectedQuestionId) return;
     const label = this.selectedQuestionLabel();
-    this.logDiscoverActivityEvent('proposition_requested');
     this.isGenerating = true;
     this.api.getPropositionForQuestion(label, this.selectedSubThemeLabel).subscribe({
       next: (response) => {
@@ -655,9 +648,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
         this.draftPayload = payload;
-        if (this.draftPayloadHasExercise(payload)) {
-          this.logDiscoverActivityEvent('exercise_in_proposition');
-        }
       },
       error: () => {
         this.isGenerating = false;
@@ -2676,7 +2666,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private loadQuestionsForSubTheme(options?: { preserveSelection?: boolean }): void {
     if (!this.selectedSubThemeId) return;
-    this.beginSubthemeSessionIfNeeded();
     const preserve = options?.preserveSelection === true;
     const previousQuestionId = preserve ? this.selectedQuestionId : null;
 
@@ -3570,9 +3559,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cancelDraft(): void {
-    if (this.draftPayload && this.savedPayloadHasContent(this.draftPayload)) {
-      this.logDiscoverActivityEvent('proposition_discarded');
-    }
     this.draftPayload = null;
   }
 
@@ -3600,7 +3586,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     this.savingSavedProposition = true;
     this.api.storeSavedDiscoverProposition(storePayload).subscribe({
       next: () => {
-        this.logDiscoverActivityEvent('proposition_saved');
         this.draftPayload = null;
         this.personalNotesDirty = false;
         this.loadSavedPropositionsForQuestion(questionId);
@@ -3999,76 +3984,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     const n = Number(s);
     if (!Number.isInteger(n) || n <= 0) return null;
     return n;
-  }
-
-  private endActiveSubthemeSession(): void {
-    if (this.activeSubthemeSessionId == null) {
-      this.trackedSubthemeId = null;
-      return;
-    }
-    const sessionId = this.activeSubthemeSessionId;
-    this.activeSubthemeSessionId = null;
-    this.trackedSubthemeId = null;
-    this.api
-      .endSubthemeSession(sessionId)
-      .pipe(catchError(() => of(null)))
-      .subscribe();
-  }
-
-  private beginSubthemeSessionIfNeeded(): void {
-    const subId = this.selectedSubThemeId?.trim();
-    if (!subId) {
-      this.endActiveSubthemeSession();
-      return;
-    }
-    if (this.trackedSubthemeId === subId && this.activeSubthemeSessionId != null) {
-      return;
-    }
-    this.endActiveSubthemeSession();
-    const idSubtheme = this.parseIntegerId(subId);
-    if (idSubtheme === null) return;
-    const idTheme = this.parseIntegerId(this.selectedThemeId);
-    this.trackedSubthemeId = subId;
-    this.api
-      .startSubthemeSession({
-        id_theme: idTheme,
-        id_subtheme: idSubtheme,
-        source: 'discover'
-      })
-      .pipe(catchError(() => of(null)))
-      .subscribe((res) => {
-        const idSession =
-          res && typeof res === 'object' && 'id_session' in res
-            ? Number((res as { id_session: number }).id_session)
-            : null;
-        if (idSession != null && Number.isFinite(idSession) && this.trackedSubthemeId === subId) {
-          this.activeSubthemeSessionId = idSession;
-        }
-      });
-  }
-
-  private logDiscoverActivityEvent(
-    eventType: DiscoverActivityPayload['event_type'],
-    extra?: {
-      id_question?: number | null;
-      id_proposition?: number | null;
-      meta?: Record<string, unknown> | null;
-    }
-  ): void {
-    this.api
-      .logDiscoverActivity({
-        id_theme: this.parseIntegerId(this.selectedThemeId),
-        id_subtheme: this.parseIntegerId(this.selectedSubThemeId),
-        id_question:
-          extra?.id_question !== undefined
-            ? extra.id_question
-            : this.parseIntegerId(this.selectedQuestionId ?? ''),
-        event_type: eventType,
-        id_proposition: extra?.id_proposition ?? null,
-        meta: extra?.meta ?? null
-      })
-      .pipe(catchError(() => of(null)))
-      .subscribe();
   }
 
   private draftPayloadHasExercise(payload: SavedDiscoverPayload): boolean {
