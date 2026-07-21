@@ -1,0 +1,620 @@
+@use "../../styles/themes/mixins" as *;
+
+.challenges-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: 2rem;
+  padding-bottom: 2.5rem;
+  box-sizing: border-box;
+  @include app-mesh-background;
+  @include page-with-transverse-rail-padding;
+}
+
+.challenges-shell {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.challenges-shell__header h1 {
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.challenges-shell__intro {
+  color: var(--app-text-muted, #666);
+  margin: 0 0 1rem;
+  line-height: 1.55;
+  max-width: 52rem;
+}
+
+.challenges-shell__loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.challenges-shell__panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.challenges-shell__panel--operations {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.challenges-operations-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-top: 0.75rem;
+}
+
+.challenges-operations-tab__intro-block {
+  max-width: 42rem;
+}
+
+.challenges-operations-tab__intro {
+  margin: 0 0 0.5rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--app-text-muted, #666);
+}
+
+.challenges-operations-tab__role {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--app-text-muted, #666);
+  font-style: italic;
+}
+
+// Couleurs partagées cartes + groupes
+@mixin cognitive-family-accent {
+  --op-accent: var(--app-brand-from, #c45c26);
+
+  &[data-family='perception'] {
+    --op-accent: #2563eb;
+  }
+
+  &[data-family='organisation'] {
+    --op-accent: #6d28d9;
+  }
+
+  &[data-family='transformation'] {
+    --op-accent: #0284c7;
+  }
+
+  &[data-family='construction'] {
+    --op-accent: #047857;
+  }
+
+  &[data-family='diagnostic'] {
+    --op-accent: #ea580c;
+  }
+
+  &[data-family='simulation'] {
+    --op-accent: #be185d;
+  }
+
+  &[data-family='optimisation'] {
+    --op-accent: #1e3a8a;
+  }
+
+  &[data-family='discours'] {
+    --op-accent: #b45309;
+  }
+
+  &[data-family='meta'] {
+    --op-accent: #c026d3;
+  }
+}
+
+.challenges-family-group {
+  @include cognitive-family-accent;
+
+  --op-accent-soft: color-mix(in srgb, var(--op-accent) 10%, transparent);
+  --op-accent-border: color-mix(in srgb, var(--op-accent) 35%, transparent);
+}
+
+.challenges-family-group__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 2px solid var(--op-accent-border);
+}
+
+.challenges-family-group__swatch {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  align-self: center;
+  border-radius: 3px;
+  background: var(--op-accent);
+}
+
+.challenges-family-group__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--op-accent);
+}
+
+.challenges-family-group__ops {
+  flex: 1 1 100%;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--app-text-muted, #666);
+}
+
+@media (min-width: 640px) {
+  .challenges-family-group__ops {
+    flex: 1 1 auto;
+    margin-left: auto;
+    text-align: right;
+  }
+}
+
+.challenges-family-group__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.15rem;
+}
+
+// —— Cartes opérations cognitives ——
+
+.challenges-op-card {
+  @include cognitive-family-accent;
+
+  --op-accent-soft: color-mix(in srgb, var(--op-accent) 14%, transparent);
+  --op-accent-border: color-mix(in srgb, var(--op-accent) 38%, transparent);
+  --op-frame: color-mix(in srgb, var(--op-accent) 30%, var(--app-stroke-strong, rgba(0, 0, 0, 0.14)));
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--app-radius, 12px);
+  border: 1px solid var(--op-frame);
+  background: var(--app-surface, #fff);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--op-accent) 8%, transparent),
+    var(--app-shadow, 0 2px 8px rgba(0, 0, 0, 0.05));
+  overflow: hidden;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    --op-frame: color-mix(in srgb, var(--op-accent) 48%, var(--app-stroke-strong, rgba(0, 0, 0, 0.14)));
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--op-accent) 14%, transparent),
+      var(--app-shadow, 0 2px 8px rgba(0, 0, 0, 0.05));
+  }
+}
+
+.challenges-op-card__accent {
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--op-accent) 0%,
+    color-mix(in srgb, var(--op-accent) 55%, white) 100%
+  );
+}
+
+.challenges-op-card__header {
+  padding: 1rem 1.15rem 0.85rem;
+  background: linear-gradient(
+    180deg,
+    var(--op-accent-soft) 0%,
+    transparent 100%
+  );
+  border-bottom: 1px solid color-mix(in srgb, var(--op-accent) 12%, transparent);
+}
+
+.challenges-op-card__title {
+  margin: 0;
+  font-size: 1.28rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--app-text, #1a1a1a);
+}
+
+.challenges-op-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem 1.15rem 1.15rem;
+  flex: 1;
+}
+
+.challenges-op-card__section {
+  margin: 0;
+}
+
+.challenges-op-card__section-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-text-muted, #777);
+}
+
+.challenges-op-card__description {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--app-text, #222);
+}
+
+.challenges-op-card__levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.challenges-op-card__level-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--op-accent) 8%, var(--app-surface, #fff));
+  border: 1px solid var(--op-accent-border);
+  color: var(--app-text, #333);
+}
+
+// —— Mécaniques de jeu (présentation ludique) ——
+
+@mixin mechanic-category-accent {
+  --mech-accent: #6366f1;
+
+  &[data-category='manipulation'] {
+    --mech-accent: #0ea5e9;
+    --mech-accent-soft: #e0f2fe;
+  }
+
+  &[data-category='creation'] {
+    --mech-accent: #10b981;
+    --mech-accent-soft: #d1fae5;
+  }
+
+  &[data-category='adventure'] {
+    --mech-accent: #f59e0b;
+    --mech-accent-soft: #fef3c7;
+  }
+
+  &[data-category='pressure'] {
+    --mech-accent: #ef4444;
+    --mech-accent-soft: #fee2e2;
+  }
+}
+
+.challenges-mechanics-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-top: 0.75rem;
+}
+
+.challenges-mechanics-tab__intro {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--app-text-muted, #666);
+}
+
+.challenges-mech-group {
+  @include mechanic-category-accent;
+}
+
+.challenges-mech-group__header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px dashed color-mix(in srgb, var(--mech-accent) 35%, transparent);
+}
+
+.challenges-mech-group__emoji {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.challenges-mech-group__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--mech-accent);
+}
+
+.challenges-mech-group__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.15rem;
+}
+
+.challenges-mech-card {
+  --card-accent: var(--mech-accent, #6366f1);
+  --card-soft: var(--mech-accent-soft, #eef2ff);
+
+  display: flex;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 28%, var(--app-stroke, #ddd));
+  background: linear-gradient(
+    145deg,
+    var(--card-soft) 0%,
+    var(--app-surface, #fff) 55%
+  );
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--card-accent) 12%, transparent);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--card-accent) 45%, transparent);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--card-accent) 18%, transparent);
+  }
+
+  &[data-mechanic='memory'] .challenges-mech-card__icon-wrap {
+    transform: rotate(-6deg);
+  }
+
+  &[data-mechanic='timed'] .challenges-mech-card__icon-wrap {
+    animation: mech-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes mech-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.challenges-mech-card__icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 12px;
+  background: var(--card-accent);
+  color: #fff;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--card-accent) 65%, black);
+}
+
+.challenges-mech-card__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 1.75rem;
+}
+
+.challenges-mech-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.challenges-mech-card__title {
+  margin: 0 0 0.15rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--app-text, #1a1a1a);
+}
+
+.challenges-mech-card__tagline {
+  margin: 0 0 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--card-accent);
+}
+
+.challenges-mech-card__desc {
+  margin: 0 0 0.65rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--app-text, #333);
+}
+
+.challenges-mech-card__traits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.challenges-mech-card__trait {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  line-height: 1.35;
+
+  mat-icon {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+    margin-top: 0.1rem;
+  }
+
+  &--plus {
+    color: #047857;
+
+    mat-icon {
+      color: #10b981;
+    }
+  }
+
+  &--minus {
+    color: #9a3412;
+
+    mat-icon {
+      color: #f97316;
+    }
+  }
+}
+
+.challenges-mech-card__ops-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--app-text-muted, #777);
+}
+
+.challenges-mech-card__ops-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.challenges-mech-card__chip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-accent) 10%, #fff);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 25%, transparent);
+  color: var(--app-text, #333);
+}
+
+// —— Autres onglets ——
+
+.challenges-shell__card .muted {
+  font-size: 0.85rem;
+  color: var(--app-text-muted, #666);
+}
+
+.challenges-shell__card .tags {
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+.challenges-shell__matrix-wrap {
+  overflow: auto;
+  padding: 1rem 0;
+  --matrix-score-3: #16653433;
+  --matrix-score-2: #ea580c33;
+  --matrix-score-1: #64748b40;
+}
+
+.challenges-shell__matrix-intro {
+  margin: 0 0 0.75rem;
+  max-width: 42rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--app-text-muted, #666);
+}
+
+.challenges-shell__matrix-legend {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  max-width: 42rem;
+}
+
+.challenges-shell__matrix-legend-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.challenges-shell__matrix-legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.challenges-shell__matrix-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--app-text-muted, #666);
+}
+
+.challenges-shell__matrix-legend-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.challenges-shell__matrix-legend-item[data-score='3'] .challenges-shell__matrix-legend-swatch {
+  background: var(--matrix-score-3);
+}
+
+.challenges-shell__matrix-legend-item[data-score='2'] .challenges-shell__matrix-legend-swatch {
+  background: var(--matrix-score-2);
+}
+
+.challenges-shell__matrix-legend-item[data-score='1'] .challenges-shell__matrix-legend-swatch {
+  background: var(--matrix-score-1);
+}
+
+.challenges-shell__matrix-legend-item[data-score='0'] .challenges-shell__matrix-legend-swatch {
+  background: transparent;
+  color: var(--app-text-muted, #888);
+}
+
+.challenges-shell__matrix {
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.challenges-shell__matrix th,
+.challenges-shell__matrix td {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0.25rem 0.35rem;
+  text-align: center;
+}
+
+.challenges-shell__matrix td[data-score='3'] {
+  background: var(--matrix-score-3);
+}
+
+.challenges-shell__matrix td[data-score='2'] {
+  background: var(--matrix-score-2);
+}
+
+.challenges-shell__matrix td[data-score='1'] {
+  background: var(--matrix-score-1);
+}

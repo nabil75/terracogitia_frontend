@@ -1,39 +1,59 @@
-.discover-answer-image-links__lead {
-  margin: 0.65rem 0 0.25rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--app-text-muted);
+:host {
+  display: block;
 }
 
-.discover-answer-image-links {
+.discover-answer-body {
   margin: 0;
-  padding: 0.5rem 0 0 1.1rem;
-  list-style: disc;
-  font-size: 0.9rem;
-  line-height: 1.45;
-  border-top: 1px dashed var(--app-stroke-strong);
-}
+  font-size: inherit;
+  line-height: 1.6;
+  color: inherit;
+  letter-spacing: 0.005em;
 
-.discover-answer-image-links__a {
-  color: var(--app-forest-light);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  word-break: break-word;
+  p {
+    margin: 0 0 0.75rem;
 
-  &:hover,
-  &:focus-visible {
-    color: var(--app-ochre);
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
-}
 
-:host-context(body.dark-theme) .discover-answer-image-links__a {
-  color: var(--app-forest-light);
+  ol,
+  ul {
+    margin: 0 0 0.85rem 1.35rem;
+    padding: 0;
+  }
 
-  &:hover,
-  &:focus-visible {
-    color: var(--app-ochre);
+  li {
+    margin-bottom: 0.4rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  strong {
+    font-weight: 650;
+    color: color-mix(in srgb, var(--app-text) 92%, var(--app-forest) 8%);
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  code {
+    font-family: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    padding: 0.08em 0.35em;
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--app-surface-strong) 82%, var(--app-forest) 6%);
+    border: 1px solid color-mix(in srgb, var(--app-stroke) 75%, var(--app-forest) 10%);
   }
 }

@@ -1,4 +1,4 @@
-/** Lien illustration (Pexels stockée côté backend). */
+/** Utilitaires Discover : nettoyage du texte (mots-clés / illustrations legacy). */
 export interface DiscoverImageLink {
   label: string;
   url: string;

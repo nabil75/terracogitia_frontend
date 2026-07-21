@@ -1,29 +1,25 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-
-import { DiscoverImageLink, isSafeDiscoverImageUrl, sanitizeDiscoverImageLinks } from './discover-image-links.util';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { formatDiscoverProseHtml } from './discover-prose-format.util';
 
 @Component({
   selector: 'app-discover-answer-body',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule],
   templateUrl: './discover-answer-body.component.html',
-  styleUrl: './discover-answer-body.component.scss'
+  styleUrl: './discover-answer-body.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
-export class DiscoverAnswerBodyComponent {
+export class DiscoverAnswerBodyComponent implements OnChanges {
+  private readonly sanitizer = inject(DomSanitizer);
+
   @Input() text = '';
-  @Input() imageLinks: DiscoverImageLink[] = [];
 
-  get safeImageLinks(): DiscoverImageLink[] {
-    return sanitizeDiscoverImageLinks(this.imageLinks);
-  }
+  formattedHtml: SafeHtml | null = null;
 
-  openImageLink(event: Event, link: DiscoverImageLink): void {
-    event.preventDefault();
-    event.stopPropagation();
-    if (isSafeDiscoverImageUrl(link.url)) {
-      window.open(link.url, '_blank', 'noopener,noreferrer');
-    }
+  ngOnChanges(): void {
+    const html = formatDiscoverProseHtml(this.text);
+    this.formattedHtml = html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
   }
 }

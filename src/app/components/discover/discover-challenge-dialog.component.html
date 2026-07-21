@@ -1,0 +1,150 @@
+<h2 mat-dialog-title class="discover-challenge-dialog__title">
+  <span class="discover-challenge-dialog__title-line">
+    <span class="discover-challenge-dialog__title-main">{{ 'discover.challengeDialog.title' | translate }}</span>
+    @if (activeChallengeMetaSuffix()) {
+      <span class="discover-challenge-dialog__title-meta">({{ activeChallengeMetaSuffix() }})</span>
+    }
+  </span>
+  @if (isFirstChallenge) {
+    <span class="discover-challenge-dialog__badge">{{ 'discover.challengeDialog.firstBadge' | translate }}</span>
+  }
+</h2>
+
+<mat-dialog-content class="discover-challenge-dialog__content">
+  @if (regenerating) {
+    <div class="discover-challenge-dialog__regen-overlay" aria-live="polite">
+      <mat-spinner diameter="36" />
+      <p>{{ 'discover.challengeDialog.forceMechanicLoading' | translate }}</p>
+    </div>
+  } @else {
+    <app-challenge-exercise-panel
+      [exercise]="exercise"
+      [idUser]="idUser"
+      [showMeta]="false"
+      [showSubmit]="false"
+    />
+  }
+</mat-dialog-content>
+
+@if (!regenerating && (canReplayChallenge() || showSubmitChallenge())) {
+  <div class="discover-challenge-dialog__play-actions">
+    @if (canReplayChallenge()) {
+      <button mat-stroked-button type="button" (click)="replayChallenge()">
+        {{ 'challenges.replay' | translate }}
+      </button>
+    }
+    @if (showSubmitChallenge()) {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        [disabled]="!canSubmitChallenge() || isChallengeSubmitting()"
+        (click)="submitChallenge()"
+      >
+        @if (isChallengeSubmitting()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          {{ 'challenges.submit' | translate }}
+        }
+      </button>
+    }
+  </div>
+}
+
+<div class="discover-challenge-dialog__stickers" role="toolbar">
+  <button
+    type="button"
+    class="discover-challenge-dialog__sticker discover-challenge-dialog__sticker--menu"
+    [matMenuTriggerFor]="mechanicMenu"
+    #mechanicMenuTrigger="matMenuTrigger"
+    [disabled]="regenerating || mechanicOptions.length === 0"
+    [matTooltip]="'discover.challengeDialog.forceMechanicMenuTooltip' | translate"
+    matTooltipPosition="left"
+    matTooltipShowDelay="200"
+    [attr.aria-label]="'discover.challengeDialog.forceMechanicMenuTooltip' | translate"
+    [attr.aria-expanded]="mechanicMenuTrigger.menuOpen"
+  >
+    <mat-icon aria-hidden="true">menu</mat-icon>
+  </button>
+
+  <button
+    type="button"
+    class="discover-challenge-dialog__sticker discover-challenge-dialog__sticker--close"
+    [matTooltip]="'discover.challengeDialog.closeTooltip' | translate"
+    matTooltipPosition="left"
+    matTooltipShowDelay="200"
+    [attr.aria-label]="'discover.challengeDialog.closeTooltip' | translate"
+    (click)="close()"
+  >
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+
+  <button
+    type="button"
+    class="discover-challenge-dialog__sticker discover-challenge-dialog__sticker--save"
+    [class.discover-challenge-dialog__sticker--saved]="saved"
+    [disabled]="saving || saved || regenerating"
+    [matTooltip]="
+      (saved
+        ? 'discover.challengeDialog.saved'
+        : 'discover.challengeDialog.saveTooltip'
+      ) | translate
+    "
+    matTooltipPosition="left"
+    matTooltipShowDelay="200"
+    [attr.aria-label]="
+      (saved
+        ? 'discover.challengeDialog.saved'
+        : 'discover.challengeDialog.saveTooltip'
+      ) | translate
+    "
+    (click)="saveChallenge()"
+  >
+    @if (saving) {
+      <mat-spinner diameter="20" />
+    } @else {
+      <mat-icon aria-hidden="true" class="material-icons">{{
+        saved ? 'done' : 'save'
+      }}</mat-icon>
+    }
+  </button>
+</div>
+
+<mat-menu
+  #mechanicMenu="matMenu"
+  panelClass="discover-challenge-dialog__mechanic-menu"
+  xPosition="before"
+  yPosition="below"
+  [overlapTrigger]="false"
+>
+  <div
+    class="discover-challenge-dialog__mechanic-menu-panel"
+    role="listbox"
+    [attr.aria-label]="'discover.challengeDialog.forceMechanic' | translate"
+    (click)="$event.stopPropagation()"
+  >
+    <p class="discover-challenge-dialog__mechanic-label">
+      {{ 'discover.challengeDialog.forceMechanic' | translate }}
+    </p>
+    <div class="discover-challenge-dialog__mechanic-pills">
+      @for (option of mechanicOptions; track option.key) {
+        <button
+          type="button"
+          class="discover-challenge-dialog__mechanic-pill"
+          role="option"
+          [class.discover-challenge-dialog__mechanic-pill--active]="
+            option.playable && exercise.game_mechanic === option.key
+          "
+          [class.discover-challenge-dialog__mechanic-pill--inactive]="!option.playable"
+          [attr.aria-selected]="option.playable && exercise.game_mechanic === option.key"
+          [attr.aria-disabled]="!option.playable"
+          [disabled]="isMechanicDisabled(option)"
+          [title]="mechanicOptionTitle(option)"
+          (click)="selectMechanic(option.key)"
+        >
+          {{ mechanicOptionLabel(option) }}
+        </button>
+      }
+    </div>
+  </div>
+</mat-menu>

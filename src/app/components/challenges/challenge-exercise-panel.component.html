@@ -1,0 +1,992 @@
+<div class="challenge-exercise-panel">
+  <p class="challenge-exercise-panel__instruction">{{ instruction() }}</p>
+  @if (showMeta) {
+    <p class="challenge-exercise-panel__meta">
+      {{ exercise.cognitive_operation }} · {{ exercise.game_mechanic }} ·
+      {{ exercise.pyramid_level }}
+      @if (compatibilityScore() != null) {
+        · {{ 'discover.challengeDialog.compatScore' | translate }}: {{ compatibilityScore() }}/3
+      }
+    </p>
+  }
+
+  @if (mechanicKey() === 'matching') {
+    <p class="challenge-exercise-panel__matching-hint">{{ 'challenges.matching.boardHint' | translate }}</p>
+    <div class="challenge-exercise-panel__matching" role="group" [attr.aria-label]="'challenges.matching.boardAria' | translate">
+      @for (prompt of matchingPrompts; track prompt) {
+        <div class="challenge-exercise-panel__matching-row">
+          <p class="challenge-exercise-panel__matching-prompt">{{ prompt }}</p>
+          <div class="challenge-exercise-panel__matching-pills" role="group" [attr.aria-label]="prompt">
+            @for (choice of matchingChoices; track choice) {
+              <button
+                type="button"
+                class="challenge-exercise-panel__matching-pill"
+                [class.challenge-exercise-panel__matching-pill--selected]="isMatchingChoiceSelected(prompt, choice)"
+                [disabled]="isMatchingChoiceDisabled(prompt, choice)"
+                (click)="selectMatchingChoice(prompt, choice)"
+              >
+                {{ choice }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (mechanicKey() === 'knowledge_bridges') {
+    @if (!bridgesStarted) {
+      <p class="challenge-exercise-panel__bridges-hint">
+        {{ 'challenges.knowledgeBridges.missionHint' | translate }}
+      </p>
+      <button mat-flat-button color="primary" type="button" (click)="startKnowledgeBridges()">
+        {{ 'challenges.knowledgeBridges.start' | translate }}
+      </button>
+    } @else {
+      <p class="challenge-exercise-panel__bridges-hint">
+        {{ 'challenges.knowledgeBridges.boardHint' | translate }}
+      </p>
+      @if (bridgesHint) {
+        <p class="challenge-exercise-panel__bridges-feedback" role="status">{{ bridgesHint }}</p>
+      }
+      <div
+        class="challenge-exercise-panel__bridges"
+        role="group"
+        [attr.aria-label]="'challenges.knowledgeBridges.boardAria' | translate"
+      >
+        <div class="challenge-exercise-panel__bridges-col">
+          <h3 class="challenge-exercise-panel__bridges-heading">
+            {{ 'challenges.knowledgeBridges.sourcesTitle' | translate }}
+          </h3>
+          @for (source of bridgesSources; track source.id) {
+            <div class="challenge-exercise-panel__bridges-chip-row">
+              <button
+                type="button"
+                class="challenge-exercise-panel__bridges-chip"
+                [class.challenge-exercise-panel__bridges-chip--selected]="
+                  bridgesSelectedSourceId === source.id
+                "
+                [class.challenge-exercise-panel__bridges-chip--linked]="
+                  !!bridgesLinkedTargetId(source.id)
+                "
+                [class.challenge-exercise-panel__bridges-chip--locked]="!!bridgesLocked[source.id]"
+                [class.challenge-exercise-panel__bridges-chip--flash]="
+                  bridgesFlashSourceId === source.id
+                "
+                [class.challenge-exercise-panel__bridges-chip--error]="
+                  bridgesErrorSourceId === source.id
+                "
+                [style.--bridge-color]="
+                  'var(--bridge-c' + bridgesSourceColorIndex(source.id) + ')'
+                "
+                [disabled]="!!result || bridgesChecking || !!bridgesLocked[source.id]"
+                (click)="selectBridgesSource(source.id)"
+              >
+                {{ bridgesItemLabel(source) }}
+              </button>
+              @if (bridgesLinkedTargetId(source.id) && !bridgesLocked[source.id] && !result) {
+                <button
+                  type="button"
+                  class="challenge-exercise-panel__bridges-clear"
+                  [attr.aria-label]="'challenges.knowledgeBridges.clearLink' | translate"
+                  [disabled]="bridgesChecking"
+                  (click)="clearBridgesLink(source.id)"
+                >
+                  ×
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <div class="challenge-exercise-panel__bridges-col">
+          <h3 class="challenge-exercise-panel__bridges-heading">
+            {{ 'challenges.knowledgeBridges.targetsTitle' | translate }}
+          </h3>
+          @for (target of bridgesTargets; track target.id) {
+            <button
+              type="button"
+              class="challenge-exercise-panel__bridges-chip challenge-exercise-panel__bridges-chip--target"
+              [class.challenge-exercise-panel__bridges-chip--linked]="bridgesTargetLinked(target.id)"
+              [disabled]="!!result || bridgesChecking || !bridgesSelectedSourceId"
+              (click)="selectBridgesTarget(target.id)"
+            >
+              {{ bridgesItemLabel(target) }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  } @else if (mechanicKey() === 'sequence_frieze') {
+    <p class="challenge-exercise-panel__frieze-hint">
+      {{ 'challenges.sequenceFrieze.boardHint' | translate }}
+    </p>
+    @if (friezeAxis) {
+      <p class="challenge-exercise-panel__frieze-axis">
+        {{ 'challenges.sequenceFrieze.axis' | translate }}: {{ friezeAxis }}
+      </p>
+    }
+    @if (friezeSelectedPoolId || friezeSelectedSlotIndex !== null) {
+      <p class="challenge-exercise-panel__frieze-select-hint" role="status">
+        {{
+          (friezeSelectedPoolId
+            ? 'challenges.sequenceFrieze.selectPoolHint'
+            : 'challenges.sequenceFrieze.selectSlotHint'
+          ) | translate
+        }}
+      </p>
+    }
+
+    <div
+      class="challenge-exercise-panel__frieze"
+      role="group"
+      [attr.aria-label]="'challenges.sequenceFrieze.boardAria' | translate"
+    >
+      <div class="challenge-exercise-panel__frieze-col">
+        <h3 class="challenge-exercise-panel__frieze-heading">
+          {{ 'challenges.sequenceFrieze.poolTitle' | translate }}
+        </h3>
+        <div
+          id="frieze-pool"
+          class="challenge-exercise-panel__frieze-list"
+          cdkDropList
+          [cdkDropListData]="friezePool"
+          [cdkDropListConnectedTo]="friezeListIds()"
+          [cdkDropListDisabled]="!!result"
+          (cdkDropListDropped)="onFriezeDrop($event)"
+        >
+          @for (itemId of friezePool; track itemId) {
+            <button
+              type="button"
+              class="challenge-exercise-panel__frieze-chip"
+              [class.challenge-exercise-panel__frieze-chip--selected]="friezeSelectedPoolId === itemId"
+              cdkDrag
+              [cdkDragData]="itemId"
+              [cdkDragDisabled]="!!result"
+              [disabled]="!!result"
+              (click)="selectFriezePoolItem(itemId)"
+            >
+              <mat-icon class="challenge-exercise-panel__frieze-chip-icon" aria-hidden="true"
+                >drag_indicator</mat-icon
+              >
+              <span>{{ friezeItemLabel(itemId) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="challenge-exercise-panel__frieze-col">
+        <h3 class="challenge-exercise-panel__frieze-heading">
+          {{ 'challenges.sequenceFrieze.sequenceTitle' | translate }}
+        </h3>
+        <ol class="challenge-exercise-panel__frieze-slots">
+          @for (slot of friezeSlots; track $index; let i = $index) {
+            <li
+              class="challenge-exercise-panel__frieze-slot"
+              [class.challenge-exercise-panel__frieze-slot--selected]="friezeSelectedSlotIndex === i"
+              [class.challenge-exercise-panel__frieze-slot--locked]="friezeLocked[i]"
+              [class.challenge-exercise-panel__frieze-slot--correct]="
+                friezePositionState(i) === 'correct'
+              "
+              [class.challenge-exercise-panel__frieze-slot--incorrect]="
+                friezePositionState(i) === 'incorrect'
+              "
+              (click)="selectFriezeSlot(i)"
+            >
+              <span class="challenge-exercise-panel__frieze-slot-label">
+                {{ 'challenges.sequenceFrieze.position' | translate }} {{ i + 1 }}
+              </span>
+              <div
+                [id]="friezeSlotListId(i)"
+                class="challenge-exercise-panel__frieze-list challenge-exercise-panel__frieze-list--slot"
+                cdkDropList
+                [cdkDropListData]="slot"
+                [cdkDropListConnectedTo]="friezeListIds()"
+                [cdkDropListDisabled]="!!result || friezeLocked[i]"
+                (cdkDropListDropped)="onFriezeDrop($event)"
+              >
+                @for (itemId of slot; track itemId) {
+                  <div class="challenge-exercise-panel__frieze-chip-row">
+                    <button
+                      type="button"
+                      class="challenge-exercise-panel__frieze-chip"
+                      [class.challenge-exercise-panel__frieze-chip--locked]="friezeLocked[i]"
+                      [class.challenge-exercise-panel__frieze-chip--selected]="
+                        friezeSelectedSlotIndex === i
+                      "
+                      cdkDrag
+                      [cdkDragData]="itemId"
+                      [cdkDragDisabled]="!!result || friezeLocked[i]"
+                      [disabled]="!!result"
+                    >
+                      <mat-icon
+                        class="challenge-exercise-panel__frieze-chip-icon"
+                        aria-hidden="true"
+                        >drag_indicator</mat-icon
+                      >
+                      <span>{{ friezeItemLabel(itemId) }}</span>
+                    </button>
+                    @if (!friezeLocked[i] && !result) {
+                      <button
+                        type="button"
+                        class="challenge-exercise-panel__frieze-clear"
+                        [attr.aria-label]="'challenges.sequenceFrieze.returnToPool' | translate"
+                        (click)="returnFriezeSlotToPool(i, $event)"
+                      >
+                        ×
+                      </button>
+                    }
+                  </div>
+                } @empty {
+                  <span class="challenge-exercise-panel__frieze-slot-empty">
+                    {{ 'challenges.sequenceFrieze.emptySlot' | translate }}
+                  </span>
+                }
+              </div>
+            </li>
+          }
+        </ol>
+      </div>
+    </div>
+  } @else if (mechanicKey() === 'missing_fragment') {
+    <p class="challenge-exercise-panel__mf-hint">
+      {{
+        (mfFeedbackMode === 'learning'
+          ? 'challenges.missingFragment.boardHintLearning'
+          : 'challenges.missingFragment.boardHint'
+        ) | translate
+      }}
+    </p>
+    <div class="challenge-exercise-panel__mf-stats">
+      <span>{{ 'challenges.missingFragment.errors' | translate }}: {{ mfIncorrectAttempts }}</span>
+    </div>
+    @if (mfHint) {
+      <p class="challenge-exercise-panel__mf-feedback" role="status">{{ mfHint }}</p>
+    }
+    @if (mfSelectedId) {
+      <p class="challenge-exercise-panel__mf-select-hint">
+        {{ 'challenges.missingFragment.selectHint' | translate }}
+      </p>
+    }
+
+    <div
+      class="challenge-exercise-panel__mf"
+      role="group"
+      [attr.aria-label]="'challenges.missingFragment.boardAria' | translate"
+    >
+      <div class="challenge-exercise-panel__mf-structure">
+        <h3 class="challenge-exercise-panel__mf-heading">
+          {{ 'challenges.missingFragment.structureTitle' | translate }}
+        </h3>
+        <div class="challenge-exercise-panel__mf-artifact">
+          @for (segment of mfSegments; track $index) {
+            @if (segment.type === 'text') {
+              <span class="challenge-exercise-panel__mf-text">{{ mfSegmentText(segment) }}</span>
+            } @else if (segment.id) {
+              <span
+                class="challenge-exercise-panel__mf-gap"
+                [class.challenge-exercise-panel__mf-gap--flash]="mfFlashGapId === segment.id"
+                [class.challenge-exercise-panel__mf-gap--locked]="!!mfLocked[segment.id]"
+                [class.challenge-exercise-panel__mf-gap--correct]="
+                  mfGapState(segment.id) === 'correct'
+                "
+                [class.challenge-exercise-panel__mf-gap--incorrect]="
+                  mfGapState(segment.id) === 'incorrect'
+                "
+                (click)="assignMfToGap(segment.id)"
+              >
+                <div
+                  [id]="mfGapListId(segment.id)"
+                  class="challenge-exercise-panel__mf-gap-list"
+                  cdkDropList
+                  [cdkDropListData]="mfByGap[segment.id]"
+                  [cdkDropListConnectedTo]="mfListIds()"
+                  [cdkDropListDisabled]="!!result || mfChecking || !!mfLocked[segment.id]"
+                  (cdkDropListDropped)="onMfDrop($event)"
+                >
+                  @for (fragId of mfByGap[segment.id]; track fragId) {
+                    <button
+                      type="button"
+                      class="challenge-exercise-panel__mf-chip challenge-exercise-panel__mf-chip--placed"
+                      [class.challenge-exercise-panel__mf-chip--locked]="!!mfLocked[segment.id]"
+                      cdkDrag
+                      [cdkDragData]="fragId"
+                      [cdkDragDisabled]="!!result || mfChecking || !!mfLocked[segment.id]"
+                      [disabled]="!!result || mfChecking"
+                      (click)="selectMfFragment(fragId); $event.stopPropagation()"
+                    >
+                      {{ mfFragmentLabel(fragId) }}
+                    </button>
+                    @if (!mfLocked[segment.id] && !result) {
+                      <button
+                        type="button"
+                        class="challenge-exercise-panel__mf-clear"
+                        [attr.aria-label]="'challenges.missingFragment.clearGap' | translate"
+                        (click)="clearMfGap(segment.id, $event)"
+                      >
+                        ×
+                      </button>
+                    }
+                  } @empty {
+                    <span class="challenge-exercise-panel__mf-gap-empty">
+                      {{ 'challenges.missingFragment.emptyGap' | translate }}
+                    </span>
+                  }
+                </div>
+              </span>
+            }
+          }
+        </div>
+      </div>
+
+      <div class="challenge-exercise-panel__mf-reserve">
+        <h3 class="challenge-exercise-panel__mf-heading">
+          {{ 'challenges.missingFragment.poolTitle' | translate }}
+        </h3>
+        <div
+          id="mf-pool"
+          class="challenge-exercise-panel__mf-pool-list"
+          cdkDropList
+          [cdkDropListData]="mfPool"
+          [cdkDropListConnectedTo]="mfListIds()"
+          [cdkDropListDisabled]="!!result || mfChecking"
+          (cdkDropListDropped)="onMfDrop($event)"
+        >
+          @for (fragId of mfPool; track fragId) {
+            <button
+              type="button"
+              class="challenge-exercise-panel__mf-chip"
+              [class.challenge-exercise-panel__mf-chip--selected]="mfSelectedId === fragId"
+              [class.challenge-exercise-panel__mf-chip--bounce]="mfBounceId === fragId"
+              cdkDrag
+              [cdkDragData]="fragId"
+              [cdkDragDisabled]="!!result || mfChecking"
+              [disabled]="!!result || mfChecking"
+              (click)="selectMfFragment(fragId)"
+            >
+              <mat-icon class="challenge-exercise-panel__mf-chip-icon" aria-hidden="true"
+                >drag_indicator</mat-icon
+              >
+              <span>{{ mfFragmentLabel(fragId) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  } @else if (mechanicKey() === 'transform_atelier') {
+    <p class="challenge-exercise-panel__ta-hint">
+      {{
+        (taMode === 'chain'
+          ? 'challenges.transformAtelier.boardHintChain'
+          : 'challenges.transformAtelier.boardHint'
+        ) | translate
+      }}
+    </p>
+    @if (taHint) {
+      <p class="challenge-exercise-panel__ta-feedback" role="status">{{ taHint }}</p>
+    }
+
+    <div
+      class="challenge-exercise-panel__ta-gauge"
+      [attr.data-level]="taIntegrityLevel()"
+      role="meter"
+      [attr.aria-valuenow]="taIntegrityPercent()"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-label]="'challenges.transformAtelier.integrityAria' | translate"
+    >
+      <div class="challenge-exercise-panel__ta-gauge-label">
+        <span>{{ 'challenges.transformAtelier.integrity' | translate }}</span>
+        <strong>{{ taIntegrityPercent() }}%</strong>
+      </div>
+      <div class="challenge-exercise-panel__ta-gauge-track">
+        <div
+          class="challenge-exercise-panel__ta-gauge-fill"
+          [style.width.%]="taIntegrityPercent()"
+        ></div>
+      </div>
+    </div>
+
+    <div
+      class="challenge-exercise-panel__ta"
+      role="group"
+      [attr.aria-label]="'challenges.transformAtelier.boardAria' | translate"
+    >
+      <section class="challenge-exercise-panel__ta-zone">
+        <h3 class="challenge-exercise-panel__ta-heading">
+          {{ 'challenges.transformAtelier.sourceTitle' | translate }}
+        </h3>
+        <div class="challenge-exercise-panel__ta-panel challenge-exercise-panel__ta-panel--source">
+          {{ taSource }}
+        </div>
+        <p class="challenge-exercise-panel__ta-target">
+          {{ 'challenges.transformAtelier.targetForm' | translate }}:
+          <strong>{{ taTargetForm }}</strong>
+        </p>
+      </section>
+
+      <section class="challenge-exercise-panel__ta-zone">
+        <h3 class="challenge-exercise-panel__ta-heading">
+          {{ 'challenges.transformAtelier.toolsTitle' | translate }}
+        </h3>
+        <div class="challenge-exercise-panel__ta-tools">
+          @for (tool of taTools; track tool.id) {
+            <button
+              type="button"
+              class="challenge-exercise-panel__ta-tool"
+              [class.challenge-exercise-panel__ta-tool--selected]="
+                taSelectedTools.includes(tool.id)
+              "
+              [class.challenge-exercise-panel__ta-tool--error]="taErrorToolId === tool.id"
+              [disabled]="
+                !!result ||
+                taChecking ||
+                taComplete ||
+                (taFeedbackMode === 'learning' && taUsedToolIds[tool.id])
+              "
+              (click)="selectTransformTool(tool.id)"
+            >
+              {{ taToolLabel(tool) }}
+            </button>
+          }
+        </div>
+        @if (taFeedbackMode === 'evaluation' && taSelectedTools.length > 0 && !result) {
+          <button mat-stroked-button type="button" (click)="undoLastTransformTool()">
+            {{ 'challenges.transformAtelier.undo' | translate }}
+          </button>
+        }
+      </section>
+
+      <section class="challenge-exercise-panel__ta-zone">
+        <h3 class="challenge-exercise-panel__ta-heading">
+          {{ 'challenges.transformAtelier.resultTitle' | translate }}
+        </h3>
+        <div
+          class="challenge-exercise-panel__ta-panel challenge-exercise-panel__ta-panel--result"
+          [class.challenge-exercise-panel__ta-panel--complete]="taComplete || !!result?.passed"
+        >
+          {{ taCurrentResult }}
+        </div>
+        @if (taInvariant && (taComplete || result)) {
+          <p class="challenge-exercise-panel__ta-invariant">
+            {{ 'challenges.transformAtelier.invariant' | translate }}: {{ taInvariant }}
+          </p>
+        }
+      </section>
+    </div>
+  } @else if (mechanicKey() === 'sorting') {
+    <ul class="challenge-exercise-panel__sorting">
+      @for (item of sortingOrder; track item; let i = $index) {
+        <li>
+          <span>{{ item }}</span>
+          <button mat-button type="button" [disabled]="!!result" (click)="moveSortItem(i, -1)">↑</button>
+          <button mat-button type="button" [disabled]="!!result" (click)="moveSortItem(i, 1)">↓</button>
+        </li>
+      }
+    </ul>
+  } @else if (mechanicKey() === 'drag_drop') {
+    <div class="challenge-exercise-panel__drag-drop" role="group" [attr.aria-label]="'challenges.dragDrop.boardAria' | translate">
+      <div class="challenge-exercise-panel__drag-drop-col challenge-exercise-panel__drag-drop-col--pool">
+        <h3 class="challenge-exercise-panel__drag-drop-heading">
+          {{ 'challenges.dragDrop.poolTitle' | translate }}
+        </h3>
+        <p class="challenge-exercise-panel__drag-drop-hint">{{ 'challenges.dragDrop.poolHint' | translate }}</p>
+        <div
+          id="drag-drop-pool"
+          class="challenge-exercise-panel__drag-drop-list"
+          cdkDropList
+          [cdkDropListData]="dragDropPool"
+          [cdkDropListConnectedTo]="dragDropListIds()"
+          [cdkDropListDisabled]="!!result"
+          (cdkDropListDropped)="onDragDrop($event)"
+        >
+          @for (item of dragDropPool; track item) {
+            <div class="challenge-exercise-panel__drag-chip" cdkDrag [cdkDragDisabled]="!!result">
+              <mat-icon class="challenge-exercise-panel__drag-chip-icon" aria-hidden="true">drag_indicator</mat-icon>
+              <span>{{ item }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="challenge-exercise-panel__drag-drop-col challenge-exercise-panel__drag-drop-col--zones">
+        <h3 class="challenge-exercise-panel__drag-drop-heading">
+          {{ 'challenges.dragDrop.zonesTitle' | translate }}
+        </h3>
+        <p class="challenge-exercise-panel__drag-drop-hint">{{ 'challenges.dragDrop.zonesHint' | translate }}</p>
+        @for (zone of dragDropZones; track zone; let zi = $index) {
+          <div class="challenge-exercise-panel__drag-zone">
+            <h4 class="challenge-exercise-panel__drag-zone-label">{{ zone }}</h4>
+            <div
+              [id]="dragDropZoneListId(zi)"
+              class="challenge-exercise-panel__drag-drop-list challenge-exercise-panel__drag-drop-list--zone"
+              cdkDropList
+              [cdkDropListData]="dragDropByZone[zone]"
+              [cdkDropListConnectedTo]="dragDropListIds()"
+              [cdkDropListDisabled]="!!result"
+              (cdkDropListDropped)="onDragDrop($event)"
+            >
+              @for (item of dragDropByZone[zone]; track item) {
+                <div class="challenge-exercise-panel__drag-chip" cdkDrag [cdkDragDisabled]="!!result">
+                  <mat-icon class="challenge-exercise-panel__drag-chip-icon" aria-hidden="true">drag_indicator</mat-icon>
+                  <span>{{ item }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (mechanicKey() === 'memory') {
+    <p class="challenge-exercise-panel__memory-hint">{{ 'challenges.memory.boardHint' | translate }}</p>
+    <div class="challenge-exercise-panel__memory-stats">
+      <span>{{ 'challenges.memory.moves' | translate }}: {{ memoryMoves }}</span>
+      <span
+        >{{ 'challenges.memory.pairsFound' | translate }}:
+        {{ memoryMatchedPairIds.length }}/{{ memoryPairCount }}</span
+      >
+    </div>
+    <div
+      class="challenge-exercise-panel__memory-grid"
+      role="group"
+      [attr.aria-label]="'challenges.memory.boardAria' | translate"
+    >
+      @for (card of memoryCards; track card.id) {
+        @if (!card.matched) {
+          <button
+            type="button"
+            class="challenge-exercise-panel__memory-card"
+            [class.challenge-exercise-panel__memory-card--revealed]="card.revealed"
+            [class.challenge-exercise-panel__memory-card--prompt]="card.kind === 'prompt'"
+            [class.challenge-exercise-panel__memory-card--answer]="card.kind === 'answer'"
+            [style.--pair-color]="card.color"
+            [disabled]="!!result || memoryInputLocked"
+            (click)="flipMemoryCard(card.id)"
+          >
+            @if (card.revealed) {
+              <span
+                class="challenge-exercise-panel__memory-card-swatch"
+                aria-hidden="true"
+              ></span>
+              <span class="challenge-exercise-panel__memory-card-kind">
+                {{
+                  (card.kind === 'prompt'
+                    ? 'challenges.memory.cardPrompt'
+                    : 'challenges.memory.cardAnswer'
+                  ) | translate
+                }}
+              </span>
+              <span class="challenge-exercise-panel__memory-card-face">{{ card.face }}</span>
+            } @else {
+              <mat-icon aria-hidden="true">help_outline</mat-icon>
+              <span class="sr-only">{{ 'challenges.memory.cardBack' | translate }}</span>
+            }
+          </button>
+        }
+      }
+    </div>
+    @if (submitting && !result) {
+      <p class="challenge-exercise-panel__memory-submitting">{{ 'challenges.submit' | translate }}…</p>
+    }
+    @if (isMemoryComplete() && result) {
+      <p class="challenge-exercise-panel__memory-complete">{{ 'challenges.memory.complete' | translate }}</p>
+    }
+  } @else if (mechanicKey() === 'investigation') {
+    <p class="challenge-exercise-panel__investigation-hint">
+      {{ 'challenges.investigation.boardHint' | translate }}
+    </p>
+    <div
+      class="challenge-exercise-panel__investigation"
+      role="group"
+      [attr.aria-label]="'challenges.investigation.boardAria' | translate"
+    >
+      @for (stmt of investigationStatements; track stmt.id) {
+        <div class="challenge-exercise-panel__investigation-row">
+          <p class="challenge-exercise-panel__investigation-prompt">
+            {{ investigationStatementText(stmt) }}
+          </p>
+          <div class="challenge-exercise-panel__investigation-pills" role="group" [attr.aria-label]="stmt.id">
+            <button
+              type="button"
+              class="challenge-exercise-panel__investigation-pill"
+              [class.challenge-exercise-panel__investigation-pill--selected]="
+                isInvestigationAnswerSelected(stmt.id, true)
+              "
+              [disabled]="!!result"
+              (click)="selectInvestigationAnswer(stmt.id, true)"
+            >
+              {{ 'challenges.investigation.true' | translate }}
+            </button>
+            <button
+              type="button"
+              class="challenge-exercise-panel__investigation-pill"
+              [class.challenge-exercise-panel__investigation-pill--selected]="
+                isInvestigationAnswerSelected(stmt.id, false)
+              "
+              [disabled]="!!result"
+              (click)="selectInvestigationAnswer(stmt.id, false)"
+            >
+              {{ 'challenges.investigation.false' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (mechanicKey() === 'comparator') {
+    <p class="challenge-exercise-panel__comparator-hint">
+      {{ 'challenges.comparator.boardHint' | translate }}
+    </p>
+    <div class="challenge-exercise-panel__comparator-progress">
+      {{ 'challenges.comparator.progress' | translate }}:
+      {{ comparatorMatrix.length }}/{{ comparatorRequiredCount }}
+    </div>
+
+    <div class="challenge-exercise-panel__comparator-pair" role="group">
+      @for (el of comparatorElements; track el.id) {
+        <article class="challenge-exercise-panel__comparator-card">
+          <h3>{{ comparatorElementLabel(el) }}</h3>
+          @if (comparatorStep === 'observe') {
+            <p class="challenge-exercise-panel__comparator-card-hint">
+              {{ 'challenges.comparator.cardObserveHint' | translate }}
+            </p>
+          }
+          @if (comparatorActiveCriterion(); as criterion) {
+            <p class="challenge-exercise-panel__comparator-trait">
+              <span class="challenge-exercise-panel__comparator-trait-label">
+                {{ comparatorCriterionLabel(criterion) }}
+              </span>
+              {{ comparatorTraitText(el, criterion.key) }}
+            </p>
+          }
+        </article>
+      }
+    </div>
+
+    @if (comparatorStep === 'observe') {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        [disabled]="!!result"
+        (click)="startComparator()"
+      >
+        {{ 'challenges.comparator.start' | translate }}
+      </button>
+    }
+
+    @if (comparatorStep === 'pick_criterion') {
+      <h4 class="challenge-exercise-panel__comparator-step-title">
+        {{ 'challenges.comparator.pickCriterion' | translate }}
+      </h4>
+      <div class="challenge-exercise-panel__comparator-pills">
+        @for (criterion of comparatorAvailableCriteria(); track criterion.key) {
+          <button
+            type="button"
+            class="challenge-exercise-panel__comparator-pill"
+            [disabled]="!!result"
+            (click)="selectComparatorCriterion(criterion.key)"
+          >
+            {{ comparatorCriterionLabel(criterion) }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (comparatorStep === 'relation' || comparatorStep === 'justify') {
+      <h4 class="challenge-exercise-panel__comparator-step-title">
+        {{ 'challenges.comparator.pickRelation' | translate }}
+      </h4>
+      <div class="challenge-exercise-panel__comparator-pills">
+        <button
+          type="button"
+          class="challenge-exercise-panel__comparator-pill"
+          [class.challenge-exercise-panel__comparator-pill--selected]="
+            comparatorSelectedRelation === 'similar'
+          "
+          [disabled]="!!result"
+          (click)="selectComparatorRelation('similar')"
+        >
+          {{ 'challenges.comparator.relationSimilar' | translate }}
+        </button>
+        <button
+          type="button"
+          class="challenge-exercise-panel__comparator-pill"
+          [class.challenge-exercise-panel__comparator-pill--selected]="
+            comparatorSelectedRelation === 'different'
+          "
+          [disabled]="!!result"
+          (click)="selectComparatorRelation('different')"
+        >
+          {{ 'challenges.comparator.relationDifferent' | translate }}
+        </button>
+        <button
+          type="button"
+          class="challenge-exercise-panel__comparator-pill"
+          [class.challenge-exercise-panel__comparator-pill--selected]="
+            comparatorSelectedRelation === 'partial'
+          "
+          [disabled]="!!result"
+          (click)="selectComparatorRelation('partial')"
+        >
+          {{ 'challenges.comparator.relationPartial' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (comparatorStep === 'justify') {
+      <h4 class="challenge-exercise-panel__comparator-step-title">
+        {{ 'challenges.comparator.pickJustification' | translate }}
+      </h4>
+      @if (comparatorJustificationOptions.length === 0) {
+        <p class="challenge-exercise-panel__comparator-hint">
+          {{ 'challenges.comparator.noJustifications' | translate }}
+        </p>
+      } @else {
+        <div class="challenge-exercise-panel__comparator-justifications">
+          @for (option of comparatorJustificationOptions; track option.id) {
+            <button
+              type="button"
+              class="challenge-exercise-panel__comparator-justification"
+              [class.challenge-exercise-panel__comparator-justification--selected]="
+                comparatorSelectedJustificationId === option.id
+              "
+              [disabled]="!!result"
+              (click)="selectComparatorJustification(option.id)"
+            >
+              {{ comparatorOptionText(option) }}
+            </button>
+          }
+        </div>
+      }
+    }
+
+    @if (comparatorMatrix.length > 0) {
+      <table class="challenge-exercise-panel__comparator-matrix">
+        <thead>
+          <tr>
+            <th>{{ 'challenges.comparator.matrixCriterion' | translate }}</th>
+            <th>{{ 'challenges.comparator.matrixRelation' | translate }}</th>
+            <th>{{ 'challenges.comparator.matrixJustification' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of comparatorMatrix; track row.key) {
+            <tr>
+              <td>{{ row.label }}</td>
+              <td
+                [class.challenge-exercise-panel__comparator-cell--incorrect]="
+                  isComparatorRelationIncorrect(row.key)
+                "
+              >
+                {{ comparatorRelationI18nKey(row.relation) | translate }}
+              </td>
+              <td
+                [class.challenge-exercise-panel__comparator-cell--incorrect]="
+                  isComparatorJustificationIncorrect(row.key)
+                "
+              >
+                {{ comparatorJustificationText(row) }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    @if (comparatorStep === 'matrix') {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        [disabled]="!!result"
+        (click)="confirmComparatorMatrix()"
+      >
+        {{ 'challenges.comparator.validateMatrix' | translate }}
+      </button>
+    }
+
+    @if (comparatorStep === 'synthesis') {
+      <h4 class="challenge-exercise-panel__comparator-step-title">
+        {{ 'challenges.comparator.pickSynthesis' | translate }}
+      </h4>
+      <div class="challenge-exercise-panel__comparator-justifications">
+        @for (option of comparatorSynthesisOptions; track option.id) {
+          <button
+            type="button"
+            class="challenge-exercise-panel__comparator-justification"
+            [class.challenge-exercise-panel__comparator-justification--selected]="
+              comparatorSynthesisId === option.id
+            "
+            [class.challenge-exercise-panel__comparator-justification--incorrect]="
+              comparatorSynthesisId === option.id && isComparatorSynthesisIncorrect()
+            "
+            [disabled]="!!result"
+            (click)="selectComparatorSynthesis(option.id)"
+          >
+            {{ comparatorOptionText(option) }}
+          </button>
+        }
+      </div>
+    }
+  } @else if (mechanicKey() === 'sorting_lab') {
+    <p class="challenge-exercise-panel__sorting-lab-hint">
+      {{
+        (sortingLabMode === 'hidden'
+          ? 'challenges.sortingLab.boardHintHidden'
+          : 'challenges.sortingLab.boardHint'
+        ) | translate
+      }}
+    </p>
+    <div class="challenge-exercise-panel__sorting-lab-stats">
+      <span>{{ 'challenges.sortingLab.moves' | translate }}: {{ sortingLabMoves }}</span>
+      <span>{{ 'challenges.sortingLab.errors' | translate }}: {{ sortingLabIncorrectAttempts }}</span>
+    </div>
+    @if (sortingLabHint) {
+      <p class="challenge-exercise-panel__sorting-lab-feedback" role="status">{{ sortingLabHint }}</p>
+    }
+    @if (sortingLabSelectedItemId) {
+      <p class="challenge-exercise-panel__sorting-lab-select-hint">
+        {{ 'challenges.sortingLab.selectHint' | translate }}
+      </p>
+    }
+
+    <div
+      class="challenge-exercise-panel__sorting-lab"
+      role="group"
+      [attr.aria-label]="'challenges.sortingLab.boardAria' | translate"
+    >
+      <div class="challenge-exercise-panel__sorting-lab-col">
+        <h3 class="challenge-exercise-panel__sorting-lab-heading">
+          {{ 'challenges.sortingLab.poolTitle' | translate }}
+        </h3>
+        <div
+          id="sorting-lab-pool"
+          class="challenge-exercise-panel__sorting-lab-list"
+          cdkDropList
+          [cdkDropListData]="sortingLabPool"
+          [cdkDropListConnectedTo]="sortingLabListIds()"
+          [cdkDropListDisabled]="!!result || sortingLabChecking"
+          (cdkDropListDropped)="onSortingLabDrop($event)"
+        >
+          @for (itemId of sortingLabPool; track itemId) {
+            <button
+              type="button"
+              class="challenge-exercise-panel__sorting-lab-chip"
+              [class.challenge-exercise-panel__sorting-lab-chip--selected]="
+                sortingLabSelectedItemId === itemId
+              "
+              [class.challenge-exercise-panel__sorting-lab-chip--bounce]="
+                sortingLabBounceItemId === itemId
+              "
+              cdkDrag
+              [cdkDragData]="itemId"
+              [cdkDragDisabled]="!!result || sortingLabChecking || isSortingLabLocked(itemId)"
+              [disabled]="!!result || sortingLabChecking"
+              (click)="selectSortingLabItem(itemId)"
+            >
+              <mat-icon class="challenge-exercise-panel__sorting-lab-chip-icon" aria-hidden="true"
+                >drag_indicator</mat-icon
+              >
+              <span>{{ sortingLabItemLabel(itemId) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="challenge-exercise-panel__sorting-lab-col">
+        <h3 class="challenge-exercise-panel__sorting-lab-heading">
+          {{ 'challenges.sortingLab.categoriesTitle' | translate }}
+        </h3>
+        @for (category of sortingLabCategories; track category.id) {
+          <div
+            class="challenge-exercise-panel__sorting-lab-zone"
+            [class.challenge-exercise-panel__sorting-lab-zone--flash]="
+              sortingLabFlashCategoryId === category.id
+            "
+            (click)="assignSortingLabToCategory(category.id)"
+          >
+            <h4 class="challenge-exercise-panel__sorting-lab-zone-label">
+              {{ sortingLabCategoryLabel(category) }}
+            </h4>
+            <div
+              [id]="sortingLabCategoryListId(category.id)"
+              class="challenge-exercise-panel__sorting-lab-list challenge-exercise-panel__sorting-lab-list--zone"
+              cdkDropList
+              [cdkDropListData]="sortingLabByCategory[category.id]"
+              [cdkDropListConnectedTo]="sortingLabListIds()"
+              [cdkDropListDisabled]="!!result || sortingLabChecking"
+              (cdkDropListDropped)="onSortingLabDrop($event)"
+            >
+              @for (itemId of sortingLabByCategory[category.id]; track itemId) {
+                <button
+                  type="button"
+                  class="challenge-exercise-panel__sorting-lab-chip"
+                  [class.challenge-exercise-panel__sorting-lab-chip--locked]="
+                    isSortingLabLocked(itemId)
+                  "
+                  [class.challenge-exercise-panel__sorting-lab-chip--selected]="
+                    sortingLabSelectedItemId === itemId
+                  "
+                  cdkDrag
+                  [cdkDragData]="itemId"
+                  [cdkDragDisabled]="!!result || sortingLabChecking || isSortingLabLocked(itemId)"
+                  [disabled]="!!result || sortingLabChecking || isSortingLabLocked(itemId)"
+                  (click)="$event.stopPropagation(); selectSortingLabItem(itemId)"
+                >
+                  <mat-icon
+                    class="challenge-exercise-panel__sorting-lab-chip-icon"
+                    aria-hidden="true"
+                    >{{ isSortingLabLocked(itemId) ? 'lock' : 'drag_indicator' }}</mat-icon
+                  >
+                  <span>{{ sortingLabItemLabel(itemId) }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="challenge-exercise-panel__selection">
+      @for (opt of $any(exercise.content['options']); track opt) {
+        <label>
+          <input type="radio" name="challenge-opt" [value]="opt" [(ngModel)]="selectedOption" [disabled]="!!result" />
+          {{ opt }}
+        </label>
+      }
+    </div>
+  }
+
+  @if (result) {
+    <div class="challenge-exercise-panel__result" [class.challenge-exercise-panel__result--ok]="result.passed">
+      <p>{{ feedbackText() }}</p>
+      <p>
+        {{ 'discover.challengeDialog.score' | translate }}:
+        {{ result.score * 100 | number: '1.0-0' }}% · XP +{{ result.xp_gained }}
+      </p>
+    </div>
+  }
+
+  @if (showSubmit && mechanicKey() !== 'memory') {
+    <div class="challenge-exercise-panel__actions">
+      @if (canReplay()) {
+        <button mat-stroked-button type="button" (click)="replay()">
+          {{ 'challenges.replay' | translate }}
+        </button>
+      }
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        [disabled]="submitting || !!result || !canSubmit()"
+        (click)="submit()"
+      >
+        {{ 'challenges.submit' | translate }}
+      </button>
+    </div>
+  }
+  @if (showSubmit && mechanicKey() === 'memory' && canReplay()) {
+    <div class="challenge-exercise-panel__actions">
+      <button mat-stroked-button type="button" (click)="replay()">
+        {{ 'challenges.replay' | translate }}
+      </button>
+    </div>
+  }
+</div>

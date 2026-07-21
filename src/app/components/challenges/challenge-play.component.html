@@ -1,0 +1,19 @@
+<app-transverse-rail />
+
+<div class="challenges-page">
+<main class="challenge-play">
+  <a routerLink="/challenges" class="challenge-play__back">{{ 'challenges.back' | translate }}</a>
+
+  @if (loading) {
+    <mat-spinner diameter="36"></mat-spinner>
+  } @else if (loadError) {
+    <p class="error">{{ loadError }}</p>
+  } @else if (exercise) {
+    <mat-card>
+      <mat-card-content>
+        <app-challenge-exercise-panel [exercise]="exercise" [idUser]="idUser" />
+      </mat-card-content>
+    </mat-card>
+  }
+</main>
+</div>

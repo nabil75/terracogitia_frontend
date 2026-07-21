@@ -41,6 +41,8 @@
     "ariaDiscipline": "Choisir une discipline",
     "tooltipResume": "Vue d’ensemble des savoirs",
     "ariaResume": "Vue d’ensemble des savoirs",
+    "tooltipChallenges": "Défis cognitifs",
+    "ariaChallenges": "Défis cognitifs et gamification",
     "tooltipInactiveHomeHide": "Masquer les thèmes inactifs (aucun parcours)",
     "tooltipInactiveHomeShowAll": "Afficher tous les thèmes",
     "tooltipInactiveGenericHide": "Masquer les thèmes inactifs (aucun parcours)",
@@ -90,7 +92,7 @@
     "editError": "Impossible de modifier la discipline.",
     "deleteError": "Impossible de supprimer la discipline.",
     "deleteConfirm": "Supprimer définitivement la discipline « {{label}} » ?",
-    "deleteHint": "Suppression autorisée tant qu'aucun parcours n'existe pour cette discipline (des thèmes sans parcours ne bloquent pas).",
+    "deleteHint": "Suppression autorisée tant qu'aucun parcours n'existe pour cette discipline. Les thèmes, compétences et prérequis associés seront supprimés avec la discipline.",
     "deleteBlockedByParcours": "Suppression impossible : {{count}} parcours encore rattaché(s) à cette discipline. Supprimez d'abord les parcours (ou leurs thèmes) avant de supprimer la discipline."
   },
   "disciplinePage": {
@@ -181,6 +183,8 @@
     "timelineToggleAria": "Afficher ou masquer la séquence d’apprentissage",
     "timelinePickPath": "Sélectionnez un parcours sur la carte pour afficher la timeline.",
     "timelineEmpty": "Aucune séquence disponible pour ce parcours.",
+    "timelineGenerate": "Générer la séquence",
+    "timelineGenerateHint": "La séquence d'apprentissage n'est pas calculée automatiquement. Cliquez pour lancer l'analyse des prérequis (peut prendre quelques secondes).",
     "timelineFromCache": "Enregistrée",
     "timelineRegenerate": "Régénérer",
     "timelineMatchesApiOrder":
@@ -205,6 +209,40 @@
     "timelinePrereqClose": "Fermer le détail des prérequis",
     "cta": "Découvrir",
     "ctaTooltip": "Découvrir une proposition de réponse à cette question",
+    "launchChallenge": "Lancer un défi",
+    "launchChallengeTooltip": "Générer et jouer un défi cognitif pour cette question",
+    "launchChallengeAria": "Lancer un défi cognitif pour cette question",
+    "launchChallengeError": "Impossible de générer le défi. Vérifiez le backend ou réessayez.",
+    "challengeDialog": {
+      "title": "Défi cognitif",
+      "firstBadge": "Premier défi — compatibilité maximale",
+      "compatScore": "Compatibilité",
+      "score": "Score",
+      "save": "Sauvegarder le défi",
+      "saved": "Défi sauvegardé",
+      "saveSuccess": "Le défi a été enregistré. Vous pourrez le rejouer.",
+      "saveError": "Impossible de sauvegarder le défi.",
+      "tabPrimary": "Défi principal",
+      "tabMemory": "Deuxième défi",
+      "memoryBadge": "Renforcement mémoriel",
+      "launchMemory": "Défi memory",
+      "memoryReady": "Défi memory prêt — associez les cartes.",
+      "memoryError": "Impossible de créer le défi memory pour cet exercice.",
+      "tabInvestigation": "Troisième défi",
+      "investigationBadge": "Renforcement par enquête",
+      "launchInvestigation": "Défi enquête",
+      "investigationReady": "Défi enquête prêt — répondez Vrai ou Faux.",
+      "investigationError": "Impossible de créer le défi enquête pour cet exercice.",
+      "forceMechanic": "Mécanique de jeu",
+      "forceMechanicApply": "Appliquer",
+      "forceMechanicLoading": "Régénération du défi avec la mécanique choisie…",
+      "forceMechanicSuccess": "Défi régénéré avec la mécanique sélectionnée.",
+      "forceMechanicError": "Impossible de régénérer le défi avec cette mécanique.",
+      "mechanicNotPlayable": "Template de jeu pas encore disponible",
+      "closeTooltip": "Fermer",
+      "saveTooltip": "Sauvegarder le défi",
+      "forceMechanicMenuTooltip": "Choisir une mécanique de jeu"
+    },
     "proposedAnswerTitle": "Proposition de réponse",
     "proposedAnswerPickQuestion": "Sélectionnez une question dans la liste centrale pour afficher sa proposition de réponse.",
     "proposedAnswerEmpty": "Utilisez l’icône Découvrir pour générer une proposition de réponse.",
@@ -220,8 +258,6 @@
     "sectionContext": "Contexte",
     "sectionAnalysis": "Analyse",
     "sectionConclusion": "Conclusion",
-    "sectionExercise": "Exercice",
-    "imageLinksLead": "Illustrations (Pexels)",
     "dividerQuestionsCurrent": "Ajuster la largeur entre les questions et la proposition courante",
     "dividerCurrentSide": "Ajuster la largeur entre la proposition courante et le panneau latéral",
     "notesSavedOnFirstSave": "Les notes seront enregistrées avec la première proposition sauvegardée.",
@@ -246,7 +282,17 @@
     "savedLoadError": "Impossible de charger les propositions sauvegardées.",
     "savedStoreError": "Impossible de sauvegarder la proposition.",
     "savedDeleteSuccess": "Proposition supprimée.",
-    "savedDeleteError": "Impossible de supprimer la proposition."
+    "savedDeleteError": "Impossible de supprimer la proposition.",
+    "savedChallengesTitle": "Défis sauvegardés",
+    "savedChallengesEmpty": "Aucun défi enregistré pour cette question.",
+    "savedChallengesLoading": "Chargement des défis sauvegardés…",
+    "savedChallengesLoadError": "Impossible de charger les défis sauvegardés.",
+    "savedChallengesLoadExerciseError": "Impossible d’ouvrir ce défi.",
+    "savedChallengesOpenAria": "Rejouer le défi : {{ title }}",
+    "savedChallengesOpenTooltip": "Ouvrir et rejouer le défi",
+    "savedChallengesDeleteAria": "Supprimer le défi : {{ title }}",
+    "savedChallengesDeleteSuccess": "Défi supprimé.",
+    "savedChallengesDeleteError": "Impossible de supprimer le défi."
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -520,6 +566,181 @@
     "navThemes": "Thèmes & parcours",
     "navNotation": "Notation & formules",
     "navSources": "Sources & LLM"
+  },
+  "challenges": {
+    "title": "Défis cognitifs",
+    "intro": "Cadre d'évaluation ludique : opérations cognitives, mécaniques de jeu et matrice de compatibilité, alignés sur la pyramide des savoirs. Les défis se génèrent depuis Découverte, à partir d'une question du parcours.",
+    "tabOperations": "Opérations cognitives",
+    "tabMechanics": "Mécaniques de jeu",
+    "mechanicsIntro": "Douze façons de jouer avec les idées : chaque mécanique colore l'exercice d'une interaction différente.",
+    "mechanicCategory": {
+      "manipulation": "Manipuler & relier",
+      "creation": "Construire & explorer",
+      "adventure": "Enquêter & simuler",
+      "pressure": "Défier & optimiser"
+    },
+    "mechanicCard": {
+      "compatibleOps": "Opérations compatibles",
+      "tagline": {
+        "drag_drop": "Pose, glisse, valide !",
+        "sorting_lab": "Trouve la règle, classe !",
+        "knowledge_bridges": "Relie les bons ponts",
+        "sequence_frieze": "Reconstitue la frise",
+        "missing_fragment": "Retrouve le fragment",
+        "transform_atelier": "Transforme sans perdre l'essentiel",
+        "matching": "Relie les bonnes paires",
+        "memory": "Retourne et mémorise",
+        "puzzle": "Recompose le tableau",
+        "sorting": "Remets de l'ordre",
+        "construction": "Bâtis brique par brique",
+        "sandbox": "Expérimente librement",
+        "investigation": "Suis les indices",
+        "simulation": "Fais réagir le modèle",
+        "strategy": "Planifie ton coup",
+        "timed": "Contre la montre !",
+        "resource_management": "Gère tes ressources",
+        "comparator": "Compare critère par critère"
+      }
+    },
+    "tabMatrix": "Matrice compatibilité",
+    "matrixLegend": {
+      "aria": "Légende des scores de compatibilité",
+      "title": "Scores de compatibilité (0 à 3)",
+      "intro": "Chaque cellule indique à quel point une opération cognitive et une mécanique de jeu se combinent bien pour concevoir un exercice. Les combinaisons à 0 ne peuvent pas être générées.",
+      "score": {
+        "3": "3 — Compatibilité optimale",
+        "2": "2 — Bonne compatibilité",
+        "1": "1 — Compatible mais faible",
+        "0": "0 — Incompatible (génération refusée)"
+      }
+    },
+    "back": "Retour au cadre",
+    "dragDrop": {
+      "boardAria": "Glisser-déposer : éléments à classer et zones cibles",
+      "poolTitle": "Éléments à classer",
+      "poolHint": "Glissez chaque élément vers la zone correspondante à droite.",
+      "zonesTitle": "Zones cibles",
+      "zonesHint": "Déposez ici les éléments selon le type ou la catégorie attendue."
+    },
+    "sortingLab": {
+      "boardAria": "Laboratoire de tri : éléments et catégories",
+      "boardHint": "Glissez un élément vers une catégorie, ou cliquez l'élément puis la catégorie.",
+      "boardHintHidden": "Les noms des groupes sont cachés : découvrez la règle de regroupement.",
+      "poolTitle": "Éléments à classer",
+      "categoriesTitle": "Conteneurs",
+      "moves": "Déplacements",
+      "errors": "Erreurs",
+      "locked": "Classé",
+      "selectHint": "Élément sélectionné — choisissez une catégorie."
+    },
+    "knowledgeBridges": {
+      "boardAria": "Ponts du savoir : sources et cibles à relier",
+      "missionHint": "Reliez chaque élément de gauche à l'élément correspondant à droite.",
+      "boardHint": "Cliquez un élément à gauche, puis sa cible à droite. Une cible ne peut être utilisée qu'une fois.",
+      "start": "Commencer",
+      "sourcesTitle": "Sources",
+      "targetsTitle": "Cibles",
+      "clearLink": "Retirer le lien"
+    },
+    "sequenceFrieze": {
+      "boardAria": "Frise à reconstituer : cartes et positions",
+      "boardHint": "Glissez les cartes vers les positions, ou cliquez une carte puis une case. Cliquez deux cartes placées pour les échanger.",
+      "poolTitle": "Cartes mélangées",
+      "sequenceTitle": "Séquence",
+      "position": "Position",
+      "emptySlot": "Déposez une carte ici",
+      "axis": "Axe",
+      "selectPoolHint": "Carte sélectionnée — choisissez une position.",
+      "selectSlotHint": "Position sélectionnée — cliquez une autre carte pour échanger.",
+      "returnToPool": "Remettre dans le pool"
+    },
+    "missingFragment": {
+      "boardAria": "Fragment manquant : structure et réserve de fragments",
+      "boardHint": "Complétez la structure en plaçant les bons fragments dans les lacunes, puis validez.",
+      "boardHintLearning": "Placez un fragment dans une lacune : un placement correct se verrouille, un incorrect revient dans la réserve.",
+      "structureTitle": "Artefact à restaurer",
+      "poolTitle": "Réserve de fragments",
+      "emptyGap": "…",
+      "selectHint": "Fragment sélectionné — cliquez une lacune.",
+      "clearGap": "Retirer le fragment",
+      "errors": "Erreurs"
+    },
+    "transformAtelier": {
+      "boardAria": "Atelier des transformations : source, outils et résultat",
+      "boardHint": "Choisissez l'opération qui atteint la forme cible sans altérer l'invariant.",
+      "boardHintChain": "Appliquez les transformations dans le bon ordre jusqu'à la forme cible.",
+      "sourceTitle": "Élément source",
+      "toolsTitle": "Outils de transformation",
+      "resultTitle": "Résultat",
+      "targetForm": "Forme cible",
+      "invariant": "Invariant",
+      "integrity": "Intégrité",
+      "integrityAria": "Jauge de conservation de l'invariant",
+      "undo": "Annuler la dernière opération"
+    },
+    "matching": {
+      "boardAria": "Associer chaque proposition à une réponse unique",
+      "boardHint": "Cliquez sur la pastille correspondant à chaque élément. Chaque réponse ne peut être utilisée qu'une fois."
+    },
+    "memory": {
+      "boardAria": "Jeu de memory : associer problèmes et solutions",
+      "boardHint": "Retournez une carte puis une autre (ou attendez 2 s). Une paire correcte a la même couleur et disparaît ; sinon les deux cartes se recachent.",
+      "moves": "Coups",
+      "pairsFound": "Paires trouvées",
+      "cardBack": "Carte cachée",
+      "cardPrompt": "Problème",
+      "cardAnswer": "Solution",
+      "complete": "Toutes les paires trouvées !"
+    },
+    "investigation": {
+      "boardAria": "Enquête : valider des affirmations sur le concept",
+      "boardHint": "Pour chaque affirmation, choisissez Vrai ou Faux.",
+      "true": "Vrai",
+      "false": "Faux"
+    },
+    "comparator": {
+      "boardHint": "Comparez les deux éléments critère par critère, justifiez, puis choisissez une synthèse.",
+      "progress": "Critères traités",
+      "start": "Commencer la comparaison",
+      "cardObserveHint": "Élément à comparer",
+      "pickCriterion": "Choisissez un critère",
+      "pickRelation": "Ces éléments sont…",
+      "relationSimilar": "Similaires",
+      "relationDifferent": "Différents",
+      "relationPartial": "Partiellement similaires",
+      "pickJustification": "Choisissez la meilleure justification",
+      "noJustifications": "Aucune justification disponible pour ce critère.",
+      "matrixCriterion": "Critère",
+      "matrixRelation": "Relation",
+      "matrixJustification": "Justification",
+      "validateMatrix": "Valider le tableau",
+      "pickSynthesis": "Choisissez la meilleure conclusion"
+    },
+    "submit": "Valider ma réponse",
+    "replay": "Rejouer le défi",
+    "operationCard": {
+      "definition": "Définition",
+      "evaluates": "Évalue principalement",
+      "pyramidLevels": "Niveaux pyramide",
+      "technicalKey": "Clé technique"
+    },
+    "family": {
+      "perception": "Perception",
+      "organisation": "Organisation",
+      "transformation": "Transformation",
+      "construction": "Construction",
+      "diagnostic": "Diagnostic",
+      "simulation": "Simulation",
+      "optimisation": "Optimisation",
+      "discours": "Discours",
+      "meta": "Métacognition"
+    },
+    "familyLegend": {
+      "aria": "Légende des couleurs par famille cognitive",
+      "title": "Couleurs des familles cognitives",
+      "intro": "Chaque carte correspond à une opération précise (un verbe : Identifier, Associer…). C'est cette opération — et non la famille — qui sert à générer et noter un défi.",
+      "role": "La famille est un regroupement de lecture : elle classe des opérations voisines et colore les cartes. Les opérations listées ci-dessous sont celles du catalogue."
+    }
   },
   "adminPlaceholder": {
     "notation": {

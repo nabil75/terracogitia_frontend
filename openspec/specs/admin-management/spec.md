@@ -37,7 +37,7 @@ de discipline.
 #### Scenario: Choix de discipline requis
 - GIVEN aucune discipline sélectionnée
 - WHEN l'utilisateur crée un thème
-- THEN un dialogue de choix de discipline s'ouvre
+- THEN un dialogue de choix de discipline (`ThemeDisciplinePickDialogComponent`) s'ouvre avec la liste des disciplines
 
 #### Scenario: Échec de chargement de la liste
 - GIVEN `getAllThemesAdmin` renvoie une erreur

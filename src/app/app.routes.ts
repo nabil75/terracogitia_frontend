@@ -5,6 +5,8 @@ import { DiscoverComponent } from './components/discover/discover.component';
 import { DisciplineComponent } from './components/discipline/discipline.component';
 import { LoginComponent } from './components/login/login.component';
 import { DrawingTestComponent } from './components/review/drawing-test.component';
+import { ChallengesShellComponent } from './components/challenges/challenges-shell.component';
+import { ChallengePlayComponent } from './components/challenges/challenge-play.component';
 import { ADMIN_CHILD_ROUTES } from './components/admin/admin.routes';
 
 export const routes: Routes = [
@@ -14,6 +16,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'discover', component: DiscoverComponent },
   { path: 'discipline', component: DisciplineComponent },
+  { path: 'challenges', component: ChallengesShellComponent },
+  { path: 'challenges/play/:exerciseId', component: ChallengePlayComponent },
   { path: 'dev/drawing-test', component: DrawingTestComponent },
   { path: 'admin', children: ADMIN_CHILD_ROUTES }
 ];

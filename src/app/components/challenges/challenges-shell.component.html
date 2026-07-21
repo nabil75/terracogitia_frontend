@@ -1,0 +1,173 @@
+<app-transverse-rail />
+
+<div class="challenges-page">
+<main class="challenges-shell">
+  <header class="challenges-shell__header">
+    <h1>{{ 'challenges.title' | translate }}</h1>
+    <p class="challenges-shell__intro">{{ 'challenges.intro' | translate }}</p>
+  </header>
+
+  @if (loading) {
+    <div class="challenges-shell__loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <mat-tab-group>
+      <mat-tab [label]="'challenges.tabOperations' | translate">
+        <div class="challenges-operations-tab">
+          <div class="challenges-operations-tab__intro-block">
+            <p class="challenges-operations-tab__intro">
+              {{ 'challenges.familyLegend.intro' | translate }}
+            </p>
+            <p class="challenges-operations-tab__role">
+              {{ 'challenges.familyLegend.role' | translate }}
+            </p>
+          </div>
+
+          @for (fam of operationFamilies; track fam) {
+            @if (operationsInFamily(fam).length) {
+              <section class="challenges-family-group" [attr.data-family]="fam">
+                <header class="challenges-family-group__header">
+                  <span class="challenges-family-group__swatch" aria-hidden="true"></span>
+                  <h2 class="challenges-family-group__title">{{ familyLabel(fam) }}</h2>
+                  <span class="challenges-family-group__ops">{{ familyHint(fam) }}</span>
+                </header>
+                <div class="challenges-family-group__grid">
+                  @for (op of operationsInFamily(fam); track op.key) {
+                    <article class="challenges-op-card" [attr.data-family]="op.family">
+                      <div class="challenges-op-card__accent" aria-hidden="true"></div>
+                      <header class="challenges-op-card__header">
+                        <h3 class="challenges-op-card__title">{{ opLabel(op) }}</h3>
+                      </header>
+                      <div class="challenges-op-card__body">
+                        <section class="challenges-op-card__section">
+                          <p class="challenges-op-card__description">{{ operationDescription(op) }}</p>
+                        </section>
+                        <section class="challenges-op-card__section">
+                          <h4 class="challenges-op-card__section-title">
+                            {{ 'challenges.operationCard.pyramidLevels' | translate }}
+                          </h4>
+                          <ul class="challenges-op-card__levels">
+                            @for (lvl of operationPyramidLevels(op); track lvl) {
+                              <li>
+                                <span class="challenges-op-card__level-pill">{{ pyramidLevelLabel(lvl) }}</span>
+                              </li>
+                            }
+                          </ul>
+                        </section>
+                      </div>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab [label]="'challenges.tabMechanics' | translate">
+        <div class="challenges-mechanics-tab">
+          <p class="challenges-mechanics-tab__intro">{{ 'challenges.mechanicsIntro' | translate }}</p>
+
+          @for (cat of mechanicCategories; track cat) {
+            @if (mechanicsInCategory(cat).length) {
+              <section class="challenges-mech-group" [attr.data-category]="cat">
+                <header class="challenges-mech-group__header">
+                  <span class="challenges-mech-group__emoji" aria-hidden="true">{{
+                    cat === 'manipulation'
+                      ? '🎯'
+                      : cat === 'creation'
+                        ? '🛠️'
+                        : cat === 'adventure'
+                          ? '🗺️'
+                          : '⚡'
+                  }}</span>
+                  <h2 class="challenges-mech-group__title">{{ mechanicCategoryLabel(cat) }}</h2>
+                </header>
+                <div class="challenges-mech-group__grid">
+                  @for (m of mechanicsInCategory(cat); track m.key) {
+                    <article class="challenges-mech-card" [attr.data-mechanic]="m.key">
+                      <div class="challenges-mech-card__icon-wrap" aria-hidden="true">
+                        <mat-icon class="challenges-mech-card__icon">{{ mechIcon(m.key) }}</mat-icon>
+                      </div>
+                      <div class="challenges-mech-card__body">
+                        <h3 class="challenges-mech-card__title">{{ mechLabel(m) }}</h3>
+                        @if (mechTagline(m.key)) {
+                          <p class="challenges-mech-card__tagline">{{ mechTagline(m.key) }}</p>
+                        }
+                        <p class="challenges-mech-card__desc">{{ mechDescription(m) }}</p>
+                        <div class="challenges-mech-card__traits">
+                          <span class="challenges-mech-card__trait challenges-mech-card__trait--plus">
+                            <mat-icon aria-hidden="true">add_circle</mat-icon>
+                            {{ mechAdvantages(m) }}
+                          </span>
+                          <span class="challenges-mech-card__trait challenges-mech-card__trait--minus">
+                            <mat-icon aria-hidden="true">remove_circle_outline</mat-icon>
+                            {{ mechLimitations(m) }}
+                          </span>
+                        </div>
+                        <div class="challenges-mech-card__ops">
+                          <span class="challenges-mech-card__ops-label">{{
+                            'challenges.mechanicCard.compatibleOps' | translate
+                          }}</span>
+                          <div class="challenges-mech-card__ops-chips">
+                            @for (opName of mechanicCompatibleOps(m); track opName) {
+                              <span class="challenges-mech-card__chip">{{ opName }}</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab [label]="'challenges.tabMatrix' | translate">
+        <div class="challenges-shell__matrix-wrap">
+          <p class="challenges-shell__matrix-intro">{{ 'challenges.matrixLegend.intro' | translate }}</p>
+          <table class="challenges-shell__matrix">
+            <thead>
+              <tr>
+                <th></th>
+                @for (m of mechanics; track m.key) {
+                  <th>{{ m.key }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (op of operations; track op.key) {
+                <tr>
+                  <th>{{ op.key }}</th>
+                  @for (m of mechanics; track m.key) {
+                    <td [attr.data-score]="matrixScore(op.key, m.key)">
+                      {{ matrixScore(op.key, m.key) }}
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+          <aside
+            class="challenges-shell__matrix-legend"
+            [attr.aria-label]="'challenges.matrixLegend.aria' | translate"
+          >
+            <h2 class="challenges-shell__matrix-legend-title">{{ 'challenges.matrixLegend.title' | translate }}</h2>
+            <ul class="challenges-shell__matrix-legend-items">
+              @for (score of matrixLegendScores; track score) {
+                <li class="challenges-shell__matrix-legend-item" [attr.data-score]="score">
+                  <span class="challenges-shell__matrix-legend-swatch" aria-hidden="true">{{ score }}</span>
+                  <span class="challenges-shell__matrix-legend-label">{{ matrixLegendLabel(score) }}</span>
+                </li>
+              }
+            </ul>
+          </aside>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</main>
+</div>

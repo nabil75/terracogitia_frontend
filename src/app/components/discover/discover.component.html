@@ -180,21 +180,39 @@
                 {{ 'discover.timelineFromCache' | translate }}
               </span>
             }
-            <button
-              mat-stroked-button
-              type="button"
-              color="primary"
-              class="discover-timeline-panel__regenerate"
-              [disabled]="learningOrderLoading || learningOrderRegenerating"
-              (click)="regenerateLearningTimeline()"
-            >
-              @if (learningOrderRegenerating) {
-                <mat-progress-spinner diameter="18" mode="indeterminate" />
-              } @else {
-                <mat-icon aria-hidden="true">refresh</mat-icon>
-              }
-              <span>{{ 'discover.timelineRegenerate' | translate }}</span>
-            </button>
+            @if (learningOrderTimelineSteps.length > 0) {
+              <button
+                mat-stroked-button
+                type="button"
+                color="primary"
+                class="discover-timeline-panel__regenerate"
+                [disabled]="learningOrderLoading || learningOrderRegenerating"
+                (click)="regenerateLearningTimeline()"
+              >
+                @if (learningOrderRegenerating) {
+                  <mat-progress-spinner diameter="18" mode="indeterminate" />
+                } @else {
+                  <mat-icon aria-hidden="true">refresh</mat-icon>
+                }
+                <span>{{ 'discover.timelineRegenerate' | translate }}</span>
+              </button>
+            } @else {
+              <button
+                mat-stroked-button
+                type="button"
+                color="primary"
+                class="discover-timeline-panel__generate"
+                [disabled]="learningOrderLoading || learningOrderRegenerating"
+                (click)="generateLearningTimeline()"
+              >
+                @if (learningOrderLoading) {
+                  <mat-progress-spinner diameter="18" mode="indeterminate" />
+                } @else {
+                  <mat-icon aria-hidden="true">timeline</mat-icon>
+                }
+                <span>{{ 'discover.timelineGenerate' | translate }}</span>
+              </button>
+            }
           }
           <button
             mat-icon-button
@@ -235,7 +253,9 @@
           } @else if (learningOrderError) {
             <p class="discover-error">{{ learningOrderError }}</p>
           } @else if (learningOrderTimelineSteps.length === 0) {
-            <p class="discover-muted">{{ 'discover.timelineEmpty' | translate }}</p>
+            <p class="discover-muted discover-timeline-panel__empty-hint">
+              {{ 'discover.timelineGenerateHint' | translate }}
+            </p>
           } @else {
             @if (learningOrderSequencePartial && !learningOrderStructureEmpty) {
               <p class="discover-timeline-panel__hint">
@@ -444,6 +464,25 @@
                         <button
                           mat-icon-button
                           type="button"
+                          color="accent"
+                          class="discover-q-challenge-btn"
+                          [attr.aria-label]="'discover.launchChallengeAria' | translate"
+                          [matTooltip]="'discover.launchChallengeTooltip' | translate"
+                          matTooltipClass="app-transverse-rail-tooltip"
+                          matTooltipPosition="above"
+                          matTooltipShowDelay="200"
+                          [disabled]="isLaunchingChallenge(q.id)"
+                          (click)="$event.stopPropagation(); launchChallenge(q.id)"
+                        >
+                          @if (isLaunchingChallenge(q.id)) {
+                            <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
+                          } @else {
+                            <mat-icon aria-hidden="true">sports_esports</mat-icon>
+                          }
+                        </button>
+                        <button
+                          mat-icon-button
+                          type="button"
                           color="primary"
                           class="discover-q-discover-btn"
                           [attr.aria-label]="'discover.cta' | translate"
@@ -538,7 +577,7 @@
                         <section class="discover-answer-section">
                           <h3 class="discover-answer-section__title">{{ row.titleKey | translate }}</h3>
                           @if (row.kind === 'simple') {
-                            <app-discover-answer-body [text]="row.text" [imageLinks]="row.imageLinks" />
+                            <app-discover-answer-body [text]="row.text" />
                           } @else {
                             <div class="discover-answer-subsections" role="group">
                               @for (sub of row.subsections; track subIx; let subIx = $index) {
@@ -553,15 +592,12 @@
                                 </div>
                               }
                             </div>
-                            @if (row.imageLinks.length > 0) {
-                              <app-discover-answer-body [text]="''" [imageLinks]="row.imageLinks" />
-                            }
                           }
                         </section>
                       }
                     } @else {
                       @if (mainPlainBody().length > 0) {
-                        <div class="discover-answer-body">{{ mainPlainBody() }}</div>
+                        <app-discover-answer-body [text]="mainPlainBody()" />
                       }
                       @if (mainKeyPoints().length > 0) {
                         <ul class="discover-answer-keypoints">
@@ -608,7 +644,7 @@
                     }}</span>
                   }
                 </div>
-                @if (loadingSavedPropositions) {
+                @if (savedPropositionsLoadingInitial) {
                   <div class="discover-state discover-state--compact">
                     <mat-progress-spinner diameter="22" mode="indeterminate" />
                   </div>
@@ -616,7 +652,10 @@
                   <mat-form-field appearance="outline" class="discover-side-panel__notes-field">
                     <textarea
                       matInput
-                      rows="4"
+                      #personalNotesAutosize="cdkTextareaAutosize"
+                      cdkTextareaAutosize
+                      cdkAutosizeMinRows="3"
+                      cdkAutosizeMaxRows="16"
                       name="personalNotes"
                       [(ngModel)]="personalNotes"
                       (ngModelChange)="onPersonalNotesInput()"
@@ -626,6 +665,99 @@
                   @if (personalNotesError) {
                     <p class="discover-error">{{ personalNotesError }}</p>
                   }
+                }
+              </section>
+
+              <section
+                class="discover-side-panel__challenges"
+                aria-labelledby="discover-challenges-heading"
+              >
+                <h2 id="discover-challenges-heading" class="discover-panel__title">
+                  {{ 'discover.savedChallengesTitle' | translate }}
+                </h2>
+                @if (loadingSavedChallenges) {
+                  <div class="discover-state discover-state--compact">
+                    <mat-progress-spinner diameter="22" mode="indeterminate" />
+                    <span>{{ 'discover.savedChallengesLoading' | translate }}</span>
+                  </div>
+                } @else if (savedChallengesError) {
+                  <p class="discover-error">{{ savedChallengesError }}</p>
+                } @else if (currentQuestionSavedChallenges.length === 0) {
+                  <p class="discover-muted">{{ 'discover.savedChallengesEmpty' | translate }}</p>
+                } @else {
+                  <ul class="discover-challenges-list">
+                    @for (ch of currentQuestionSavedChallenges; track ch.id_exercise) {
+                      <li class="discover-challenges-row">
+                        <div class="discover-challenges-row__info">
+                          <span class="discover-challenges-row__title">{{ ch.title }}</span>
+                          <span class="discover-challenges-row__meta">
+                            {{ ch.game_mechanic }}
+                            @if (ch.compatibility_score != null) {
+                              · {{ 'discover.challengeDialog.compatScore' | translate }}
+                              {{ ch.compatibility_score }}/3
+                            }
+                          </span>
+                          @if (formatSavedChallengeDate(ch); as savedAt) {
+                            <span class="discover-challenges-row__date">{{ savedAt }}</span>
+                          }
+                        </div>
+                        <div class="discover-challenges-row__actions">
+                          @if (isOpeningSavedChallenge(ch.id_exercise)) {
+                            <mat-progress-spinner
+                              class="discover-challenges-row__spinner"
+                              diameter="28"
+                              mode="indeterminate"
+                            />
+                          } @else {
+                            <button
+                              mat-icon-button
+                              type="button"
+                              color="accent"
+                              class="discover-challenges-row__play-btn"
+                              [disabled]="
+                                isOpeningSavedChallenge(ch.id_exercise) ||
+                                isDeletingSavedChallenge(ch.id_exercise)
+                              "
+                              [attr.aria-label]="
+                                'discover.savedChallengesOpenAria'
+                                  | translate: { title: ch.title }
+                              "
+                              [matTooltip]="'discover.savedChallengesOpenTooltip' | translate"
+                              matTooltipPosition="above"
+                              matTooltipShowDelay="200"
+                              (click)="openSavedChallenge(ch)"
+                            >
+                              <mat-icon class="discover-challenges-row__icon" aria-hidden="true"
+                                >sports_esports</mat-icon
+                              >
+                            </button>
+                          }
+                          <button
+                            mat-icon-button
+                            type="button"
+                            class="discover-saved-delete-btn discover-challenges-row__delete-btn"
+                            [attr.aria-label]="
+                              'discover.savedChallengesDeleteAria'
+                                | translate: { title: ch.title }
+                            "
+                            [matTooltip]="'common.delete' | translate"
+                            matTooltipPosition="above"
+                            (click)="deleteSavedChallenge(ch, $event)"
+                            [disabled]="
+                              isDeletingSavedChallenge(ch.id_exercise) ||
+                              isOpeningSavedChallenge(ch.id_exercise)
+                            "
+                          >
+                            @if (isDeletingSavedChallenge(ch.id_exercise)) {
+                              <mat-progress-spinner diameter="26" mode="indeterminate" />
+                            } @else {
+                              <mat-icon aria-hidden="true">delete</mat-icon>
+                            }
+                          </button>
+                        </div>
+                      </li>
+                    }
+                  </ul>
                 }
               </section>
 

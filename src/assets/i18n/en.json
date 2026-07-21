@@ -41,6 +41,8 @@
     "ariaDiscipline": "Pick a discipline",
     "tooltipResume": "Knowledge overview",
     "ariaResume": "Knowledge overview",
+    "tooltipChallenges": "Cognitive challenges",
+    "ariaChallenges": "Cognitive challenges and gamification",
     "tooltipInactiveHomeHide": "Hide inactive themes (no learning path)",
     "tooltipInactiveHomeShowAll": "Show all themes",
     "tooltipInactiveGenericHide": "Hide inactive themes (no learning path)",
@@ -90,7 +92,7 @@
     "editError": "Could not update the discipline.",
     "deleteError": "Could not delete the discipline.",
     "deleteConfirm": "Permanently delete discipline “{{label}}”?",
-    "deleteHint": "Deletion is allowed as long as this discipline has no learning paths (themes without paths do not block deletion).",
+    "deleteHint": "Deletion is allowed as long as this discipline has no learning paths. Associated themes, competencies, and prerequisites will be deleted with the discipline.",
     "deleteBlockedByParcours": "Cannot delete: {{count}} learning path(s) still linked to this discipline. Remove the paths (or their themes) before deleting the discipline."
   },
   "disciplinePage": {
@@ -181,6 +183,8 @@
     "timelineToggleAria": "Show or hide the learning sequence timeline",
     "timelinePickPath": "Select a path on the map to display the timeline.",
     "timelineEmpty": "No sequence available for this path.",
+    "timelineGenerate": "Generate sequence",
+    "timelineGenerateHint": "The learning sequence is not computed automatically. Click to run prerequisite analysis (may take a few seconds).",
     "timelineFromCache": "Saved",
     "timelineRegenerate": "Regenerate",
     "timelineMatchesApiOrder":
@@ -205,6 +209,40 @@
     "timelinePrereqClose": "Close prerequisite details",
     "cta": "Discover",
     "ctaTooltip": "Discover a suggested answer to this question",
+    "launchChallenge": "Launch challenge",
+    "launchChallengeTooltip": "Generate and play a cognitive challenge for this question",
+    "launchChallengeAria": "Launch cognitive challenge for this question",
+    "launchChallengeError": "Could not generate the challenge. Check the backend or try again.",
+    "challengeDialog": {
+      "title": "Cognitive challenge",
+      "firstBadge": "First challenge — maximum compatibility",
+      "compatScore": "Compatibility",
+      "score": "Score",
+      "save": "Save challenge",
+      "saved": "Challenge saved",
+      "saveSuccess": "The challenge was saved. You can replay it later.",
+      "saveError": "Could not save the challenge.",
+      "tabPrimary": "Main challenge",
+      "tabMemory": "Second challenge",
+      "memoryBadge": "Memory reinforcement",
+      "launchMemory": "Memory challenge",
+      "memoryReady": "Memory challenge ready — match the cards.",
+      "memoryError": "Could not create a memory challenge from this exercise.",
+      "tabInvestigation": "Third challenge",
+      "investigationBadge": "Investigation reinforcement",
+      "launchInvestigation": "Investigation challenge",
+      "investigationReady": "Investigation challenge ready — answer True or False.",
+      "investigationError": "Could not create an investigation challenge from this exercise.",
+      "forceMechanic": "Game mechanic",
+      "forceMechanicApply": "Apply",
+      "forceMechanicLoading": "Regenerating the challenge with the selected mechanic…",
+      "forceMechanicSuccess": "Challenge regenerated with the selected mechanic.",
+      "forceMechanicError": "Could not regenerate the challenge with this mechanic.",
+      "mechanicNotPlayable": "Game template not available yet",
+      "closeTooltip": "Close",
+      "saveTooltip": "Save challenge",
+      "forceMechanicMenuTooltip": "Choose a game mechanic"
+    },
     "proposedAnswerTitle": "Suggested answer",
     "proposedAnswerPickQuestion": "Select a question in the middle panel to see its suggested answer.",
     "proposedAnswerEmpty": "Use the Discover icon to generate a suggested answer.",
@@ -220,8 +258,6 @@
     "sectionContext": "Context",
     "sectionAnalysis": "Analysis",
     "sectionConclusion": "Conclusion",
-    "sectionExercise": "Exercise",
-    "imageLinksLead": "Illustrations (Pexels)",
     "dividerQuestionsCurrent": "Adjust width between questions and current proposal",
     "dividerCurrentSide": "Adjust width between current proposal and side panel",
     "notesSavedOnFirstSave": "Notes will be saved with the first stored proposal.",
@@ -246,7 +282,17 @@
     "savedLoadError": "Could not load saved propositions.",
     "savedStoreError": "Could not save proposition.",
     "savedDeleteSuccess": "Proposition deleted.",
-    "savedDeleteError": "Could not delete proposition."
+    "savedDeleteError": "Could not delete proposition.",
+    "savedChallengesTitle": "Saved challenges",
+    "savedChallengesEmpty": "No saved challenge for this question yet.",
+    "savedChallengesLoading": "Loading saved challenges…",
+    "savedChallengesLoadError": "Could not load saved challenges.",
+    "savedChallengesLoadExerciseError": "Could not open this challenge.",
+    "savedChallengesOpenAria": "Replay challenge: {{ title }}",
+    "savedChallengesOpenTooltip": "Open and replay the challenge",
+    "savedChallengesDeleteAria": "Delete challenge: {{ title }}",
+    "savedChallengesDeleteSuccess": "Challenge deleted.",
+    "savedChallengesDeleteError": "Could not delete challenge."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -520,6 +566,181 @@
     "navThemes": "Themes & paths",
     "navNotation": "Scoring & formulas",
     "navSources": "Sources & LLM"
+  },
+  "challenges": {
+    "title": "Cognitive challenges",
+    "intro": "Gamified evaluation framework: cognitive operations, game mechanics, and compatibility matrix aligned with the knowledge pyramid. Challenges are generated from Discover, starting from a question in the learning path.",
+    "tabOperations": "Cognitive operations",
+    "tabMechanics": "Game mechanics",
+    "mechanicsIntro": "Twelve ways to play with ideas: each mechanic gives exercises a different kind of interaction.",
+    "mechanicCategory": {
+      "manipulation": "Manipulate & connect",
+      "creation": "Build & explore",
+      "adventure": "Investigate & simulate",
+      "pressure": "Race & optimize"
+    },
+    "mechanicCard": {
+      "compatibleOps": "Compatible operations",
+      "tagline": {
+        "drag_drop": "Grab, drag, drop!",
+        "sorting_lab": "Find the rule, sort!",
+        "knowledge_bridges": "Build the right bridges",
+        "sequence_frieze": "Rebuild the sequence",
+        "missing_fragment": "Find the missing piece",
+        "transform_atelier": "Transform without losing the core",
+        "matching": "Link the right pairs",
+        "memory": "Flip and remember",
+        "puzzle": "Rebuild the picture",
+        "sorting": "Restore the order",
+        "construction": "Build piece by piece",
+        "sandbox": "Experiment freely",
+        "investigation": "Follow the clues",
+        "simulation": "Make the model react",
+        "strategy": "Plan your move",
+        "timed": "Beat the clock!",
+        "resource_management": "Manage your resources",
+        "comparator": "Compare criterion by criterion"
+      }
+    },
+    "tabMatrix": "Compatibility matrix",
+    "matrixLegend": {
+      "aria": "Compatibility score legend",
+      "title": "Compatibility scores (0 to 3)",
+      "intro": "Each cell shows how well a cognitive operation and a game mechanic fit together when designing an exercise. Combinations scored 0 cannot be generated.",
+      "score": {
+        "3": "3 — Optimal compatibility",
+        "2": "2 — Good compatibility",
+        "1": "1 — Weak but possible",
+        "0": "0 — Incompatible (generation blocked)"
+      }
+    },
+    "back": "Back to framework",
+    "dragDrop": {
+      "boardAria": "Drag and drop: items to classify and target zones",
+      "poolTitle": "Items to classify",
+      "poolHint": "Drag each item to the matching zone on the right.",
+      "zonesTitle": "Target zones",
+      "zonesHint": "Drop items here according to the expected type or category."
+    },
+    "sortingLab": {
+      "boardAria": "Sorting lab: items and categories",
+      "boardHint": "Drag an item into a category, or tap the item then the category.",
+      "boardHintHidden": "Group names are hidden: discover the grouping rule.",
+      "poolTitle": "Items to sort",
+      "categoriesTitle": "Containers",
+      "moves": "Moves",
+      "errors": "Errors",
+      "locked": "Sorted",
+      "selectHint": "Item selected — choose a category."
+    },
+    "knowledgeBridges": {
+      "boardAria": "Knowledge bridges: sources and targets to link",
+      "missionHint": "Link each left-hand item to the matching item on the right.",
+      "boardHint": "Tap a left item, then its target on the right. Each target can be used only once.",
+      "start": "Start",
+      "sourcesTitle": "Sources",
+      "targetsTitle": "Targets",
+      "clearLink": "Remove link"
+    },
+    "sequenceFrieze": {
+      "boardAria": "Sequence frieze: cards and positions",
+      "boardHint": "Drag cards into positions, or tap a card then a slot. Tap two placed cards to swap them.",
+      "poolTitle": "Shuffled cards",
+      "sequenceTitle": "Sequence",
+      "position": "Position",
+      "emptySlot": "Drop a card here",
+      "axis": "Axis",
+      "selectPoolHint": "Card selected — choose a position.",
+      "selectSlotHint": "Position selected — tap another card to swap.",
+      "returnToPool": "Return to pool"
+    },
+    "missingFragment": {
+      "boardAria": "Missing fragment: structure and fragment reserve",
+      "boardHint": "Complete the structure by placing the right fragments into the gaps, then submit.",
+      "boardHintLearning": "Place a fragment into a gap: a correct placement locks, an incorrect one returns to the reserve.",
+      "structureTitle": "Artifact to restore",
+      "poolTitle": "Fragment reserve",
+      "emptyGap": "…",
+      "selectHint": "Fragment selected — tap a gap.",
+      "clearGap": "Remove fragment",
+      "errors": "Errors"
+    },
+    "transformAtelier": {
+      "boardAria": "Transformation workshop: source, tools and result",
+      "boardHint": "Choose the operation that reaches the target form without altering the invariant.",
+      "boardHintChain": "Apply transformations in the right order until you reach the target form.",
+      "sourceTitle": "Source item",
+      "toolsTitle": "Transformation tools",
+      "resultTitle": "Result",
+      "targetForm": "Target form",
+      "invariant": "Invariant",
+      "integrity": "Integrity",
+      "integrityAria": "Invariant preservation gauge",
+      "undo": "Undo last operation"
+    },
+    "matching": {
+      "boardAria": "Match each prompt to a unique answer",
+      "boardHint": "Click the pill that matches each item. Each answer can only be used once."
+    },
+    "memory": {
+      "boardAria": "Memory game: match problems and solutions",
+      "boardHint": "Flip one card, then another (or wait 2 s). A correct pair shares the same color and disappears; otherwise both cards flip back.",
+      "moves": "Moves",
+      "pairsFound": "Pairs found",
+      "cardBack": "Hidden card",
+      "cardPrompt": "Problem",
+      "cardAnswer": "Solution",
+      "complete": "All pairs found!"
+    },
+    "investigation": {
+      "boardAria": "Investigation: validate statements about the concept",
+      "boardHint": "For each statement, choose True or False.",
+      "true": "True",
+      "false": "False"
+    },
+    "comparator": {
+      "boardHint": "Compare the two items criterion by criterion, justify, then pick a synthesis.",
+      "progress": "Criteria covered",
+      "start": "Start comparison",
+      "cardObserveHint": "Item to compare",
+      "pickCriterion": "Choose a criterion",
+      "pickRelation": "These items are…",
+      "relationSimilar": "Similar",
+      "relationDifferent": "Different",
+      "relationPartial": "Partially similar",
+      "pickJustification": "Choose the best justification",
+      "noJustifications": "No justification available for this criterion.",
+      "matrixCriterion": "Criterion",
+      "matrixRelation": "Relation",
+      "matrixJustification": "Justification",
+      "validateMatrix": "Validate the table",
+      "pickSynthesis": "Choose the best conclusion"
+    },
+    "submit": "Submit answer",
+    "replay": "Play again",
+    "operationCard": {
+      "definition": "Definition",
+      "evaluates": "Primarily evaluates",
+      "pyramidLevels": "Pyramid levels",
+      "technicalKey": "Technical key"
+    },
+    "family": {
+      "perception": "Perception",
+      "organisation": "Organisation",
+      "transformation": "Transformation",
+      "construction": "Construction",
+      "diagnostic": "Diagnostic",
+      "simulation": "Simulation",
+      "optimisation": "Optimisation",
+      "discours": "Discourse",
+      "meta": "Metacognition"
+    },
+    "familyLegend": {
+      "aria": "Color legend for cognitive families",
+      "title": "Cognitive family colors",
+      "intro": "Each card is one specific operation (a verb: Identify, Associate…). That operation — not the family — is what generates and scores a challenge.",
+      "role": "A family is a reading aid: it groups related operations and tints the cards. The operations listed below are taken from the catalog."
+    }
   },
   "adminPlaceholder": {
     "notation": {

@@ -15,6 +15,7 @@ import {
   ViewChild,
   afterNextRender
 } from '@angular/core';
+import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 import {
   CdkDragEnd,
   CdkDragMove,
@@ -32,6 +33,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subscription, forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import * as d3 from 'd3';
 
 import {
@@ -41,12 +43,15 @@ import {
   StoreSavedDiscoverPropositionPayload,
   OrdreLogiqueQuestionsPayload,
   OrdreLogiqueQuestionsResponseEnriched,
-  LearningTimelineStepDto
+  LearningTimelineStepDto,
+  ChallengeExerciseDto,
+  SavedChallengeExerciseSummary,
 } from '../../api/api.service';
 import { TransverseRailComponent } from '../../shared/transverse-rail/transverse-rail.component';
 import { SpinnerComponent } from "../../shared/spinner/spinner.component";
 import { DisciplineService } from '../../shared/services/discipline.service';
 import { ThemeService } from '../../shared/services/theme.service';
+import { LanguageService } from '../../shared/services/language.service';
 import {
   assignQuestionNumbers,
   extractIdFromOrdreLabel,
@@ -57,11 +62,13 @@ import {
 } from '../../shared/utils/question-order.util';
 import { DiscoverAnswerBodyComponent } from '../../shared/discover/discover-answer-body.component';
 import {
-  DiscoverImageLink,
+  DiscoverChallengeDialogComponent,
+  DiscoverChallengeDialogData,
+} from './discover-challenge-dialog.component';
+import {
   isDiscoverKeywordsArray,
   parseDiscoverImageLinks,
   parseDiscoverKeywords,
-  sanitizeDiscoverImageLinks,
   stripSectionDisplayText
 } from '../../shared/discover/discover-image-links.util';
 
@@ -76,7 +83,37 @@ interface DiscoverQuestion {
   groupe: number | null;
   /** Libellé de famille (colonne `libelle_groupe`) ; vide si non renvoyé par l’API. */
   libelleGroupe: string | null;
+  /** Niveau pyramide canonique (ex. `faits_observables`) si renseigné en base. */
+  niveauPyramide: string | null;
+  /** Opération cognitive cible (ex. `associer`) si renseignée en base. */
+  operationCognitive: string | null;
 }
+
+const PYRAMID_LEVEL_KEYS = new Set([
+  'faits_observables',
+  'lois_relations',
+  'schemes_operatoires',
+  'principes_generateurs',
+  'structures_abstraites',
+  'metacadres_theoriques',
+]);
+
+const COGNITIVE_OPERATION_KEYS = new Set([
+  'identifier',
+  'comparer',
+  'classer',
+  'associer',
+  'ordonner',
+  'completer',
+  'transformer',
+  'construire',
+  'diagnostiquer',
+  'simuler',
+  'optimiser',
+  'expliquer',
+  'evaluer',
+  'choisir_cadre',
+]);
 
 interface DiscoverMapTheme {
   id: string;
@@ -189,21 +226,17 @@ interface DiscoverStructuredProposition {
   introduction: string;
   contexte: string;
   contexteKeywords: string[];
-  contexteImageLinks: DiscoverImageLink[];
   analyse: DiscoverRichBlock;
   analyseKeywords: string[];
-  analyseImageLinks: DiscoverImageLink[];
   conclusion: string;
-  exercice: DiscoverRichBlock;
 }
 
 type DiscoverSectionViewRow =
-  | { kind: 'simple'; titleKey: string; text: string; imageLinks: DiscoverImageLink[] }
+  | { kind: 'simple'; titleKey: string; text: string }
   | {
       kind: 'nested';
       titleKey: string;
       subsections: DiscoverSubsection[];
-      imageLinks: DiscoverImageLink[];
     };
 
 /** Plafond d’indices de famille affichés (aligné sur le prompt backend Mistral, ex. 6 familles max). */
@@ -234,6 +267,8 @@ type QuestionsListPersistedMode = 'sequence' | 'group';
     MatTooltipModule,
     TranslateModule,
     MatSnackBarModule,
+    MatDialogModule,
+    TextFieldModule,
     SpinnerComponent,
     DiscoverAnswerBodyComponent
 ],
@@ -265,8 +300,10 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   private readonly disciplineService = inject(DisciplineService);
   private readonly themeService = inject(ThemeService);
+  private readonly languageService = inject(LanguageService);
   private readonly injector = inject(Injector);
   private readonly ngZone = inject(NgZone);
   private querySub?: Subscription;
@@ -291,7 +328,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   mindMapZoomHintVisible = false;
 
   /** Zone carte (chargement, graphe…) : repliable via le caret en barre du haut. */
-  mindMapPanelBodyVisible = true;
+  mindMapPanelBodyVisible = false;
 
   /** Panneau timeline d’apprentissage (sous la carte), repliable comme la carte mentale. */
   timelinePanelBodyVisible = true;
@@ -375,12 +412,23 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   deletingSavedPropositionId: string | null = null;
   settingCurrentPropositionId: string | null = null;
   isGenerating = false;
+  /** ID question en cours de génération d'un défi cognitif. */
+  challengeGeneratingQuestionId: string | null = null;
+  savedChallengesByQuestionId: Record<string, SavedChallengeExerciseSummary[]> = {};
+  loadingSavedChallenges = false;
+  savedChallengesError = '';
+  openingSavedChallengeId: number | null = null;
+  deletingSavedChallengeId: number | null = null;
 
   personalNotes = '';
   savingPersonalNotes = false;
   personalNotesError = '';
+  savedPropositionsLoadingInitial = false;
   private personalNotesSaveTimer: ReturnType<typeof setTimeout> | null = null;
   private personalNotesDirty = false;
+  private personalNotesLastSent = '';
+
+  @ViewChild('personalNotesAutosize') personalNotesAutosize?: CdkTextareaAutosize;
 
   /** Menu clic droit : sélection → Wikipédia (nouvel onglet). */
   wikiContextMenuOpen = false;
@@ -576,14 +624,22 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     this.draftPayload = null;
     this.personalNotes = '';
     this.personalNotesDirty = false;
+    this.personalNotesLastSent = '';
     this.savedPropositionsError = '';
+    this.savedChallengesError = '';
     this.loadSavedPropositionsForQuestion(id);
+    this.loadSavedChallengesForQuestion(id);
   }
 
   onPersonalNotesInput(): void {
     this.personalNotesDirty = true;
+    this.schedulePersonalNotesAutosize();
     if (this.personalNotesSaveTimer) clearTimeout(this.personalNotesSaveTimer);
     this.personalNotesSaveTimer = setTimeout(() => this.persistPersonalNotes(), 800);
+  }
+
+  private schedulePersonalNotesAutosize(): void {
+    queueMicrotask(() => this.personalNotesAutosize?.resizeToFitContent(true));
   }
 
   private flushPersonalNotesSave(): void {
@@ -597,13 +653,15 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private syncPersonalNotesFromCurrentEntry(): void {
+    if (this.personalNotesDirty) return;
     const current = this.currentSavedEntry;
     if (current) {
       this.personalNotes = current.notes ?? '';
-    } else if (!this.personalNotesDirty) {
+    } else {
       this.personalNotes = '';
     }
     this.personalNotesDirty = false;
+    this.schedulePersonalNotesAutosize();
   }
 
   private persistPersonalNotes(): void {
@@ -611,23 +669,77 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     const idQuestion = this.parseIntegerId(this.selectedQuestionId);
     if (idQuestion === null) return;
 
+    const notesToSave = this.personalNotes;
+    this.personalNotesLastSent = notesToSave;
     this.savingPersonalNotes = true;
     this.personalNotesError = '';
     const questionId = this.selectedQuestionId;
-    this.api.upsertQuestionPropositionNotes(idQuestion, this.personalNotes).subscribe({
+    this.api.upsertQuestionPropositionNotes(idQuestion, notesToSave).subscribe({
       next: (row) => {
-        this.personalNotes = row.notes ?? '';
-        this.personalNotesDirty = false;
         this.savingPersonalNotes = false;
-        if (row.id_proposition != null) {
-          this.loadSavedPropositionsForQuestion(questionId);
+        const savedNotes = row.notes ?? '';
+        if (!this.personalNotesDirty || this.personalNotes === this.personalNotesLastSent) {
+          this.personalNotesDirty = false;
+          if (this.personalNotes === this.personalNotesLastSent) {
+            this.personalNotes = savedNotes;
+          }
         }
+        this.applyPersonalNotesToLocalCache(
+          questionId,
+          row.id_proposition ?? null,
+          savedNotes
+        );
       },
       error: () => {
         this.savingPersonalNotes = false;
         this.personalNotesError = this.translate.instant('discover.notesSaveError');
       }
     });
+  }
+
+  /** Met à jour le cache local sans recharger l'historique (évite de masquer la textarea). */
+  private applyPersonalNotesToLocalCache(
+    questionId: string,
+    idProposition: number | null,
+    notes: string
+  ): void {
+    const existing = this.savedPropositionsByQuestionId[questionId] ?? [];
+    const currentIdx = existing.findIndex((e) => e.statutCurrent);
+    if (currentIdx >= 0) {
+      const updated = [...existing];
+      updated[currentIdx] = {
+        ...updated[currentIdx],
+        notes,
+        ...(idProposition != null ? { dbId: idProposition } : {})
+      };
+      this.savedPropositionsByQuestionId = {
+        ...this.savedPropositionsByQuestionId,
+        [questionId]: updated
+      };
+      return;
+    }
+    if (idProposition == null) return;
+    const entry: SavedDiscoverPropositionEntry = {
+      id: `notes-${idProposition}`,
+      dbId: idProposition,
+      questionId,
+      dateCreation: '',
+      createdAt: Date.now(),
+      statutCurrent: true,
+      notes,
+      payload: {
+        discoveredProposition: '',
+        discoveredKeyPoints: [],
+        discoveredStructured: null
+      }
+    };
+    this.savedPropositionsByQuestionId = {
+      ...this.savedPropositionsByQuestionId,
+      [questionId]: [
+        entry,
+        ...existing.map((e) => ({ ...e, statutCurrent: false }))
+      ]
+    };
   }
 
   discover(): void {
@@ -658,6 +770,243 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
+  }
+
+  launchChallenge(questionId: string): void {
+    const idQuestion = this.parseIntegerId(questionId);
+    if (!idQuestion) return;
+    const q = this.questions.find((x) => x.id === questionId);
+    const pyramidLevel = this.resolveQuestionPyramidLevel(q);
+    const operation = this.resolveQuestionCognitiveOperation(q);
+
+    this.challengeGeneratingQuestionId = questionId;
+    this.api
+      .generateChallengeExercise({
+        knowledge_object_type: 'question',
+        knowledge_object_id: idQuestion,
+        pyramid_level: pyramidLevel,
+        cognitive_operation: operation,
+        auto_select_mechanic: true,
+        difficulty: 2,
+        use_ai: true,
+        lang: this.languageService.getCurrentLang(),
+        id_user: 1,
+      })
+      .subscribe({
+        next: (ex) => {
+          this.challengeGeneratingQuestionId = null;
+          this.openChallengeDialog(ex, q?.label);
+        },
+        error: (err) => {
+          this.challengeGeneratingQuestionId = null;
+          const detail = this.formatApiErrorDetail(
+            err,
+            this.translate.instant('discover.launchChallengeError')
+          );
+          this.snackBar.open(detail, this.translate.instant('common.close'), { duration: 6000 });
+        },
+      });
+  }
+
+  isLaunchingChallenge(questionId: string): boolean {
+    return this.challengeGeneratingQuestionId === questionId;
+  }
+
+  openSavedChallenge(entry: SavedChallengeExerciseSummary): void {
+    if (this.openingSavedChallengeId !== null) return;
+    this.openingSavedChallengeId = entry.id_exercise;
+    this.api.getChallengeExercise(entry.id_exercise).subscribe({
+      next: (ex) => {
+        this.openingSavedChallengeId = null;
+        const q = this.questions.find((x) => x.id === this.selectedQuestionId);
+        this.openChallengeDialog(ex, q?.label);
+      },
+      error: () => {
+        this.openingSavedChallengeId = null;
+        this.snackBar.open(
+          this.translate.instant('discover.savedChallengesLoadExerciseError'),
+          this.translate.instant('common.close'),
+          { duration: 5000 }
+        );
+      },
+    });
+  }
+
+  isOpeningSavedChallenge(idExercise: number): boolean {
+    return this.openingSavedChallengeId === idExercise;
+  }
+
+  isDeletingSavedChallenge(idExercise: number): boolean {
+    return this.deletingSavedChallengeId === idExercise;
+  }
+
+  deleteSavedChallenge(entry: SavedChallengeExerciseSummary, event?: Event): void {
+    event?.stopPropagation();
+    if (this.deletingSavedChallengeId !== null || this.openingSavedChallengeId !== null) return;
+    const questionId = this.selectedQuestionId;
+    if (!questionId) return;
+    this.deletingSavedChallengeId = entry.id_exercise;
+    this.api.deleteSavedChallengeExercise(entry.id_exercise).subscribe({
+      next: () => {
+        const existing = this.savedChallengesByQuestionId[questionId] ?? [];
+        this.savedChallengesByQuestionId = {
+          ...this.savedChallengesByQuestionId,
+          [questionId]: existing.filter((item) => item.id_exercise !== entry.id_exercise)
+        };
+        this.snackBar.open(
+          this.translate.instant('discover.savedChallengesDeleteSuccess'),
+          this.translate.instant('common.close'),
+          { duration: 2500 }
+        );
+      },
+      error: () => {
+        this.snackBar.open(
+          this.translate.instant('discover.savedChallengesDeleteError'),
+          this.translate.instant('common.close'),
+          { duration: 3500 }
+        );
+      },
+      complete: () => {
+        this.deletingSavedChallengeId = null;
+      }
+    });
+  }
+
+  formatSavedChallengeDate(entry: SavedChallengeExerciseSummary): string {
+    const stored = entry.saved_at?.trim();
+    if (!stored) return '';
+    const ts = Date.parse(stored);
+    if (Number.isNaN(ts)) return stored;
+    return new Intl.DateTimeFormat(this.translate.currentLang === 'fr' ? 'fr-FR' : 'en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(ts));
+  }
+
+  private openChallengeDialog(exercise: ChallengeExerciseDto, questionLabel?: string): void {
+    const questionId = this.selectedQuestionId;
+    const data: DiscoverChallengeDialogData = {
+      exercise,
+      questionLabel,
+      idUser: 1,
+    };
+    this.dialog
+      .open(DiscoverChallengeDialogComponent, {
+        data,
+        width: 'min(64rem, 96vw)',
+        maxWidth: '96vw',
+        maxHeight: '92vh',
+        panelClass: 'app-discover-challenge-dialog',
+        autoFocus: false,
+      })
+      .afterClosed()
+      .subscribe((result: { saved?: boolean } | undefined) => {
+        if (result?.saved && questionId) {
+          this.loadSavedChallengesForQuestion(questionId);
+        }
+      });
+  }
+
+  private loadSavedChallengesForQuestion(questionId: string): void {
+    const idQuestion = this.parseIntegerId(questionId);
+    if (idQuestion === null) {
+      this.savedChallengesByQuestionId[questionId] = [];
+      return;
+    }
+    this.loadingSavedChallenges = true;
+    this.savedChallengesError = '';
+    this.api.getSavedChallengeExercisesByQuestion(idQuestion).subscribe({
+      next: (rows) => {
+        this.savedChallengesByQuestionId = {
+          ...this.savedChallengesByQuestionId,
+          [questionId]: Array.isArray(rows) ? rows : [],
+        };
+      },
+      error: (err: HttpErrorResponse) => {
+        if (err.status === 404) {
+          this.savedChallengesError = '';
+          this.savedChallengesByQuestionId = {
+            ...this.savedChallengesByQuestionId,
+            [questionId]: [],
+          };
+          return;
+        }
+        this.savedChallengesError = this.translate.instant('discover.savedChallengesLoadError');
+        this.savedChallengesByQuestionId = {
+          ...this.savedChallengesByQuestionId,
+          [questionId]: [],
+        };
+      },
+      complete: () => {
+        this.loadingSavedChallenges = false;
+      },
+    });
+  }
+
+  private formatApiErrorDetail(err: unknown, fallback: string): string {
+    if (!(err instanceof HttpErrorResponse)) return fallback;
+    const detail = err.error?.detail;
+    if (typeof detail === 'string' && detail.trim()) return detail.trim();
+    if (Array.isArray(detail)) {
+      return detail
+        .map((item) => {
+          if (typeof item === 'string') return item;
+          if (item && typeof item === 'object' && 'msg' in item) {
+            return String((item as { msg?: unknown }).msg ?? '');
+          }
+          return '';
+        })
+        .filter(Boolean)
+        .join(' · ');
+    }
+    return fallback;
+  }
+
+  private resolveQuestionPyramidLevel(q: DiscoverQuestion | undefined): string {
+    const raw = q?.niveauPyramide?.trim();
+    if (raw && PYRAMID_LEVEL_KEYS.has(raw)) return raw;
+    return 'faits_observables';
+  }
+
+  private resolveQuestionCognitiveOperation(q: DiscoverQuestion | undefined): string {
+    const raw = q?.operationCognitive?.trim();
+    const label = q?.label?.toLowerCase() ?? '';
+    // Signaux forts du libellé : prioritaires sur le tag en base.
+    if (
+      /\bdiff[ée]rence\b/.test(label) ||
+      /\bcompar/.test(label) ||
+      /\bversus\b/.test(label) ||
+      /\bvs\.?\b/.test(label)
+    ) {
+      return 'comparer';
+    }
+    if (this.isExplanationQuestionLabel(label)) {
+      return 'expliquer';
+    }
+    if (raw && COGNITIVE_OPERATION_KEYS.has(raw) && raw !== 'identifier') {
+      return raw;
+    }
+    return 'identifier';
+  }
+
+  private isExplanationQuestionLabel(label: string): boolean {
+    return (
+      /qu['' ]est-ce|qu['' ]est/.test(label) ||
+      /c['' ]est quoi/.test(label) ||
+      /d[ée]cri(?:vez|re)|d[ée]crire|expliquez|expliquer/.test(label) ||
+      /d[ée]finir|d[ée]finition/.test(label) ||
+      /en quoi consiste/.test(label) ||
+      /[àa] quoi sert/.test(label) ||
+      /(?:le\s+)?r[ôo]le\s+(?:du|de|d['' ]|of\s+)/.test(label) ||
+      /quelle\s+est\s+(?:la\s+)?fonction/.test(label) ||
+      /comment (?:utiliser|s['' ]en servir|employer|fonctionne)/.test(label) ||
+      /what is|what are|define|definition|describe|explain(?:ing)?|what does|consist of|used for|purpose of|how to use|how does|role of|function of/.test(
+        label
+      )
+    );
   }
 
   private clearLearningOrderUi(): void {
@@ -1295,6 +1644,13 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
           this.learningOrderError = this.translate.instant('discover.learningOrderError');
         }
       });
+  }
+
+  /** Lance explicitement le calcul (ou le rechargement cache) de la séquence d'apprentissage. */
+  generateLearningTimeline(): void {
+    if (!this.selectedSubThemeId || this.questions.length === 0) return;
+    if (this.learningOrderLoading || this.learningOrderRegenerating) return;
+    this.scheduleLearningOrderFetch();
   }
 
   /** Liens prérequis → question dérivés de la réponse API (pour la séquence). */
@@ -2673,12 +3029,19 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadingQuestions = true;
     this.questions = [];
     this.questionsInBackendOrder = [];
+    this.learningOrderSub?.unsubscribe();
+    this.learningOrderLoading = false;
+    this.learningOrderRegenerating = false;
+    this.learningOrderError = '';
+    this.clearLearningOrderUi();
     if (!preserve) {
       this.selectedQuestionId = null;
       this.draftPayload = null;
       this.personalNotes = '';
       this.savedPropositionsByQuestionId = {};
       this.savedPropositionsError = '';
+      this.savedChallengesByQuestionId = {};
+      this.savedChallengesError = '';
     }
     this.api.getQuestionsBySubTheme(this.selectedSubThemeId).subscribe({
       next: (response: unknown) => {
@@ -2693,14 +3056,16 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
           if (this.questions.some((q) => q.id === previousQuestionId)) {
             this.selectedQuestionId = previousQuestionId;
             this.loadSavedPropositionsForQuestion(previousQuestionId);
+            this.loadSavedChallengesForQuestion(previousQuestionId);
           } else {
             this.selectedQuestionId = null;
             this.draftPayload = null;
             this.savedPropositionsByQuestionId = {};
             this.savedPropositionsError = '';
+            this.savedChallengesByQuestionId = {};
+            this.savedChallengesError = '';
           }
         }
-        this.scheduleLearningOrderFetch();
       },
       error: () => {
         this.loadQuestionsError = this.translate.instant('discover.loadQuestionsError');
@@ -2985,7 +3350,17 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
           libelleGroupeRaw != null && String(libelleGroupeRaw).trim() !== ''
             ? this.decodeQuestionText(String(libelleGroupeRaw)).trim()
             : null;
-        return { id, label, proposedAnswer, groupe, libelleGroupe };
+        const niveauPyramideRaw = record?.niveau_pyramide ?? record?.niveauPyramide ?? null;
+        const niveauPyramide =
+          niveauPyramideRaw != null && String(niveauPyramideRaw).trim() !== ''
+            ? String(niveauPyramideRaw).trim()
+            : null;
+        const operationRaw = record?.operation_cognitive ?? record?.operationCognitive ?? null;
+        const operationCognitive =
+          operationRaw != null && String(operationRaw).trim() !== ''
+            ? String(operationRaw).trim()
+            : null;
+        return { id, label, proposedAnswer, groupe, libelleGroupe, niveauPyramide, operationCognitive };
       })
       .filter((q) => q.label.length > 0);
   }
@@ -3104,52 +3479,38 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   private buildStructuredSectionRows(s: DiscoverStructuredProposition | null): DiscoverSectionViewRow[] {
     if (s === null || !this.hasStructuredContent(s)) return [];
     const rows: DiscoverSectionViewRow[] = [];
-    const pushPlain = (
-      titleKey: string,
-      raw: string,
-      imageLinks: DiscoverImageLink[] = [],
-      keywords: string[] = []
-    ): void => {
-      const links = sanitizeDiscoverImageLinks(imageLinks);
-      const t = stripSectionDisplayText(raw.trim(), links, keywords);
-      if (t.length > 0 || links.length > 0) {
-        rows.push({ kind: 'simple', titleKey, text: t, imageLinks: links });
+    const pushPlain = (titleKey: string, raw: string, keywords: string[] = []): void => {
+      const t = stripSectionDisplayText(raw.trim(), [], keywords);
+      if (t.length > 0) {
+        rows.push({ kind: 'simple', titleKey, text: t });
       }
     };
     const pushRich = (
       titleKey: string,
       block: DiscoverRichBlock,
-      imageLinks: DiscoverImageLink[] = [],
       keywords: string[] = []
     ): void => {
-      const links = sanitizeDiscoverImageLinks(imageLinks);
-      if (!this.richBlockHasContent(block) && links.length === 0) return;
+      if (!this.richBlockHasContent(block)) return;
       if (block.mode === 'plain') {
-        const t = stripSectionDisplayText(block.text.trim(), links, keywords);
-        if (t.length > 0 || links.length > 0) {
-          rows.push({ kind: 'simple', titleKey, text: t, imageLinks: links });
+        const t = stripSectionDisplayText(block.text.trim(), [], keywords);
+        if (t.length > 0) {
+          rows.push({ kind: 'simple', titleKey, text: t });
         }
       } else {
         const subsections = block.subsections
           .map((sub) => ({
             ...sub,
-            text: stripSectionDisplayText(sub.text, links, keywords)
+            text: stripSectionDisplayText(sub.text, [], keywords)
           }))
           .filter((sub) => sub.text.trim().length > 0);
-        if (subsections.length === 0 && links.length === 0) return;
-        rows.push({ kind: 'nested', titleKey, subsections, imageLinks: links });
+        if (subsections.length === 0) return;
+        rows.push({ kind: 'nested', titleKey, subsections });
       }
     };
     pushPlain('discover.sectionIntroduction', s.introduction);
-    pushPlain(
-      'discover.sectionContext',
-      s.contexte,
-      s.contexteImageLinks,
-      s.contexteKeywords
-    );
-    pushRich('discover.sectionAnalysis', s.analyse, s.analyseImageLinks, s.analyseKeywords);
+    pushPlain('discover.sectionContext', s.contexte, s.contexteKeywords);
+    pushRich('discover.sectionAnalysis', s.analyse, s.analyseKeywords);
     pushPlain('discover.sectionConclusion', s.conclusion);
-    pushRich('discover.sectionExercise', s.exercice);
     return rows;
   }
 
@@ -3161,7 +3522,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     return parseDiscoverKeywords(this.pickFirst(o, keys));
   }
 
-  private parseSectionImageLinks(o: Record<string, unknown>, section: 'contexte' | 'analyse'): DiscoverImageLink[] {
+  private parseSectionImageLinks(o: Record<string, unknown>, section: 'contexte' | 'analyse') {
     const keys =
       section === 'contexte'
         ? [
@@ -3195,15 +3556,9 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
       introduction: this.coerceDiscoverSection(this.pickFirst(o, ['introduction', 'Introduction'])),
       contexte: contexteText,
       contexteKeywords: contexteKw,
-      contexteImageLinks: contexteLinks,
       analyse: this.parseRichBlock(this.pickFirst(o, ['analyse', 'Analyse', 'analysis']), 'analyse'),
       analyseKeywords: analyseKw,
-      analyseImageLinks: analyseLinks,
       conclusion: this.coerceDiscoverSection(this.pickFirst(o, ['conclusion', 'Conclusion'])),
-      exercice: this.parseRichBlock(
-        this.pickFirst(o, ['exercice', 'Exercice', 'exercise', 'exercises']),
-        'exercice'
-      )
     };
   }
 
@@ -3243,23 +3598,9 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
         introduction: this.coerceDiscoverSection(this.pickFirst(o, ['introduction', 'Introduction'])),
         contexte: stripSectionDisplayText(contexteRaw, contexteLinks, contexteKw),
         contexteKeywords: contexteKw,
-        contexteImageLinks: contexteLinks,
         analyse: this.parseRichBlock(analyseRaw, 'analyse'),
         analyseKeywords: analyseKw,
-        analyseImageLinks: analyseLinks,
         conclusion: this.coerceDiscoverSection(this.pickFirst(o, ['Conclusion', 'conclusion'])),
-        exercice: this.parseRichBlock(
-          this.pickFirst(o, [
-            'exercice',
-            'Exercice',
-            'EXERCICE',
-            'Exercise',
-            'exercise',
-            'Exercices',
-            'exercises'
-          ]),
-          'exercice'
-        )
       };
     }
     return null;
@@ -3272,10 +3613,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
       this.recordHasKeyCi(o, 'context') ||
       this.recordHasKeyCi(o, 'analyse') ||
       this.recordHasKeyCi(o, 'analysis') ||
-      this.recordHasKeyCi(o, 'conclusion') ||
-      this.recordHasKeyCi(o, 'exercice') ||
-      this.recordHasKeyCi(o, 'exercise') ||
-      this.recordHasKeyCi(o, 'exercises')
+      this.recordHasKeyCi(o, 'conclusion')
     );
   }
 
@@ -3304,7 +3642,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     return mode === 'plain' || mode === 'keyed';
   }
 
-  private parseSerializedRichBlock(o: Record<string, unknown>, parent?: 'analyse' | 'exercice'): DiscoverRichBlock | null {
+  private parseSerializedRichBlock(o: Record<string, unknown>): DiscoverRichBlock | null {
     if (o['mode'] === 'plain') {
       const textRaw = o['text'] ?? o['Text'] ?? o['body'] ?? '';
       return {
@@ -3336,10 +3674,10 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Analyse / Exercice : chaîne ou tableau → bloc plat ; objet → une sous-section par clé (titre = clé).
+   * Analyse : chaîne ou tableau → bloc plat ; objet → une sous-section par clé (titre = clé).
    * @param parent Permet d’éviter un sous-titre identique au titre de section (ex. clé « Analyse »).
    */
-  private parseRichBlock(raw: unknown, parent?: 'analyse' | 'exercice'): DiscoverRichBlock {
+  private parseRichBlock(raw: unknown, parent?: 'analyse'): DiscoverRichBlock {
     if (raw == null) return { mode: 'plain', text: '' };
     if (typeof raw === 'string' || typeof raw === 'number' || typeof raw === 'boolean') {
       return { mode: 'plain', text: this.coerceDiscoverSection(raw) };
@@ -3351,7 +3689,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
       return { mode: 'plain', text: this.coerceDiscoverSection(raw) };
     }
     const o = raw as Record<string, unknown>;
-    const serialized = this.parseSerializedRichBlock(o, parent);
+    const serialized = this.parseSerializedRichBlock(o);
     if (serialized) return serialized;
 
     const keys = Object.keys(o).filter((k) => o[k] != null);
@@ -3371,17 +3709,13 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /** Clé JSON qui reprend le nom de la section parente (affichage : pas de h4 en doublon). */
-  private isRedundantSubsectionKey(key: string, parent: 'analyse' | 'exercice' | undefined): boolean {
+  private isRedundantSubsectionKey(key: string, parent: 'analyse' | undefined): boolean {
     if (!parent) return false;
     const label = this.formatDiscoverSubsectionKey(key)
       .toLowerCase()
       .normalize('NFD')
       .replace(/\p{M}/gu, '');
-    const variants =
-      parent === 'analyse'
-        ? ['analyse', 'analysis']
-        : ['exercice', 'exercise', 'exercices', 'exercises'];
-    return variants.includes(label);
+    return ['analyse', 'analysis'].includes(label);
   }
 
   /**
@@ -3460,7 +3794,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     if (typeof raw === 'object') {
       const fromKnown = this.extractPropositionTextFromApi(raw);
       if (fromKnown.trim().length > 0) return fromKnown.trim();
-      /* Objet avec plusieurs champs texte (ex. Analyse / exercice structurés côté backend) : tout agréger. */
+      /* Objet avec plusieurs champs texte (ex. Analyse structurée côté backend) : tout agréger. */
       const o = raw as Record<string, unknown>;
       const parts: string[] = [];
       for (const key of Object.keys(o).sort()) {
@@ -3486,11 +3820,8 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     return (
       this.sectionTextHasContent(s.introduction) ||
       this.sectionTextHasContent(s.contexte) ||
-      s.contexteImageLinks.length > 0 ||
       this.richBlockHasContent(s.analyse) ||
-      s.analyseImageLinks.length > 0 ||
-      this.sectionTextHasContent(s.conclusion) ||
-      this.richBlockHasContent(s.exercice)
+      this.sectionTextHasContent(s.conclusion)
     );
   }
 
@@ -3547,6 +3878,11 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
   get currentQuestionSavedPropositions(): ReadonlyArray<SavedDiscoverPropositionEntry> {
     if (!this.selectedQuestionId) return [];
     return this.savedPropositionsByQuestionId[this.selectedQuestionId] ?? [];
+  }
+
+  get currentQuestionSavedChallenges(): ReadonlyArray<SavedChallengeExerciseSummary> {
+    if (!this.selectedQuestionId) return [];
+    return this.savedChallengesByQuestionId[this.selectedQuestionId] ?? [];
   }
 
   get canSaveDraft(): boolean {
@@ -3724,6 +4060,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
       this.savedPropositionsByQuestionId[questionId] = [];
       return;
     }
+    this.savedPropositionsLoadingInitial = true;
     this.loadingSavedPropositions = true;
     this.savedPropositionsError = '';
     this.api.getSavedDiscoverPropositionsByQuestion(idQuestion).subscribe({
@@ -3738,6 +4075,8 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
         };
       },
       error: (err: HttpErrorResponse) => {
+        this.loadingSavedPropositions = false;
+        this.savedPropositionsLoadingInitial = false;
         /* Endpoint absent côté backend (404) : on garde la page fonctionnelle sans bruit d'erreur bloquant. */
         if (err.status === 404) {
           this.savedPropositionsError = '';
@@ -3761,6 +4100,7 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       complete: () => {
         this.loadingSavedPropositions = false;
+        this.savedPropositionsLoadingInitial = false;
         if (this.selectedQuestionId === questionId) {
           this.syncPersonalNotesFromCurrentEntry();
         }
@@ -3984,11 +4324,6 @@ export class DiscoverComponent implements OnInit, AfterViewInit, OnDestroy {
     const n = Number(s);
     if (!Number.isInteger(n) || n <= 0) return null;
     return n;
-  }
-
-  private draftPayloadHasExercise(payload: SavedDiscoverPayload): boolean {
-    const structured = payload.discoveredStructured;
-    return structured != null && this.richBlockHasContent(structured.exercice);
   }
 
   private parseIntegerId(value: string): number | null {

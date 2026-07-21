@@ -98,6 +98,41 @@
       </svg>
     </a>
     <a
+      routerLink="/challenges"
+      routerLinkActive="transverse-rail__sticker--active"
+      class="transverse-rail__sticker"
+      [matTooltip]="'transverseRail.tooltipChallenges' | translate"
+      matTooltipClass="app-transverse-rail-tooltip"
+      matTooltipPosition="right"
+      matTooltipShowDelay="150"
+      [attr.aria-label]="'transverseRail.ariaChallenges' | translate"
+    >
+      <svg
+        class="transverse-rail__icon"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+        fill="none"
+        aria-hidden="true"
+        width="48"
+        height="48"
+      >
+        <path
+          d="M12 14h24v6H12v-6Zm0 10h10v16H12V24Zm14 0h10v16H26V24Z"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linejoin="round"
+          fill="currentColor"
+          fill-opacity="0.12"
+        />
+        <path
+          d="M18 30h4M18 34h6M30 30h4M30 34h2"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+    </a>
+    <a
       routerLink="/admin"
       routerLinkActive="transverse-rail__sticker--active"
       class="transverse-rail__sticker"

@@ -9,13 +9,13 @@ consultation/édition du détail, création assistée par IA, et suppression con
 
 ### Requirement: Filtre de discipline global
 Le système SHALL maintenir une discipline active partagée (id + label) via `DisciplineService`,
-persistée en localStorage, utilisée par Home, Dashboard et la barre transversale.
+persistée en localStorage, utilisée par Home, Discover, Défis et la barre transversale.
 
 #### Scenario: Sélection appliquant le filtre global
 - GIVEN la liste des disciplines
 - WHEN l'utilisateur sélectionne une discipline
 - THEN `DisciplineService` persiste son id et son label et une confirmation (snackbar) s'affiche
-- AND Home et Dashboard se rechargent filtrés sur cette discipline
+- AND Home et les vues filtrées par discipline se rechargent sur cette discipline
 
 #### Scenario: Sélection « toutes »
 - GIVEN une discipline sélectionnée

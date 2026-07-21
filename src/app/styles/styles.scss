@@ -784,3 +784,37 @@ body.dark-theme .resume-container {
     border-radius: 0 !important;
   }
 }
+
+/**
+ * Dialogue « Défi cognitif » depuis Découverte (panelClass: app-discover-challenge-dialog)
+ */
+.cdk-overlay-container .app-discover-challenge-dialog {
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 92vh;
+  }
+
+  .mat-mdc-dialog-content,
+  .mat-mdc-dialog-container .mat-mdc-dialog-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none !important;
+  }
+
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface {
+    overflow: visible;
+  }
+}
+
+.cdk-overlay-container .discover-challenge-dialog__mechanic-menu {
+  .mat-mdc-menu-content,
+  .mat-mdc-menu-panel {
+    max-width: min(22rem, 78vw);
+    padding: 0;
+  }
+}

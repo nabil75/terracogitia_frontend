@@ -9,7 +9,7 @@ Fichiers : `api/api.service.ts`, `shared/.../label-display.util.ts`,
 `shared/services/language.service.ts`.
 
 Domaines couverts : disciplines, thèmes/parcours/questions (dont dessin JSONB par `id_objet`),
-authentification, Discover, transcription et lecture audio.
+authentification, Discover, transcription et lecture audio, défis cognitifs et gamification.
 
 ## Requirements
 
@@ -73,6 +73,63 @@ et `getAudioFile` (blob) pour la barre `app-audio-recording-toolbar`.
 - GIVEN un identifiant audio serveur
 - WHEN `getAudioFile(id)` est appelé
 - THEN une requête `GET /themes/get_audio_file/{id}` est émise avec `responseType: 'blob'`
+
+### Requirement: Client API défis cognitifs
+Le système SHALL exposer dans `ApiService` les méthodes du domaine `/challenges` :
+catalogues (opérations cognitives, mécaniques, matrice, guidance pyramide), génération
+d'exercice, lecture d'exercice, soumission de tentative et profil gamification.
+
+#### Scenario: Catalogue des opérations
+- GIVEN la page cadre défis est affichée
+- WHEN le composant appelle `getCognitiveOperationsCatalog()`
+- THEN une requête `GET /challenges/catalog/cognitive-operations` est émise
+
+#### Scenario: Génération d'exercice
+- GIVEN un objet de connaissance, un niveau pyramide, une opération et une mécanique
+- WHEN `generateChallengeExercise(payload)` est appelé
+- THEN une requête `POST /challenges/generate` est émise avec le corps de génération
+  (`use_ai`, `lang` optionnels pour la génération Mistral)
+
+#### Scenario: Soumission de tentative
+- GIVEN un exercice joué côté client
+- WHEN `submitChallengeAttempt(payload)` est appelé
+- THEN une requête `POST /challenges/attempts` est émise avec actions apprenant et durée
+
+#### Scenario: Profil gamification
+- GIVEN un identifiant apprenant
+- WHEN `getChallengeGamificationProfile(idUser)` est appelé
+- THEN une requête `GET /challenges/gamification/profile?id_user=` est émise
+
+### Requirement: Client API Discover
+Le système SHALL exposer dans `ApiService` les méthodes du domaine Discover : génération de
+proposition (`getPropositionForQuestion`), sauvegarde et historique des propositions,
+notes sur la proposition courante (`upsertQuestionPropositionNotes`), timeline en cache
+(`getSubthemeTimeline`) et ordre logique (`ordreLogiqueQuestions` avec `legacy` et
+`forceRefresh` optionnels).
+
+#### Scenario: Notes sur proposition courante
+- GIVEN une question avec notes modifiées côté UI
+- WHEN `upsertQuestionPropositionNotes(idQuestion, notes)` est appelé
+- THEN une requête `PUT /discovering/question_proposition_notes/{id}` est émise avec `{ notes }`
+
+#### Scenario: Ordre logique enrichi
+- GIVEN un parcours et sa liste de questions
+- WHEN `ordreLogiqueQuestions(payload, { legacy: false })` est appelé
+- THEN une requête `POST /discovering/ordre_logique_questions?legacy=false` est émise
+
+#### Scenario: Sauvegarde et liste des défis par question
+- GIVEN un exercice généré depuis Discover
+- WHEN `saveChallengeExercise(idExercise)` puis `getSavedChallengeExercisesByQuestion(idQuestion)` sont appelés
+- THEN les requêtes `POST /challenges/exercises/{id}/save` et `GET /challenges/exercises/by-question/{id}/saved` sont émises
+
+### Requirement: Client API authentification
+Le système SHALL exposer `login`, `register`, `resetPassword`, `microsoftLoginUrl`, `getSession`
+et `logout` pour le domaine `/auth`, avec `withCredentials` sur les appels de session.
+
+#### Scenario: Connexion par email
+- GIVEN un couple email / mot de passe
+- WHEN `login(email, password)` est appelé
+- THEN une requête `POST /auth/login` est émise
 
 ### Requirement: Absence d'intercepteur et de configuration d'environnement
 Le système SHALL fonctionner sans intercepteur HTTP ni fichier d'environnement : la base URL

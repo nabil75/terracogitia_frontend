@@ -719,4 +719,344 @@ export class ApiService {
       responseType: 'blob',
     });
   }
+
+  // --- Défis cognitifs (challenge-evaluation) ---
+
+  getCognitiveOperationsCatalog() {
+    return this.http.get<CognitiveOperationCatalogItem[]>(
+      `${this.baseurl}/challenges/catalog/cognitive-operations`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  getGameMechanicsCatalog() {
+    return this.http.get<GameMechanicCatalogItem[]>(
+      `${this.baseurl}/challenges/catalog/game-mechanics`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  getChallengeCompatibilityMatrix() {
+    return this.http.get<ChallengeCompatibilityEntry[]>(
+      `${this.baseurl}/challenges/catalog/compatibility-matrix`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  getPyramidChallengeGuidance(level: string) {
+    return this.http.get<PyramidChallengeGuidance>(
+      `${this.baseurl}/challenges/catalog/pyramid-guidance/${level}`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  generateChallengeExercise(payload: GenerateChallengeExercisePayload) {
+    return this.http.post<ChallengeExerciseDto>(
+      `${this.baseurl}/challenges/generate`,
+      payload,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  getChallengeExercise(idExercise: number) {
+    return this.http.get<ChallengeExerciseDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  submitChallengeAttempt(payload: SubmitChallengeAttemptPayload) {
+    return this.http.post<ChallengeAttemptResultDto>(
+      `${this.baseurl}/challenges/attempts`,
+      payload,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  checkSortingLabPlacement(idExercise: number, itemId: string, categoryId: string) {
+    return this.http.post<SortingLabPlacementCheckDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/check-placement`,
+      { item_id: itemId, category_id: categoryId },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  checkKnowledgeBridgesLink(idExercise: number, sourceId: string, targetId: string) {
+    return this.http.post<KnowledgeBridgesLinkCheckDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/check-link`,
+      { source_id: sourceId, target_id: targetId },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  checkMissingFragmentPlacement(idExercise: number, gapId: string, fragmentId: string) {
+    return this.http.post<MissingFragmentCheckDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/check-fragment`,
+      { gap_id: gapId, fragment_id: fragmentId },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  checkTransformAtelierStep(idExercise: number, toolId: string, stepIndex: number) {
+    return this.http.post<TransformAtelierCheckDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/check-transform`,
+      { tool_id: toolId, step_index: stepIndex },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  getChallengeGamificationProfile(idUser?: number) {
+    const params = idUser != null ? new HttpParams().set('id_user', String(idUser)) : undefined;
+    return this.http.get<ChallengeGamificationProfile>(
+      `${this.baseurl}/challenges/gamification/profile`,
+      { headers: this.httpHeaders_json, params }
+    );
+  }
+
+  getSavedChallengeExercisesByQuestion(idQuestion: number) {
+    return this.http.get<SavedChallengeExerciseSummary[]>(
+      `${this.baseurl}/challenges/exercises/by-question/${idQuestion}/saved`
+    );
+  }
+
+  saveChallengeExercise(idExercise: number, title?: string) {
+    return this.http.post<SavedChallengeDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/save`,
+      { title, status: 'published' },
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  deleteSavedChallengeExercise(idExercise: number) {
+    return this.http.delete<void>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/saved`,
+      { headers: this.httpHeaders_json }
+    );
+  }
+
+  getMemoryReinforcementAvailable(idExercise: number) {
+    return this.http.get<{ available: boolean; pair_count: number }>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/memory-reinforcement/available`
+    );
+  }
+
+  createMemoryReinforcementExercise(idExercise: number, lang?: string) {
+    let params = new HttpParams();
+    if (lang) params = params.set('lang', lang);
+    return this.http.post<ChallengeExerciseDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/memory-reinforcement`,
+      {},
+      { headers: this.httpHeaders_json, params }
+    );
+  }
+
+  getInvestigationReinforcementAvailable(idExercise: number) {
+    return this.http.get<{ available: boolean; pair_count: number; explanation_question: boolean }>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/investigation-reinforcement/available`
+    );
+  }
+
+  createInvestigationReinforcementExercise(idExercise: number, lang?: string) {
+    let params = new HttpParams();
+    if (lang) params = params.set('lang', lang);
+    return this.http.post<ChallengeExerciseDto>(
+      `${this.baseurl}/challenges/exercises/${idExercise}/investigation-reinforcement`,
+      {},
+      { headers: this.httpHeaders_json, params }
+    );
+  }
+
+  getEvaluationReservoir(params?: {
+    id_user?: number;
+    knowledge_object_type?: string;
+    knowledge_object_id?: number;
+    limit?: number;
+  }) {
+    let httpParams = new HttpParams();
+    if (params?.id_user != null) httpParams = httpParams.set('id_user', String(params.id_user));
+    if (params?.knowledge_object_type) {
+      httpParams = httpParams.set('knowledge_object_type', params.knowledge_object_type);
+    }
+    if (params?.knowledge_object_id != null) {
+      httpParams = httpParams.set('knowledge_object_id', String(params.knowledge_object_id));
+    }
+    if (params?.limit != null) httpParams = httpParams.set('limit', String(params.limit));
+    return this.http.get<EvaluationReservoirRecord[]>(
+      `${this.baseurl}/challenges/evaluation-reservoir`,
+      { headers: this.httpHeaders_json, params: httpParams }
+    );
+  }
+}
+
+export interface CognitiveOperationCatalogItem {
+  key: string;
+  family: string;
+  label_fr: string;
+  label_en: string;
+  definition_fr: string;
+  definition_en: string;
+  evaluates_fr: string;
+  evaluates_en: string;
+  pyramid_levels: string[];
+  examples: Record<string, string>[];
+}
+
+export interface GameMechanicCatalogItem {
+  key: string;
+  label_fr: string;
+  label_en: string;
+  description_fr: string;
+  description_en: string;
+  advantages_fr: string;
+  limitations_fr: string;
+  compatible_operations: string[];
+  compatible_pyramid_levels: string[];
+}
+
+export interface ChallengeCompatibilityEntry {
+  operation: string;
+  mechanic: string;
+  score: number;
+}
+
+export interface PyramidChallengeGuidance {
+  pyramid_level: string;
+  operations: string[];
+  mechanics: string[];
+  challenge_types: string[];
+  indicators: string[];
+}
+
+export interface GenerateChallengeExercisePayload {
+  knowledge_object_type?: 'question' | 'subtheme' | 'concept' | 'theme';
+  knowledge_object_id: number;
+  pyramid_level: string;
+  cognitive_operation: string;
+  game_mechanic?: string;
+  auto_select_mechanic?: boolean;
+  difficulty?: number;
+  id_user?: number;
+  variant?: string;
+  use_ai?: boolean | null;
+  lang?: string;
+}
+
+export interface ChallengeExerciseDto {
+  id_exercise: number;
+  id_challenge?: number | null;
+  id_user?: number | null;
+  knowledge_object_type: string;
+  knowledge_object_id: number;
+  pyramid_level: string;
+  cognitive_operation: string;
+  game_mechanic: string;
+  difficulty: number;
+  content: Record<string, unknown>;
+  success_criteria: Record<string, unknown>;
+  status: string;
+  compatibility_score?: number | null;
+  is_first_for_question?: boolean;
+}
+
+export interface SavedChallengeExerciseSummary {
+  id_exercise: number;
+  id_challenge: number;
+  title: string;
+  game_mechanic: string;
+  cognitive_operation: string;
+  compatibility_score?: number | null;
+  is_first_for_question?: boolean;
+  saved_at?: string | null;
+}
+
+export interface SavedChallengeDto {
+  id_challenge: number;
+  title: string;
+  pyramid_level: string;
+  cognitive_operation: string;
+  game_mechanic: string;
+  knowledge_object_type: string;
+  knowledge_object_id: number;
+  difficulty: number;
+  status: string;
+}
+
+export interface EvaluationReservoirRecord {
+  id_record: number;
+  id_user?: number | null;
+  knowledge_object_type: string;
+  knowledge_object_id: number;
+  pyramid_level: string;
+  cognitive_operation: string;
+  game_mechanic: string;
+  compatibility_score: number;
+  is_first_challenge: boolean;
+  score: number;
+  passed: boolean;
+  xp_gained: number;
+  created_at?: string | null;
+}
+
+export interface SubmitChallengeAttemptPayload {
+  id_exercise: number;
+  learner_actions: Record<string, unknown>;
+  duration_ms?: number;
+  id_user?: number;
+}
+
+export interface ChallengeAttemptResultDto {
+  id_attempt: number;
+  id_evaluation: number;
+  score: number;
+  passed: boolean;
+  mastery_delta: number;
+  xp_gained: number;
+  feedback: Record<string, string>;
+  criteria_results: Record<string, unknown>;
+}
+
+export interface SortingLabPlacementCheckDto {
+  correct: boolean;
+  hint_fr: string;
+  hint_en: string;
+  feedback_mode: string;
+  mode: string;
+}
+
+export interface KnowledgeBridgesLinkCheckDto {
+  correct: boolean;
+  hint_fr: string;
+  hint_en: string;
+  feedback_mode: string;
+}
+
+export interface MissingFragmentCheckDto {
+  correct: boolean;
+  hint_fr: string;
+  hint_en: string;
+  feedback_mode: string;
+}
+
+export interface TransformAtelierCheckDto {
+  correct: boolean;
+  preserves_invariant: boolean;
+  result_fr: string;
+  result_en: string;
+  hint_fr: string;
+  hint_en: string;
+  feedback_mode: string;
+  next_step_index: number;
+  complete: boolean;
+}
+
+export interface ChallengeGamificationProfile {
+  xp_total: number;
+  level: number;
+  streak_days: number;
+  achievements?: {
+    achievement_key: string;
+    unlocked_at: string;
+    title_fr: string;
+    title_en: string;
+  }[];
 }

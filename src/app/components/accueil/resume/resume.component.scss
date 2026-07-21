@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "../../../styles/themes/mixins" as *;
 
 .resume-container {
@@ -161,10 +162,10 @@ $resume-tree-depths: (
 
 @each $depth, $sizes in $resume-tree-depths {
   .resume-tree-row--depth-#{$depth} {
-    --resume-tree-toggle-size: #{map-get($sizes, toggle)};
-    --resume-tree-toggle-icon-size: #{map-get($sizes, toggle-icon)};
-    --resume-tree-icon-wrap-size: #{map-get($sizes, wrap)};
-    --resume-tree-icon-size: #{map-get($sizes, icon)};
+    --resume-tree-toggle-size: #{map.get($sizes, toggle)};
+    --resume-tree-toggle-icon-size: #{map.get($sizes, toggle-icon)};
+    --resume-tree-icon-wrap-size: #{map.get($sizes, wrap)};
+    --resume-tree-icon-size: #{map.get($sizes, icon)};
   }
 }
 

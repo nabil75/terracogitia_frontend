@@ -42,8 +42,8 @@ existe mais n'est pas lié depuis la barre transversale.
 
 ### Requirement: Barre de navigation transversale
 Le système SHALL afficher une barre transversale fixe proposant les liens vers `/home`,
-`/discipline`, `/resume`, `/admin`, ainsi que les bascules de langue (FR/EN) et de thème
-(clair/sombre), et surligner la route active.
+`/discipline`, `/resume`, `/challenges`, `/admin`, ainsi que les bascules de langue (FR/EN) et
+de thème (clair/sombre), et surligner la route active.
 
 Les routes `/review`, `/dashboard` et `/evaluation-avancee` (ancien dispositif
 d'évaluation par questions) ne SHALL plus exister.
